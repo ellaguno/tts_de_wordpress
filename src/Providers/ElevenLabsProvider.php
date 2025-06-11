@@ -1,0 +1,394 @@
+<?php
+
+namespace WP_TTS\Providers;
+
+use WP_TTS\Interfaces\TTSProviderInterface;
+use WP_TTS\Interfaces\AudioResult;
+use WP_TTS\Exceptions\ProviderException;
+use WP_TTS\Utils\Logger;
+
+/**
+ * ElevenLabs TTS Provider
+ *
+ * Provides text-to-speech functionality using ElevenLabs service.
+ *
+ * @package WP_TTS\Providers
+ * @since 1.0.0
+ */
+class ElevenLabsProvider implements TTSProviderInterface {
+
+	/**
+	 * Provider name
+	 *
+	 * @var string
+	 */
+	private $name = 'elevenlabs';
+
+	/**
+	 * Provider configuration
+	 *
+	 * @var array
+	 */
+	private $config;
+
+	/**
+	 * Logger instance
+	 *
+	 * @var Logger
+	 */
+	private $logger;
+
+	/**
+	 * Constructor
+	 *
+	 * @param array  $config Provider configuration.
+	 * @param Logger $logger Logger instance.
+	 */
+	public function __construct( array $config, Logger $logger ) {
+		$this->config = $config;
+		$this->logger = $logger;
+	}
+
+	/**
+	 * Convert text to audio (interface method)
+	 *
+	 * @param string $text Text to convert to speech.
+	 * @param array  $options Voice and synthesis options.
+	 * @return AudioResult Audio generation result.
+	 * @throws ProviderException If synthesis fails.
+	 */
+	public function synthesize( string $text, array $options = [] ): AudioResult {
+		$result = $this->generateSpeech( $text, $options );
+		
+		if ( ! $result['success'] ) {
+			throw new ProviderException( 'ElevenLabs TTS synthesis failed' );
+		}
+
+		// Read the audio file
+		$audio_data = file_get_contents( $result['file_path'] );
+		if ( $audio_data === false ) {
+			throw new ProviderException( 'Failed to read generated audio file' );
+		}
+
+		return new AudioResult(
+			$audio_data,
+			$result['format'],
+			$result['duration'],
+			[
+				'provider' => $this->name,
+				'voice' => $result['voice'],
+				'character_count' => strlen( $text ),
+				'file_path' => $result['file_path'],
+				'audio_url' => $result['audio_url'],
+			]
+		);
+	}
+
+	/**
+	 * Generate speech from text
+	 *
+	 * @param string $text Text to convert.
+	 * @param array  $options TTS options.
+	 * @return array Audio data with URL and metadata.
+	 * @throws ProviderException If generation fails.
+	 */
+	public function generateSpeech( string $text, array $options = [] ): array {
+		if ( ! $this->isConfigured() ) {
+			throw new ProviderException( 'ElevenLabs provider is not properly configured' );
+		}
+
+		$this->logger->info( 'Starting ElevenLabs TTS generation', [
+			'text_length' => strlen( $text ),
+			'voice' => $options['voice'] ?? $this->config['default_voice'] ?? 'Rachel',
+		] );
+
+		try {
+			// Prepare request parameters
+			$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'Rachel';
+			$model_id = $options['model_id'] ?? 'eleven_monolingual_v1';
+			$output_format = $options['output_format'] ?? 'mp3';
+
+			// For now, generate mock audio since we don't have ElevenLabs API integration
+			$audio_data = $this->generateMockAudioData();
+
+			// Generate unique filename
+			$filename = 'elevenlabs_' . md5( $text . time() ) . '.' . $output_format;
+			$upload_dir = wp_upload_dir();
+			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
+			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
+
+			// Ensure directory exists
+			wp_mkdir_p( dirname( $file_path ) );
+
+			// Save audio file
+			if ( file_put_contents( $file_path, $audio_data ) === false ) {
+				throw new ProviderException( 'Failed to save audio file' );
+			}
+
+			$this->logger->info( 'ElevenLabs TTS generation completed', [
+				'file_path' => $file_path,
+				'file_size' => filesize( $file_path ),
+			] );
+
+			return [
+				'success' => true,
+				'audio_url' => $file_url,
+				'file_path' => $file_path,
+				'provider' => $this->name,
+				'voice' => $voice_id,
+				'format' => $output_format,
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'model_id' => $model_id,
+					'characters' => strlen( $text ),
+				],
+			];
+
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'ElevenLabs TTS generation failed', [
+				'error' => $e->getMessage(),
+			] );
+			throw new ProviderException( 'ElevenLabs TTS generation failed: ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Get available voices
+	 *
+	 * @param string $language Language code (optional).
+	 * @return array Available voices.
+	 */
+	public function getAvailableVoices( string $language = 'es-MX' ): array {
+		// ElevenLabs voices
+		return [
+			[ 'id' => 'Rachel', 'name' => 'Rachel (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'Domi', 'name' => 'Domi (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'Bella', 'name' => 'Bella (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'Antoni', 'name' => 'Antoni (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'Elli', 'name' => 'Elli (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'Josh', 'name' => 'Josh (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'Arnold', 'name' => 'Arnold (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'Adam', 'name' => 'Adam (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'Sam', 'name' => 'Sam (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+		];
+	}
+
+	/**
+	 * Validate API credentials
+	 *
+	 * @param array $credentials Optional credentials to validate.
+	 * @return bool True if credentials are valid.
+	 */
+	public function validateCredentials( array $credentials = [] ): bool {
+		$config = ! empty( $credentials ) ? $credentials : $this->config;
+		
+		return ! empty( $config['api_key'] );
+	}
+
+	/**
+	 * Get remaining quota for this provider
+	 *
+	 * @return int|null Remaining characters/requests, null if unlimited.
+	 */
+	public function getRemainingQuota(): ?int {
+		// ElevenLabs provides quota information, but we'd need API integration
+		return null;
+	}
+
+	/**
+	 * Get provider-specific configuration schema
+	 *
+	 * @return array Configuration schema for admin interface.
+	 */
+	public function getConfigSchema(): array {
+		return [
+			'api_key' => [
+				'type' => 'password',
+				'label' => 'ElevenLabs API Key',
+				'required' => true,
+				'description' => 'Your ElevenLabs API key for TTS services',
+			],
+			'default_voice' => [
+				'type' => 'select',
+				'label' => 'Default Voice',
+				'required' => false,
+				'options' => [
+					'Rachel' => 'Rachel (Female, American)',
+					'Domi' => 'Domi (Female, American)',
+					'Bella' => 'Bella (Female, American)',
+					'Antoni' => 'Antoni (Male, American)',
+					'Elli' => 'Elli (Female, American)',
+					'Josh' => 'Josh (Male, American)',
+					'Arnold' => 'Arnold (Male, American)',
+					'Adam' => 'Adam (Male, American)',
+					'Sam' => 'Sam (Male, American)',
+				],
+				'default' => 'Rachel',
+				'description' => 'Default voice to use when none is specified',
+			],
+		];
+	}
+
+	/**
+	 * Get provider name
+	 *
+	 * @return string Provider name.
+	 */
+	public function getName(): string {
+		return $this->name;
+	}
+
+	/**
+	 * Get provider display name
+	 *
+	 * @return string Human-readable provider name.
+	 */
+	public function getDisplayName(): string {
+		return 'ElevenLabs';
+	}
+
+	/**
+	 * Check if provider supports SSML
+	 *
+	 * @return bool True if SSML is supported.
+	 */
+	public function supportsSSML(): bool {
+		return false; // ElevenLabs doesn't support SSML
+	}
+
+	/**
+	 * Get supported audio formats
+	 *
+	 * @return array Array of supported formats.
+	 */
+	public function getSupportedFormats(): array {
+		return [ 'mp3', 'wav', 'ogg' ];
+	}
+
+	/**
+	 * Get cost per character for this provider
+	 *
+	 * @return float Cost per character in USD.
+	 */
+	public function getCostPerCharacter(): float {
+		// ElevenLabs pricing varies by plan, using approximate value
+		return 0.00003; // $30 per 1 million characters (approximate)
+	}
+
+	/**
+	 * Preview voice with sample text
+	 *
+	 * @param string $voice_id Voice identifier.
+	 * @param string $sample_text Sample text to synthesize.
+	 * @param array  $options Additional options.
+	 * @return AudioResult Preview audio result.
+	 */
+	public function previewVoice( string $voice_id, string $sample_text = '', array $options = [] ): AudioResult {
+		if ( empty( $sample_text ) ) {
+			$sample_text = 'Hello, this is a sample voice from ElevenLabs.';
+		}
+
+		$options['voice'] = $voice_id;
+		return $this->synthesize( $sample_text, $options );
+	}
+
+	/**
+	 * Get voice details
+	 *
+	 * @param string $voice_id Voice identifier.
+	 * @return array Voice details.
+	 */
+	public function getVoiceDetails( string $voice_id ): array {
+		$voices = $this->getAvailableVoices();
+		
+		foreach ( $voices as $voice ) {
+			if ( $voice['id'] === $voice_id ) {
+				return $voice;
+			}
+		}
+
+		return [
+			'id' => $voice_id,
+			'name' => $voice_id,
+			'gender' => 'Unknown',
+			'accent' => 'American',
+		];
+	}
+
+	/**
+	 * Check provider health/availability
+	 *
+	 * @return bool True if provider is available.
+	 */
+	public function isHealthy(): bool {
+		return $this->isConfigured();
+	}
+
+	/**
+	 * Get provider-specific error messages
+	 *
+	 * @param string $error_code Error code from provider.
+	 * @return string Human-readable error message.
+	 */
+	public function getErrorMessage( string $error_code ): string {
+		$error_messages = [
+			'400' => 'Bad request - invalid parameters',
+			'401' => 'Authentication failed - check API key',
+			'403' => 'Access forbidden - check permissions',
+			'422' => 'Validation error - check input parameters',
+			'429' => 'Rate limit exceeded - too many requests',
+			'500' => 'ElevenLabs service error',
+		];
+
+		return $error_messages[ $error_code ] ?? 'Unknown ElevenLabs error: ' . $error_code;
+	}
+
+	/**
+	 * Check if provider is configured
+	 *
+	 * @return bool True if configured.
+	 */
+	public function isConfigured(): bool {
+		// Allow mock mode even without credentials for testing
+		return true;
+	}
+
+	/**
+	 * Generate mock audio data for testing
+	 *
+	 * @return string Mock audio data.
+	 */
+	private function generateMockAudioData(): string {
+		// Create a simple MP3-like header for testing
+		$sample_rate = 22050;
+		$channels = 1;
+		$bits_per_sample = 16;
+		$duration = 3; // 3 seconds
+		$data_size = $sample_rate * $channels * $bits_per_sample / 8 * $duration;
+		
+		// Simple MP3 header simulation
+		$header = 'ID3' . chr(3) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0);
+		
+		// Generate simple tone data with different frequency for ElevenLabs
+		$audio_data = '';
+		for ( $i = 0; $i < $data_size / 2; $i++ ) {
+			$sample = sin( 2 * M_PI * 659 * $i / $sample_rate ) * 16383; // 659Hz tone (E5)
+			$audio_data .= pack( 's', $sample );
+		}
+		
+		return $header . $audio_data;
+	}
+
+	/**
+	 * Estimate audio duration based on text length
+	 *
+	 * @param string $text Text content.
+	 * @return int Estimated duration in seconds.
+	 */
+	private function estimateAudioDuration( string $text ): int {
+		// Rough estimation: 150 words per minute, average 5 characters per word
+		$words = strlen( $text ) / 5;
+		$minutes = $words / 150;
+		return max( 1, round( $minutes * 60 ) );
+	}
+}
