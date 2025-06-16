@@ -25,7 +25,7 @@ $defaults = $config->getDefaults();
 
 // If no providers are enabled, show default providers
 if (empty($enabled_providers)) {
-    $enabled_providers = ['google', 'openai', 'elevenlabs', 'aws'];
+    $enabled_providers = ['google', 'openai', 'elevenlabs', 'azure_tts', 'amazon_polly'];
 }
 ?>
 

@@ -526,10 +526,8 @@ class TTSService {
 						$config = get_option( 'wp_tts_config', [] );
 						$provider_config = $config['providers']['azure_tts'] ?? [];
 						
-						if ( ! empty( $provider_config['subscription_key'] ) &&
-							 ! empty( $provider_config['region'] ) ) {
-							return new \WP_TTS\Providers\AzureTTSProvider( $provider_config );
-						}
+						// Always create instance, even without full configuration (for mock mode)
+						return new \WP_TTS\Providers\AzureTTSProvider( $provider_config, $this->logger );
 					}
 					return null;
 					
