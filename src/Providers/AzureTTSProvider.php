@@ -41,54 +41,41 @@ class AzureTTSProvider implements TTSProviderInterface {
 	/**
 	 * Constructor
 	 *
-	 * @param array $config Provider configuration.
+	 * @param array  $config Provider configuration.
+	 * @param Logger $logger Logger instance.
 	 */
-	public function __construct( array $config ) {
+	public function __construct( array $config, Logger $logger ) {
 		$this->config = $config;
-		$this->logger = new Logger();
+		$this->logger = $logger;
 		
 		// Set endpoint based on region
 		$region = $config['region'] ?? 'eastus';
 		$this->endpoint_base = "https://{$region}.tts.speech.microsoft.com";
-		
-		$this->validateConfig();
 	}
 
-	/**
-	 * Validate provider configuration
-	 *
-	 * @throws ProviderException If configuration is invalid.
-	 */
-	private function validateConfig(): void {
-		$required_fields = [ 'subscription_key', 'region' ];
-		
-		foreach ( $required_fields as $field ) {
-			if ( empty( $this->config[ $field ] ) ) {
-				throw new ProviderException( "Azure TTS: Missing required field '{$field}'" );
-			}
-		}
-	}
 
 	/**
 	 * Generate speech from text
 	 *
 	 * @param string $text Text to convert to speech.
-	 * @param string $voice_id Voice ID to use.
-	 * @param array  $options Additional options.
+	 * @param array  $options Additional options including voice.
 	 * @return array Result array with success status and audio URL.
 	 * @throws ProviderException If generation fails.
 	 */
-	public function generateSpeech( string $text, string $voice_id = '', array $options = [] ): array {
+	public function generateSpeech( string $text, array $options = [] ): array {
+		if ( ! $this->isConfigured() ) {
+			$this->logger->error( 'Azure TTS provider is not configured. Subscription key or region is missing.' );
+			throw new ProviderException( 'Azure TTS provider is not properly configured (subscription key or region missing)' );
+		}
+
 		try {
+			// Get voice from options or use default
+			$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-MX-DaliaNeural');
+
 			$this->logger->info( 'Azure TTS: Starting speech generation', [
 				'text_length' => strlen( $text ),
 				'voice_id' => $voice_id
 			] );
-
-			// Use default voice if none specified
-			if ( empty( $voice_id ) ) {
-				$voice_id = $this->config['default_voice'] ?? 'es-MX-DaliaNeural';
-			}
 
 			// Get access token
 			$access_token = $this->getAccessToken();
@@ -118,15 +105,20 @@ class AzureTTSProvider implements TTSProviderInterface {
 			return [
 				'success' => true,
 				'audio_url' => $audio_url,
+				'file_path' => $this->getFilePathFromUrl( $audio_url ),
 				'provider' => 'azure_tts',
-				'voice_id' => $voice_id,
-				'duration' => 0, // Azure doesn't provide duration in response
+				'voice' => $voice_id,
+				'format' => 'mp3',
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'characters' => strlen( $text ),
+				],
 			];
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Azure TTS: Speech generation failed', [
 				'error' => $e->getMessage(),
-				'voice_id' => $voice_id
+				'voice_id' => $voice_id ?? 'unknown'
 			] );
 			
 			throw new ProviderException( 'Azure TTS generation failed: ' . $e->getMessage() );
@@ -507,6 +499,39 @@ class AzureTTSProvider implements TTSProviderInterface {
 	 */
 	public function getName(): string {
 		return 'Microsoft Azure TTS';
+	}
+
+	/**
+	 * Check if provider is configured
+	 *
+	 * @return bool True if configured.
+	 */
+	public function isConfigured(): bool {
+		return ! empty( $this->config['subscription_key'] ) && ! empty( $this->config['region'] );
+	}
+
+	/**
+	 * Get file path from URL
+	 *
+	 * @param string $url File URL.
+	 * @return string File path.
+	 */
+	private function getFilePathFromUrl( string $url ): string {
+		$upload_dir = wp_upload_dir();
+		return str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $url );
+	}
+
+	/**
+	 * Estimate audio duration based on text length
+	 *
+	 * @param string $text Text content.
+	 * @return int Estimated duration in seconds.
+	 */
+	private function estimateAudioDuration( string $text ): int {
+		// Rough estimation: 150 words per minute, average 5 characters per word
+		$words = strlen( $text ) / 5;
+		$minutes = $words / 150;
+		return max( 1, round( $minutes * 60 ) );
 	}
 
 	/**
