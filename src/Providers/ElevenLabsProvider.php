@@ -99,7 +99,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 		}
 		
 		$api_key = $this->config['api_key'];
-		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'Rachel'); // Default to Rachel if nothing else is set
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'pNInz6obpgDQGcFmaJgB'); // Default to Adam voice if nothing else is set
 		$model_id = $options['model_id'] ?? $this->config['default_model'] ?? 'eleven_multilingual_v2'; // Or 'eleven_monolingual_v1' etc.
 		$output_format = 'mp3_44100_128'; // ElevenLabs specific format for mp3
 		
@@ -210,18 +210,82 @@ class ElevenLabsProvider implements TTSProviderInterface {
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
-		// ElevenLabs voices
+		// Try to get real voices from API first
+		$api_voices = $this->fetchVoicesFromAPI();
+		if (!empty($api_voices)) {
+			return $api_voices;
+		}
+		
+		// Fallback to common ElevenLabs voice IDs (more likely to exist)
 		return [
-			[ 'id' => 'Rachel', 'name' => 'Rachel (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
-			[ 'id' => 'Domi', 'name' => 'Domi (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
-			[ 'id' => 'Bella', 'name' => 'Bella (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
-			[ 'id' => 'Antoni', 'name' => 'Antoni (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
-			[ 'id' => 'Elli', 'name' => 'Elli (Female, American)', 'gender' => 'Female', 'accent' => 'American' ],
-			[ 'id' => 'Josh', 'name' => 'Josh (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
-			[ 'id' => 'Arnold', 'name' => 'Arnold (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
-			[ 'id' => 'Adam', 'name' => 'Adam (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
-			[ 'id' => 'Sam', 'name' => 'Sam (Male, American)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'pNInz6obpgDQGcFmaJgB', 'name' => 'Adam (Male, Deep)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'EXAVITQu4vr4xnSDxMaL', 'name' => 'Bella (Female, Young)', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'VR6AewLTigWG4xSOukaG', 'name' => 'Arnold (Male, Middle-aged)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'TxGEqnHWrfWFTfGW9XjX', 'name' => 'Josh (Male, Young)', 'gender' => 'Male', 'accent' => 'American' ],
+			[ 'id' => 'rSwN5qhhs7d4JwSEc2T4', 'name' => 'Generic Voice 1', 'gender' => 'Female', 'accent' => 'American' ],
+			[ 'id' => 'bIHbv24MWmeRgasZH58o', 'name' => 'Generic Voice 2', 'gender' => 'Male', 'accent' => 'American' ],
 		];
+	}
+
+	/**
+	 * Fetch voices from ElevenLabs API
+	 *
+	 * @return array Array of voices or empty array on failure.
+	 */
+	private function fetchVoicesFromAPI(): array {
+		if (!$this->isConfigured()) {
+			return [];
+		}
+
+		try {
+			$api_url = 'https://api.elevenlabs.io/v1/voices';
+			
+			$response = wp_remote_get( $api_url, [
+				'headers' => [
+					'Accept' => 'application/json',
+					'xi-api-key' => $this->config['api_key'],
+				],
+				'timeout' => 10,
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				$this->logger->warning( 'Failed to fetch voices from ElevenLabs API', [ 'error' => $response->get_error_message() ] );
+				return [];
+			}
+
+			$response_code = wp_remote_retrieve_response_code( $response );
+			if ( $response_code !== 200 ) {
+				$this->logger->warning( 'ElevenLabs voices API returned non-200 status', [ 'status' => $response_code ] );
+				return [];
+			}
+
+			$body = wp_remote_retrieve_body( $response );
+			$data = json_decode( $body, true );
+
+			if ( !isset( $data['voices'] ) || !is_array( $data['voices'] ) ) {
+				$this->logger->warning( 'Invalid voices response from ElevenLabs API' );
+				return [];
+			}
+
+			$voices = [];
+			foreach ( $data['voices'] as $voice ) {
+				if ( isset( $voice['voice_id'], $voice['name'] ) ) {
+					$voices[] = [
+						'id' => $voice['voice_id'],
+						'name' => $voice['name'],
+						'category' => $voice['category'] ?? 'Unknown',
+						'accent' => 'ElevenLabs',
+					];
+				}
+			}
+
+			$this->logger->info( 'Successfully fetched voices from ElevenLabs API', [ 'count' => count( $voices ) ] );
+			return $voices;
+
+		} catch ( \Exception $e ) {
+			$this->logger->warning( 'Exception while fetching ElevenLabs voices', [ 'error' => $e->getMessage() ] );
+			return [];
+		}
 	}
 
 	/**
@@ -264,7 +328,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 				'label' => 'Default Voice ID',
 				'required' => true,
 				'options' => $this->getSimplifiedVoiceList(), // Dynamically populate or keep a static list
-				'default' => 'Rachel', // A common default voice
+				'default' => 'pNInz6obpgDQGcFmaJgB', // Adam voice (more likely to exist)
 				'description' => 'Default ElevenLabs voice ID. Find IDs via ElevenLabs documentation or API.',
 			],
 			'default_model' => [
