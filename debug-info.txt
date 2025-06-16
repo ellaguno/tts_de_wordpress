@@ -1,0 +1,59 @@
+INSTRUCCIONES DE DEPURACIÓN - Plugin WordPress TTS
+==================================================
+
+Si tienes problemas al activar el plugin, sigue estos pasos:
+
+1. VERIFICAR REQUISITOS:
+   - WordPress 5.0 o superior
+   - PHP 7.4 o superior
+   - Permisos de escritura en wp-content/uploads/
+
+2. ACTIVACIÓN MANUAL (si hay errores):
+   a) Descomprime el ZIP en wp-content/plugins/
+   b) Ve a Plugins en WordPress Admin
+   c) Busca "WordPress Text-to-Speech"
+   d) Haz clic en "Activar"
+
+3. SI AÚN HAY ERRORES:
+   a) Habilita WP_DEBUG en wp-config.php:
+      define('WP_DEBUG', true);
+      define('WP_DEBUG_LOG', true);
+   
+   b) Revisa el log de errores en:
+      /wp-content/debug.log
+
+4. ERRORES COMUNES Y SOLUCIONES:
+
+   Error: "Class not found"
+   - Asegúrate de que todos los archivos se subieron correctamente
+   - Verifica permisos de archivo (644 para archivos, 755 para directorios)
+
+   Error: "Permission denied"
+   - Cambia permisos: chmod 755 wp-content/plugins/wp-tts-plugin/
+   - Asegúrate de que wp-content/uploads/ sea escribible
+
+   Error: "PHP version"
+   - Actualiza PHP a versión 7.4 o superior
+
+5. PRUEBA BÁSICA:
+   Una vez activado, ve a:
+   WordPress Admin → Herramientas → TTS Tools
+   
+   Escribe "Hola mundo" y haz clic en "Generate Test Audio"
+   Debería generar un archivo de audio de prueba.
+
+6. CONTACTO:
+   Si persisten los problemas, contacta con:
+   - Email: [tu-email]
+   - GitHub: https://github.com/ellaguno/tts_de_wordpress
+
+ESTRUCTURA DEL PLUGIN:
+======================
+wp-tts-plugin/
+├── wp-tts-plugin.php (archivo principal)
+├── src/ (código fuente)
+├── assets/ (CSS y JS)
+├── templates/ (plantillas)
+└── languages/ (traducciones)
+
+El plugin funciona en modo MOCK por defecto, así que debería generar archivos de audio de prueba sin necesidad de configurar APIs.

@@ -45,10 +45,10 @@ class AmazonPollyProvider implements TTSProviderInterface {
 	 * @param Logger $logger      Logger instance.
 	 */
 	public function __construct( array $credentials, Logger $logger ) {
-		$this->credentials = $credentials;
+		$this->credentials = $credentials; // These are expected to be like ['access_key' => ..., 'secret_key' => ..., 'region' => ...]
 		$this->logger      = $logger;
 	}
-
+	
 	/**
 	 * Get provider name
 	 *
@@ -57,17 +57,18 @@ class AmazonPollyProvider implements TTSProviderInterface {
 	public function getName(): string {
 		return $this->name;
 	}
-
+	
 	/**
 	 * Check if provider is configured
 	 *
 	 * @return bool True if configured.
 	 */
 	public function isConfigured(): bool {
-		// Allow mock mode even without credentials for testing
-		return true;
+		return ! empty( $this->credentials['access_key'] ) &&
+			   ! empty( $this->credentials['secret_key'] ) &&
+			   ! empty( $this->credentials['region'] );
 	}
-
+	
 	/**
 	 * Generate speech from text
 	 *
@@ -78,44 +79,69 @@ class AmazonPollyProvider implements TTSProviderInterface {
 	 */
 	public function generateSpeech( string $text, array $options = [] ): array {
 		if ( ! $this->isConfigured() ) {
-			throw new ProviderException( 'Amazon Polly provider is not properly configured' );
+			$this->logger->error( 'Amazon Polly provider is not configured. Credentials missing.' );
+			throw new ProviderException( 'Amazon Polly provider is not properly configured (credentials missing)' );
 		}
+
+		if ( ! class_exists( '\Aws\Polly\PollyClient' ) ) {
+			$this->logger->error( 'AWS SDK for PHP (Polly) not found. Please install it via Composer.' );
+			throw new ProviderException( 'AWS SDK for PHP (Polly) not found. Run "composer require aws/aws-sdk-php".' );
+		}
+		
+		$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'Joanna'; // Assuming $this->config is populated by TTSService
+		$output_format = $options['output_format'] ?? 'mp3'; // Polly supports mp3, ogg_vorbis, pcm
+		$engine = $options['engine'] ?? $this->config['default_engine'] ?? 'standard'; // 'standard' or 'neural'
+		// SampleRate is often dictated by the voice/engine, but can be specified.
+		// For mp3, common rates are 22050, 16000, 8000. For neural, often higher.
+		$sample_rate = $options['sample_rate'] ?? $this->config['default_sample_rate'] ?? '22050';
+
 
 		$this->logger->info( 'Starting Amazon Polly TTS generation', [
 			'text_length' => strlen( $text ),
-			'voice' => $options['voice'] ?? 'Joanna',
+			'voice' => $voice_id,
+			'engine' => $engine,
+			'output_format' => $output_format,
 		] );
-
+		
 		try {
-			// Prepare request parameters
-			$voice_id = $options['voice'] ?? 'Joanna';
-			$output_format = $options['output_format'] ?? 'mp3';
-			$sample_rate = $options['sample_rate'] ?? '22050';
-			$engine = $options['engine'] ?? 'standard';
+			$pollyClient = new \Aws\Polly\PollyClient( [
+				'version'     => 'latest',
+				'region'      => $this->credentials['region'],
+				'credentials' => [
+					'key'    => $this->credentials['access_key'],
+					'secret' => $this->credentials['secret_key'],
+				],
+			] );
 
-			// Build request data
-			$request_data = [
-				'Text' => $text,
-				'VoiceId' => $voice_id,
+			$request_args = [
+				'Text'         => $text,
 				'OutputFormat' => $output_format,
-				'SampleRate' => $sample_rate,
-				'Engine' => $engine,
+				'VoiceId'      => $voice_id,
+				'Engine'       => $engine,
+				// 'SampleRate' => $sample_rate, // Only for PCM or if specific control needed
 			];
+			if ($output_format === 'pcm') { // SampleRate is required for PCM
+		              $request_args['SampleRate'] = $sample_rate;
+		          }
 
-			// Add SSML support if needed
+
 			if ( isset( $options['text_type'] ) && $options['text_type'] === 'ssml' ) {
-				$request_data['TextType'] = 'ssml';
+				$request_args['TextType'] = 'ssml';
 			}
+			
+			$this->logger->debug( 'Amazon Polly API Request arguments', $request_args);
 
-			// Make API request
-			$response = $this->makePollyRequest( 'synthesize-speech', $request_data );
-
-			if ( ! $response || ! isset( $response['AudioStream'] ) ) {
-				throw new ProviderException( 'Invalid response from Amazon Polly' );
+			$result = $pollyClient->synthesizeSpeech( $request_args );
+			
+			$audio_stream = $result->get( 'AudioStream' );
+			if ( ! $audio_stream ) {
+				$this->logger->error( 'Invalid response from Amazon Polly: No AudioStream.', ['result' => $result]);
+				throw new ProviderException( 'Invalid response from Amazon Polly: No AudioStream' );
 			}
-
+			$audio_data = $audio_stream->getContents();
+			
 			// Generate unique filename
-			$filename = 'polly_' . md5( $text . time() ) . '.' . $output_format;
+			$filename = 'polly_' . md5( $text . $voice_id . $engine . time() ) . '.' . $output_format;
 			$upload_dir = wp_upload_dir();
 			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
 			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
@@ -124,10 +150,10 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			wp_mkdir_p( dirname( $file_path ) );
 
 			// Save audio file
-			if ( file_put_contents( $file_path, $response['AudioStream'] ) === false ) {
+			if ( file_put_contents( $file_path, $audio_data ) === false ) { // Use $audio_data here
 				throw new ProviderException( 'Failed to save audio file' );
 			}
-
+			
 			$this->logger->info( 'Amazon Polly TTS generation completed', [
 				'file_path' => $file_path,
 				'file_size' => filesize( $file_path ),
@@ -455,63 +481,47 @@ class AmazonPollyProvider implements TTSProviderInterface {
 	 * @throws ProviderException If request fails.
 	 */
 	private function makePollyRequest( string $action, array $parameters ): array {
-		// For now, return mock response since we don't have AWS SDK
-		// In production, this would use AWS SDK for PHP
-		
-		if ( $action === 'describe-voices' ) {
-			return [
-				'Voices' => $this->getAvailableVoices(),
-			];
+		if ( ! $this->isConfigured() ) {
+			$this->logger->error('[AmazonPollyProvider::makePollyRequest] Not configured.');
+			throw new ProviderException( 'Amazon Polly provider is not configured for makePollyRequest.' );
+		}
+		if ( ! class_exists( '\Aws\Polly\PollyClient' ) ) {
+			$this->logger->error('[AmazonPollyProvider::makePollyRequest] AWS SDK PollyClient not found.');
+			throw new ProviderException( 'AWS SDK for PHP (Polly) not found for makePollyRequest.' );
 		}
 
-		if ( $action === 'synthesize-speech' ) {
-			// Generate mock audio data (simple WAV header)
-			$mock_audio = $this->generateMockAudioData();
-			
-			return [
-				'AudioStream' => $mock_audio,
-			];
-		}
+		$pollyClient = new \Aws\Polly\PollyClient( [
+			'version'     => 'latest',
+			'region'      => $this->credentials['region'],
+			'credentials' => [
+				'key'    => $this->credentials['access_key'],
+				'secret' => $this->credentials['secret_key'],
+			],
+		] );
 
-		throw new ProviderException( 'Unknown Polly action: ' . $action );
-	}
+		try {
+			if ( $action === 'describe-voices' ) {
+				$this->logger->debug('[AmazonPollyProvider::makePollyRequest] Action: describe-voices', $parameters);
+				$result = $pollyClient->describeVoices( $parameters );
+				return $result->toArray(); // Convert AWS Result object to array
+			}
+			// synthesizeSpeech is handled directly in generateSpeech method.
+			// Other Polly actions (e.g., StartSpeechSynthesisTask) could be added here if needed.
 
-	/**
-	 * Generate mock audio data for testing
-	 *
-	 * @return string Mock audio data.
-	 */
-	private function generateMockAudioData(): string {
-		// Create a simple WAV file header for testing
-		$sample_rate = 22050;
-		$channels = 1;
-		$bits_per_sample = 16;
-		$duration = 2; // 2 seconds
-		$data_size = $sample_rate * $channels * $bits_per_sample / 8 * $duration;
-		
-		// WAV header
-		$header = 'RIFF';
-		$header .= pack( 'V', $data_size + 36 ); // File size
-		$header .= 'WAVE';
-		$header .= 'fmt ';
-		$header .= pack( 'V', 16 ); // Format chunk size
-		$header .= pack( 'v', 1 ); // Audio format (PCM)
-		$header .= pack( 'v', $channels );
-		$header .= pack( 'V', $sample_rate );
-		$header .= pack( 'V', $sample_rate * $channels * $bits_per_sample / 8 ); // Byte rate
-		$header .= pack( 'v', $channels * $bits_per_sample / 8 ); // Block align
-		$header .= pack( 'v', $bits_per_sample );
-		$header .= 'data';
-		$header .= pack( 'V', $data_size );
-		
-		// Generate simple tone data
-		$audio_data = '';
-		for ( $i = 0; $i < $data_size / 2; $i++ ) {
-			$sample = sin( 2 * M_PI * 440 * $i / $sample_rate ) * 16383; // 440Hz tone
-			$audio_data .= pack( 's', $sample );
+		} catch ( \Aws\Exception\AwsException $e ) {
+			$this->logger->error( "[AmazonPollyProvider::makePollyRequest] AWS Polly API Exception for action {$action}", [
+				'aws_error_code' => $e->getAwsErrorCode(),
+				'aws_error_message' => $e->getAwsErrorMessage(),
+				'message' => $e->getMessage(),
+			]);
+			throw new ProviderException( "Amazon Polly API request for {$action} failed: " . $e->getAwsErrorMessage() );
+		} catch ( \Exception $e ) {
+			$this->logger->error( "[AmazonPollyProvider::makePollyRequest] Generic Exception for Polly action {$action}", [ 'message' => $e->getMessage() ]);
+			throw new ProviderException( "Amazon Polly request for {$action} failed: " . $e->getMessage() );
 		}
 		
-		return $header . $audio_data;
+		$this->logger->warn('[AmazonPollyProvider::makePollyRequest] Unknown or unhandled Polly action.', ['action' => $action]);
+		throw new ProviderException( 'Unknown or unhandled Polly action in makePollyRequest: ' . $action );
 	}
 
 	/**

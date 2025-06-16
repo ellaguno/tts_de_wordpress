@@ -59,6 +59,7 @@ class TTSService {
 	public function generateAudio( string $text, array $options = [] ): ?array {
 		try {
 			$this->logger->info( 'Starting TTS generation', [ 'text_length' => strlen( $text ) ] );
+			$this->logger->debug( '[generateAudio] Initial options received', $options );
 			
 			// Check cache first
 			$textHash = $this->cache->generateTextHash( $text, $options );
@@ -74,124 +75,144 @@ class TTSService {
 				];
 			}
 			
-			// Get next provider
-			$this->logger->info( 'Getting next provider from round robin' );
-			$provider = $this->round_robin->getNextProvider();
-			$this->logger->info( 'Round robin returned provider', [ 'provider' => $provider ] );
-			
-			if ( ! $provider ) {
-				$this->logger->error( 'No active TTS providers available' );
-				return null;
-			}
-			
-			$this->logger->info( 'Using TTS provider', [ 'provider' => $provider ] );
-			
-			// Get the actual provider instance and generate audio
-			$provider_instance = $this->getProviderInstance( $provider );
-			
-			if ( ! $provider_instance ) {
-				$this->logger->info( 'Provider instance not found, using mock audio', [ 'provider' => $provider ] );
-				// Fallback to mock audio generation
-				$mock_audio_url = $this->generateMockAudio( $text, $provider );
-				
-				if ( $mock_audio_url ) {
-					// Cache the result
-					$this->cache->cacheAudioUrl( $textHash, $mock_audio_url, null, [
-						'provider' => $provider,
-						'generated_at' => time(),
-						'text_length' => strlen( $text ),
-						'mock' => true,
-					] );
-					
-					$this->round_robin->recordUsage( $provider, true );
-					
-					$this->logger->info( 'Mock TTS generation completed successfully', [
-						'provider' => $provider,
-						'audio_url' => $mock_audio_url
-					] );
-					
-					return [
-						'success' => true,
-						'audio_url' => $mock_audio_url,
-						'source' => 'mock',
-						'provider' => $provider,
-						'hash' => $textHash,
-					];
+			$current_provider_name = null;
+			$provider_instance = null;
+
+			// 1. Try provider from $options (post settings)
+			if ( ! empty( $options['provider'] ) ) {
+				$this->logger->info( '[generateAudio] Attempting to use provider from post options', [ 'options_provider' => $options['provider'] ] );
+				$instance = $this->getProviderInstance( $options['provider'] );
+				$this->logger->debug( '[generateAudio] Result of getProviderInstance for options_provider', [ 'options_provider' => $options['provider'], 'instance_is_null' => is_null($instance) ] );
+				if ( $instance ) {
+					// TODO: Add a health/configuration check here if possible, e.g., $instance->isConfiguredAndHealthy()
+					$current_provider_name = $options['provider'];
+					$provider_instance = $instance;
+					$this->logger->info( '[generateAudio] Successfully set provider from post options', [ 'provider' => $current_provider_name ] );
+				} else {
+					$this->logger->warn( '[generateAudio] Provider from post options FAILED to instantiate. Falling back to round robin.', [ 'options_provider' => $options['provider'] ] );
 				}
-				
-				$this->logger->error( 'Mock audio generation failed', [ 'provider' => $provider ] );
-				return null;
 			}
+
+			// 2. If no provider from options, or if it failed to instantiate, try round robin
+			if ( ! $provider_instance ) {
+				$this->logger->info( '[generateAudio] No provider from post options or instantiation failed/not specified. Trying round robin.' );
+				$provider_from_round_robin = $this->round_robin->getNextProvider();
+				if ( $provider_from_round_robin ) {
+					$this->logger->info( '[generateAudio] Round robin selected provider', [ 'rr_provider' => $provider_from_round_robin ] );
+					$instance = $this->getProviderInstance( $provider_from_round_robin );
+					$this->logger->debug( '[generateAudio] Result of getProviderInstance for round_robin_provider', [ 'rr_provider' => $provider_from_round_robin, 'instance_is_null' => is_null($instance) ] );
+					if ( $instance ) {
+						$current_provider_name = $provider_from_round_robin;
+						$provider_instance = $instance;
+						$this->logger->info( '[generateAudio] Successfully set provider from round robin', [ 'provider' => $current_provider_name ] );
+					} else {
+						$this->logger->error( '[generateAudio] Round robin provider FAILED to instantiate.', [ 'rr_provider' => $provider_from_round_robin ] );
+					}
+				} else {
+					$this->logger->warn( '[generateAudio] Round robin did not return any provider.' );
+				}
+			}
+			
+			if ( ! $current_provider_name || ! $provider_instance ) {
+				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
+				return [
+					'success' => false,
+					'message' => __( 'No TTS providers are configured. Please configure at least one provider in Settings > TTS Settings.', 'TTS de Wordpress' ),
+					'error_code' => 'NO_PROVIDERS_CONFIGURED',
+					'available_providers' => [
+						'openai' => 'OpenAI TTS',
+						'google' => 'Google Cloud TTS',
+						'elevenlabs' => 'ElevenLabs',
+						'amazon_polly' => 'Amazon Polly',
+						'azure_tts' => 'Microsoft Azure TTS'
+					]
+				];
+			}
+			
+			$this->logger->info( '[generateAudio] Final provider selected for speech generation', [
+				'current_provider_name' => $current_provider_name,
+				'provider_instance_class' => is_object($provider_instance) ? get_class($provider_instance) : 'N/A'
+			] );
 			
 			try {
-				// Use voice from options if provided
-				$voice = $options['voice'] ?? '';
-				$audio_result = $provider_instance->generateSpeech( $text, $voice );
+				$speech_call_options = [];
+				if ( isset( $options['voice'] ) ) {
+					$speech_call_options['voice'] = $options['voice'];
+				}
+				// Providers' generateSpeech methods should handle $speech_call_options['voice'] being empty or absent by using their defaults.
+				$this->logger->debug( '[generateAudio] About to call generateSpeech method on provider', [
+					'provider' => $current_provider_name,
+					'speech_options' => $speech_call_options
+				]);
+
+				$audio_result = $provider_instance->generateSpeech( $text, $speech_call_options );
 				
-				if ( $audio_result && $audio_result['success'] ) {
-					// Cache the result
+				if ( $audio_result && isset($audio_result['success']) && $audio_result['success'] ) {
 					$this->cache->cacheAudioUrl( $textHash, $audio_result['audio_url'], null, [
-						'provider' => $provider,
+						'provider' => $current_provider_name,
 						'generated_at' => time(),
 						'text_length' => strlen( $text ),
-						'voice' => $voice,
+						'voice' => $speech_call_options['voice'] ?? null, // Log the voice used or attempted
 					] );
 					
-					$this->round_robin->recordUsage( $provider, true );
+					$this->round_robin->recordUsage( $current_provider_name, true );
 					
 					$this->logger->info( 'TTS generation completed successfully', [
-						'provider' => $provider,
-						'audio_url' => $audio_result['audio_url']
+						'provider' => $current_provider_name,
+						'audio_url' => $audio_result['audio_url'],
 					] );
 					
 					return [
 						'success' => true,
 						'audio_url' => $audio_result['audio_url'],
 						'source' => 'generated',
-						'provider' => $provider,
+						'provider' => $current_provider_name,
 						'hash' => $textHash,
 					];
+				} else {
+					// Handle cases where generateSpeech returns success=false or an unexpected result
+					$this->logger->error( 'Provider generateSpeech did not return success', [
+						'provider' => $current_provider_name,
+						'result' => $audio_result,
+					]);
+					// Fall through to record usage as failure, then to potential mock fallback by exception or explicit call
 				}
 			} catch ( \Exception $e ) {
-				$this->logger->error( 'Provider generation failed, falling back to mock', [
-					'provider' => $provider,
-					'error' => $e->getMessage()
+				$this->logger->error( '[generateAudio] Exception during provider generation.', [
+					'provider_at_exception' => $current_provider_name,
+					'error' => $e->getMessage(),
+					'exception_class' => get_class($e),
+					'trace' => $e->getTraceAsString()
 				] );
 				
-				// Fallback to mock audio
-				$mock_audio_url = $this->generateMockAudio( $text, $provider );
+				// Record failure and continue to return null (no fallback)
+				$this->round_robin->recordUsage( $current_provider_name, false );
 				
-				if ( $mock_audio_url ) {
-					// Cache the result
-					$this->cache->cacheAudioUrl( $textHash, $mock_audio_url, null, [
-						'provider' => $provider,
-						'generated_at' => time(),
-						'text_length' => strlen( $text ),
-						'mock' => true,
-						'fallback_reason' => $e->getMessage(),
-					] );
-					
-					$this->round_robin->recordUsage( $provider, true );
-					
-					$this->logger->info( 'Fallback mock TTS generation completed', [
-						'provider' => $provider,
-						'audio_url' => $mock_audio_url
-					] );
-					
-					return [
-						'success' => true,
-						'audio_url' => $mock_audio_url,
-						'source' => 'mock_fallback',
-						'provider' => $provider,
-						'hash' => $textHash,
-					];
-				}
+				return [
+					'success' => false,
+					'message' => sprintf( 
+						__( 'TTS generation failed with %s: %s', 'TTS de Wordpress' ),
+						$current_provider_name,
+						$e->getMessage()
+					),
+					'error_code' => 'PROVIDER_EXCEPTION',
+					'provider' => $current_provider_name
+				];
 			}
 			
-			$this->round_robin->recordUsage( $provider, false );
-			$this->logger->error( 'Failed to generate audio', [ 'provider' => $provider ] );
+			// If we reach here, it means generation failed 
+			$this->round_robin->recordUsage( $current_provider_name, false );
+			$this->logger->error( 'Failed to generate audio with provider', [ 'provider' => $current_provider_name ] );
 			
-			return null;
+			return [
+				'success' => false,
+				'message' => sprintf( 
+					__( 'TTS generation failed with provider %s. Please check your configuration and try again.', 'TTS de Wordpress' ),
+					$current_provider_name
+				),
+				'error_code' => 'GENERATION_FAILED',
+				'provider' => $current_provider_name
+			];
 			
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception in generateAudio', [
@@ -339,17 +360,20 @@ class TTSService {
 			] );
 			
 			// Get TTS settings for this post
-			$provider = get_post_meta( $post_id, '_tts_voice_provider', true ) ?: 'google';
+			$provider_from_meta = get_post_meta( $post_id, '_tts_voice_provider', true );
+			// If $provider_from_meta is empty, TTSService::generateAudio will handle it
+			// (e.g., use round-robin or a global default if that logic is implemented there).
+			// We no longer default to 'google' directly here.
 			$voice = get_post_meta( $post_id, '_tts_voice_id', true );
 			
-			$this->logger->info( 'TTS settings for post', [
+			$this->logger->info( 'TTS settings for post (from post_meta)', [
 				'post_id' => $post_id,
-				'provider' => $provider,
-				'voice' => $voice
+				'provider_meta_value' => $provider_from_meta, // Log what was actually in meta
+				'voice_meta_value' => $voice
 			] );
 			
 			$options = [
-				'provider' => $provider,
+				'provider' => $provider_from_meta, // Pass the potentially empty provider to generateAudio
 				'voice' => $voice,
 				'post_id' => $post_id,
 			];
@@ -430,7 +454,14 @@ class TTSService {
 				$credentials_path = $config['providers']['google']['credentials_path'] ?? '';
 				// If not set in config, try the user's uploaded file
 				if ( empty( $credentials_path ) ) {
-					$credentials_path = ABSPATH . 'wp-content/uploads/private/sesolibre-tts-13985ba22d36.json';
+					$upload_dir = wp_upload_dir();
+					$credentials_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
+				} else {
+					// Convert relative paths to absolute paths
+					if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
+						// This is a relative path, convert to absolute
+						$credentials_path = ABSPATH . $credentials_path;
+					}
 				}
 				return ! empty( $credentials_path ) && file_exists( $credentials_path );
 				

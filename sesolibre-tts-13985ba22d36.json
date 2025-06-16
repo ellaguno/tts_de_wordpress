@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sesolibre-tts",
+  "private_key_id": "13985ba22d36009d360504820c5d9ade33216377",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDZ2TtpTb/fldSw\n34bhdSwQGstjLTh7+1yZrLdGMMSS0NrLKclJkcweOm0JAmzQ6d9hRhShAj343+0X\nomg94Eie/gGP3Tve02T9OyzANhWrVvYYQb4Sivg5UJaya/7DBAJUwuAZ7HF8EMSc\nqij2syYmP41SOy5ADaoxfCjQBTDRuqnaPX7PC5vZOwAZlVzpy+U2InVRMZo5SKIx\nzRocuSuuwb4avzrR1brHmLgYIJ9Tj+arRX8TG33oGXc677/m6X7Z6p5r2s49iu93\nqYPlNomOGwS+MRRU0Sjf2IWcXQLFoW0/r5sDdi+FEOPCZ/Jea/gSkaz2zZwFGrqw\nXxgfjnxbAgMBAAECggEAGBCCmxnPGbw74AP5KtueL/M9x2ld5Xg5XPJy1mqZtFwk\n5y9pAFr+MNKka8vcSGGlXuH2cmjEfsMBtkwm9rrZWtLVSlaWgAFbFQwd3+e5khFL\noxdUD0lRrUclNnVukY1WUpWqWsK/MITLq0CywLm+e5gmnNBTxhicVdYQzhXctDYV\n0P3NFvfXrfkfBN8pumTipURQzESZ0RGeytlZfYAQsxy/lH2iXHA6NLheQC8xQDj/\nv40LeYPFl95u50HLR3J/231RipE2HwiUUJgDMd52CV9IK8uuKLq/mAqOdHSrZpVB\nYIYmw64v32Vf16gRR0lFhyi4S/Y2sA+H7TUUMF68GQKBgQDw4+iH723MSLl6qFgB\nico17AfPM+yVk4+dvI/ppQan5aOenuQ2JSyS5+tE/y6T2Tt+xH4DpM10PbYfgJyC\ndL8REBSYObYJaGDrZs6HbRkUD56e5x41FByEwC64pgLjkLdSdXNHt8+B1Ev7NARy\nRG4ELVuKZZQIkINoaMXS4/zh6QKBgQDng1T6qlQ32ivOHE/9K3kU5UEaL4mUyvFo\nBP8VGmBPTYNfvrd3quzHlgjTLEXIhhQenOYInBtlbIEgC1lkQ7DYVUu5W/eolnqK\nHYnkVtEQS5JbFmTS98IMpGe+0TfO/2yyQFedQpmp3ldrrP9OQ7wLm5R2qxdt2zzr\nhztM/xFdowKBgQDZSQrXiw3kRfkgfbccdBi0+Nm2eiS+ayMRaiP54cSWL9qd2r8J\nZBDH1nBuhSuTa1ByMXVlfgNhBcVAtzb1qa8rCfE5ulzMMZ2y2MIUgEEtykUPGnQx\n9pke2WeLYRub/06ND6pTl6aSelerGKmmFLmUBQHcXXHhI9GUnWVLrCDP+QKBgQCN\n17hEEAGjaqc2E8CqU21O8RsPCRsZL7HyUkVaz5s8Wzhne/j6d520tubXQyPKNOO0\n0dpaYhKi9HS0hl+Rf6ulD7Vibsdw4ilX37sxTEOw4SxdZH4Hh8a7aisqDRNNXs9g\n8uz7K+fr3I7hKNAPSo626e5vOmoTY6SShXs+tHQWUwKBgFda1oZw67IFydKHn5cY\nJrgouzBDEp8qLQmFq/xGaXSv/euorNVeWpsY5pq3xX1kRU+FF7daeAjKx4gM9Xb8\nTli5S8mKse49tPBIMdNQxUkSYE2SN9E3XTIPkkbEmp51h7ptqqBtRKkpq5/Suv3u\nfwLMrXUGNliYVDIssvn2JbOZ\n-----END PRIVATE KEY-----\n",
+  "client_email": "wordpress-tts@sesolibre-tts.iam.gserviceaccount.com",
+  "client_id": "115201751198821917426",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/wordpress-tts%40sesolibre-tts.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -82,10 +82,9 @@ class RoundRobinManager {
 			}
 		}
 		
-		// If no providers are configured, return google as default
+		// If no providers are configured, return empty array
 		if ( empty( $active_providers ) ) {
-			error_log( '[WP_TTS DEBUG] No active providers, using google as default' );
-			$active_providers = [ 'google' ];
+			error_log( '[WP_TTS DEBUG] No active providers found - configuration needed' );
 		}
 		
 		error_log( '[WP_TTS DEBUG] Final active providers: ' . wp_json_encode( $active_providers ) );
@@ -99,8 +98,61 @@ class RoundRobinManager {
 	 * @return bool True if active.
 	 */
 	public function isProviderActive( string $provider ): bool {
-		// All providers are now active in mock mode for testing
-		return in_array( $provider, [ 'google', 'amazon_polly', 'azure_tts', 'openai', 'elevenlabs' ] );
+		$config = get_option( 'wp_tts_config', [] );
+		error_log( '[WP_TTS DEBUG] Full config for provider check: ' . wp_json_encode( $config ) );
+		
+		switch ( $provider ) {
+			case 'google':
+				$credentials_path = $config['providers']['google']['credentials_path'] ?? '';
+				error_log( '[WP_TTS DEBUG] Google provider check - configured path: ' . $credentials_path );
+				
+				// Check for default credentials file
+				if ( empty( $credentials_path ) ) {
+					$upload_dir = wp_upload_dir();
+					$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
+					error_log( '[WP_TTS DEBUG] Google provider check - default path: ' . $default_path );
+					error_log( '[WP_TTS DEBUG] Google provider check - default file exists: ' . ( file_exists( $default_path ) ? 'yes' : 'no' ) );
+					if ( file_exists( $default_path ) ) {
+						error_log( '[WP_TTS DEBUG] Google provider check - using default credentials, returning true' );
+						return true;
+					}
+				} else {
+					// Convert relative paths to absolute paths
+					if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
+						// This is a relative path, convert to absolute
+						$credentials_path = ABSPATH . $credentials_path;
+						error_log( '[WP_TTS DEBUG] Google provider check - converted relative to absolute path: ' . $credentials_path );
+					}
+					error_log( '[WP_TTS DEBUG] Google provider check - checking configured path exists: ' . ( file_exists( $credentials_path ) ? 'yes' : 'no' ) );
+					if ( file_exists( $credentials_path ) ) {
+						return true;
+					}
+				}
+				error_log( '[WP_TTS DEBUG] Google provider check - final result: inactive' );
+				return false;
+				
+			case 'openai':
+				$api_key = $config['providers']['openai']['api_key'] ?? '';
+				return ! empty( $api_key );
+				
+			case 'elevenlabs':
+				$api_key = $config['providers']['elevenlabs']['api_key'] ?? '';
+				return ! empty( $api_key );
+				
+			case 'amazon_polly':
+				$access_key = $config['providers']['amazon_polly']['access_key'] ?? '';
+				$secret_key = $config['providers']['amazon_polly']['secret_key'] ?? '';
+				$region = $config['providers']['amazon_polly']['region'] ?? '';
+				return ! empty( $access_key ) && ! empty( $secret_key ) && ! empty( $region );
+				
+			case 'azure_tts':
+				$subscription_key = $config['providers']['azure_tts']['subscription_key'] ?? '';
+				$region = $config['providers']['azure_tts']['region'] ?? '';
+				return ! empty( $subscription_key ) && ! empty( $region );
+				
+			default:
+				return false;
+		}
 	}
 	
 	/**

@@ -708,35 +708,104 @@ class AdminInterface {
 	}
 	
 	/**
-	 * Handle test provider AJAX request
+	 * Handle AJAX request from TTS Tools page to generate test audio.
+	 * This is different from validating a provider's connection.
 	 */
 	public function handleTestProvider(): void {
-		if ( ! $this->security->verifyNonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ) {
-			wp_die( __( 'Security check failed.', 'TTS de Wordpress' ) );
+		// Check nonce (wpTtsAdmin.nonce is 'wp_tts_admin')
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed (nonce).', 'TTS de Wordpress' ),
+				'debug_info' => [
+					'nonce_received' => isset($_POST['nonce']) ? 'yes' : 'no',
+					'expected_action' => 'wp_tts_admin'
+				]
+			], 403 );
+			return;
 		}
-		
+
+		// Check permissions
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
-			wp_die( __( 'Insufficient permissions.', 'TTS de Wordpress' ) );
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+			], 403 );
+			return;
 		}
 		
-		$provider = $this->security->sanitizeText( $_POST['provider'] ?? '' );
-		$result = $this->tts_service->testProvider( $provider );
+		$text_to_generate = isset( $_POST['text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['text'] ) ) : '';
 		
-		wp_send_json_success( [
-			'provider' => $provider,
-			'status' => $result ? 'connected' : 'failed',
-		] );
+		if ( empty( $text_to_generate ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No text provided for TTS generation.', 'TTS de Wordpress' ),
+				'error_details' => 'Text input was empty.'
+			] );
+			return;
+		}
+
+		$this->config->getLogger()->info('[AdminInterface::handleTestProvider] Received request to generate test audio.', ['text_length' => strlen($text_to_generate)]);
+
+		try {
+			// For a general test from TTS Tools, we don't specify a provider or voice in $options.
+			// TTSService::generateAudio will use its internal logic (e.g., round-robin or a global default).
+			$options = [
+				'source' => 'tts_tools_test_button' // For logging/tracking
+			];
+			$result = $this->tts_service->generateAudio( $text_to_generate, $options );
+
+			if ( $result && isset($result['success']) && $result['success'] && ! empty( $result['audio_url'] ) ) {
+				$this->config->getLogger()->info('[AdminInterface::handleTestProvider] Test audio generated successfully.', ['audio_url' => $result['audio_url'], 'provider' => $result['provider'] ?? 'N/A']);
+				wp_send_json_success( [
+					'message'   => __( 'Test audio generated successfully.', 'TTS de Wordpress' ),
+					'audio_url' => $result['audio_url'],
+					'provider'  => $result['provider'] ?? 'N/A',
+				] );
+			} else {
+				$error_message = isset($result['message']) && !empty($result['message']) ? $result['message'] : __( 'Failed to generate test audio. TTSService did not return success or audio URL.', 'TTS de Wordpress' );
+				$this->config->getLogger()->error('[AdminInterface::handleTestProvider] TTS generation failed or returned invalid result.', ['result_from_service' => $result]);
+				
+				$error_details = '';
+				if ( isset($result['error_code']) && $result['error_code'] === 'NO_PROVIDERS_CONFIGURED' ) {
+					$error_details = __( 'No TTS providers are configured. Please go to Settings > TTS Settings to configure at least one provider (OpenAI, Google Cloud, ElevenLabs, Amazon Polly, or Azure TTS).', 'TTS de Wordpress' );
+				} else {
+					$error_details = 'Provider attempted: ' . ($result['provider'] ?? 'Unknown') . '. Check plugin logs for more details from TTSService.';
+				}
+				
+				wp_send_json_error( [
+					'message' => $error_message,
+					'error_details' => $error_details,
+					'error_code' => $result['error_code'] ?? 'UNKNOWN_ERROR',
+					'available_providers' => $result['available_providers'] ?? null
+				] );
+			}
+		} catch ( \Exception $e ) {
+			$this->config->getLogger()->error( '[AdminInterface::handleTestProvider] Exception during test audio generation.', [ 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString() ] );
+			wp_send_json_error( [
+				'message' => __( 'An exception occurred during test audio generation.', 'TTS de Wordpress' ),
+				'error_details' => $e->getMessage(),
+			] );
+		}
 	}
 	
 	/**
 	 * Handle get voices AJAX request
 	 */
 	public function handleGetVoices(): void {
-		if ( ! $this->security->verifyNonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ) {
-			wp_die( __( 'Security check failed.', 'TTS de Wordpress' ) );
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+			], 403 );
+			return;
 		}
 		
-		$provider = $this->security->sanitizeText( $_POST['provider'] ?? '' );
+		// Check permissions
+		if ( ! $this->security->canUser( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+		
+		$provider = isset($_POST['provider']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['provider'])) ) : '';
 		$voices = $this->tts_service->getAvailableVoices( $provider );
 		
 		wp_send_json_success( [

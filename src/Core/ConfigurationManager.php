@@ -579,4 +579,17 @@ class ConfigurationManager {
 	private function getOption( string $option, $default = null ) {
 		return get_option( $option, $default );
 	}
+	
+	/**
+	 * Get logger instance
+	 *
+	 * @return \WP_TTS\Utils\Logger Logger instance
+	 */
+	public function getLogger() {
+		static $logger = null;
+		if ( $logger === null ) {
+			$logger = new \WP_TTS\Utils\Logger();
+		}
+		return $logger;
+	}
 }

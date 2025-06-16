@@ -63,4 +63,24 @@ class SecurityManager {
 		// Basic validation - not empty and reasonable length
 		return ! empty( $api_key ) && strlen( $api_key ) >= 10;
 	}
+	
+	/**
+	 * Sanitize general input
+	 *
+	 * @param string $input Input text.
+	 * @return string Sanitized text.
+	 */
+	public function sanitizeInput( string $input ): string {
+		return sanitize_text_field( $input );
+	}
+	
+	/**
+	 * Sanitize text for TTS processing
+	 *
+	 * @param string $text Text to sanitize.
+	 * @return string Sanitized text.
+	 */
+	public function sanitizeTextForTTS( string $text ): string {
+		return sanitize_textarea_field( $text );
+	}
 }

@@ -94,25 +94,108 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 */
 	public function generateSpeech( string $text, array $options = [] ): array {
 		if ( ! $this->isConfigured() ) {
-			throw new ProviderException( 'Google Cloud TTS provider is not properly configured' );
+			$this->logger->error( 'Google Cloud TTS provider is not configured. Credentials path is invalid or file missing.' );
+			throw new ProviderException( 'Google Cloud TTS provider is not properly configured (credentials missing or invalid)' );
 		}
+
+		$credentials_path = $this->config['credentials_path'];
+		// Attempt to use the uploaded file if the configured path is empty or default-looking
+		if (empty($credentials_path) || strpos($credentials_path, 'google-credentials.json') !== false) {
+			$upload_dir = wp_upload_dir();
+			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
+			if (file_exists($default_path)) {
+				$credentials_path = $default_path;
+				$this->logger->info('Using default credentials path for Google TTS.', ['path' => $credentials_path]);
+			}
+		} else {
+			// Convert relative paths to absolute paths
+			if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
+				// This is a relative path, convert to absolute
+				$credentials_path = ABSPATH . $credentials_path;
+				$this->logger->info('Converted relative to absolute path for Google TTS.', ['path' => $credentials_path]);
+			}
+		}
+
+
+		// Verificar diferentes rutas de clase
+		$client_class = null;
+		$possible_classes = [
+			'\Google\Cloud\TextToSpeech\V1\TextToSpeechClient',
+			'\Google\Cloud\TextToSpeech\V1\Client\TextToSpeechClient'
+		];
+		
+		foreach ($possible_classes as $class_name) {
+			if (class_exists($class_name)) {
+				$client_class = $class_name;
+				break;
+			}
+		}
+		
+		if (!$client_class) {
+			$this->logger->error( 'Google Cloud SDK for PHP not found. Please install it via Composer.' );
+			throw new ProviderException( 'Google Cloud SDK for PHP not found. Run "composer require google/cloud-text-to-speech".' );
+		}
+		
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-ES-Standard-A');
+		// Google voice names are like 'es-MX-Wavenet-A'. We need language code and name separately.
+		$language_code = substr( $voice_id, 0, 5 ); // e.g., es-MX
+		$voice_name = $voice_id;
+		
+		$output_format_enum = \Google\Cloud\TextToSpeech\V1\AudioEncoding::MP3; // Default to MP3
+		$output_format_ext = 'mp3';
+
+		// Potentially map other $options['output_format'] to Google enums if needed
+		// e.g., if ($options['output_format'] === 'wav') $output_format_enum = \Google\Cloud\TextToSpeech\V1\AudioEncoding::LINEAR16;
+
+		$speaking_rate = $options['speaking_rate'] ?? $this->config['speaking_rate'] ?? 1.0;
+		$pitch = $options['pitch'] ?? $this->config['pitch'] ?? 0.0;
+
 
 		$this->logger->info( 'Starting Google Cloud TTS generation', [
 			'text_length' => strlen( $text ),
-			'voice' => $options['voice'] ?? $this->config['default_voice'] ?? 'es-MX-Wavenet-A',
+			'voice_name' => $voice_name,
+			'language_code' => $language_code,
+			'speaking_rate' => $speaking_rate,
+			'pitch' => $pitch,
 		] );
-
+		
 		try {
-			// Prepare request parameters
-			$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'es-MX-Wavenet-A';
-			$output_format = $options['output_format'] ?? 'mp3';
-			$sample_rate = $options['sample_rate'] ?? '22050';
+			$client = new $client_class( [
+				'credentials' => $credentials_path,
+			] );
+			
+			$synthesis_input = ( new \Google\Cloud\TextToSpeech\V1\SynthesisInput() )
+				->setText( $text );
+			
+			$voice_selection_params = ( new \Google\Cloud\TextToSpeech\V1\VoiceSelectionParams() )
+				->setLanguageCode( $language_code )
+				->setName( $voice_name );
+			
+			$audio_config = ( new \Google\Cloud\TextToSpeech\V1\AudioConfig() )
+				->setAudioEncoding( $output_format_enum )
+				->setSpeakingRate( (float) $speaking_rate )
+				->setPitch( (float) $pitch );
+			
+			$this->logger->debug( 'Google Cloud API Request details', [
+				'language_code' => $language_code,
+				'voice_name' => $voice_name,
+				'audio_encoding' => $output_format_enum,
+			]);
 
-			// For now, generate mock audio since we don't have Google Cloud SDK
-			$audio_data = $this->generateMockAudioData();
-
+			// Crear el request completo para la nueva API
+			$request = new \Google\Cloud\TextToSpeech\V1\SynthesizeSpeechRequest();
+			$request->setInput($synthesis_input);
+			$request->setVoice($voice_selection_params);
+			$request->setAudioConfig($audio_config);
+			
+			$response = $client->synthesizeSpeech( $request );
+			$audio_content = $response->getAudioContent();
+			$client->close();
+			
+			$audio_data = $audio_content;
+			
 			// Generate unique filename
-			$filename = 'google_' . md5( $text . time() ) . '.' . $output_format;
+			$filename = 'google_' . md5( $text . $voice_id . time() ) . '.' . $output_format_ext;
 			$upload_dir = wp_upload_dir();
 			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
 			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
@@ -136,10 +219,9 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 				'file_path' => $file_path,
 				'provider' => $this->name,
 				'voice' => $voice_id,
-				'format' => $output_format,
+				'format' => $output_format_ext,
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
-					'sample_rate' => $sample_rate,
 					'characters' => strlen( $text ),
 				],
 			];
@@ -236,21 +318,45 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 				'description' => 'Path to Google Cloud service account JSON file',
 			],
 			'default_voice' => [
-				'type' => 'select',
+				'type' => 'select', // Should be populated via API or a more comprehensive static list
 				'label' => 'Default Voice',
+				'required' => true,
+				'options' => $this->getSimplifiedVoiceList(),
+				'default' => 'es-ES-Standard-A',
+				'description' => 'Default Google Cloud TTS voice.',
+			],
+			'speaking_rate' => [
+				'type' => 'number',
+				'label' => 'Default Speaking Rate (0.25 - 4.0)',
 				'required' => false,
-				'options' => [
-					'es-MX-Wavenet-A' => 'Wavenet A (Mexican Spanish Female)',
-					'es-MX-Wavenet-B' => 'Wavenet B (Mexican Spanish Male)',
-					'es-MX-Wavenet-C' => 'Wavenet C (Mexican Spanish Female)',
-					'es-MX-Wavenet-D' => 'Wavenet D (Mexican Spanish Male)',
-				],
-				'default' => 'es-MX-Wavenet-A',
-				'description' => 'Default voice to use when none is specified',
+				'default' => 1.0,
+				'min' => 0.25,
+				'max' => 4.0,
+				'step' => 0.05,
+				'description' => 'Adjusts the speed of speech. 1.0 is normal.',
+			],
+			'pitch' => [
+				'type' => 'number',
+				'label' => 'Default Pitch (-20.0 - 20.0)',
+				'required' => false,
+				'default' => 0.0,
+				'min' => -20.0,
+				'max' => 20.0,
+				'step' => 0.5,
+				'description' => 'Adjusts the pitch of speech. 0.0 is normal.',
 			],
 		];
 	}
 
+	private function getSimplifiedVoiceList(): array {
+		$voices = $this->getAvailableVoices(''); // Get all voices
+		$list = [];
+		foreach ($voices as $voice) {
+			$list[$voice['id']] = $voice['name'] . " ({$voice['language']})";
+		}
+		return $list;
+	}
+	
 	/**
 	 * Get provider name
 	 *
@@ -371,34 +477,21 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 * @return bool True if configured.
 	 */
 	public function isConfigured(): bool {
-		// Allow mock mode even without credentials for testing
-		return true;
-	}
-
-	/**
-	 * Generate mock audio data for testing
-	 *
-	 * @return string Mock audio data.
-	 */
-	private function generateMockAudioData(): string {
-		// Create a simple MP3-like header for testing
-		$sample_rate = 22050;
-		$channels = 1;
-		$bits_per_sample = 16;
-		$duration = 3; // 3 seconds
-		$data_size = $sample_rate * $channels * $bits_per_sample / 8 * $duration;
-		
-		// Simple MP3 header simulation
-		$header = 'ID3' . chr(3) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0);
-		
-		// Generate simple tone data
-		$audio_data = '';
-		for ( $i = 0; $i < $data_size / 2; $i++ ) {
-			$sample = sin( 2 * M_PI * 440 * $i / $sample_rate ) * 16383; // 440Hz tone
-			$audio_data .= pack( 's', $sample );
+		$path = $this->config['credentials_path'] ?? '';
+		if (empty($path) || strpos($path, 'google-credentials.json') !== false) { // Check default if specific path is empty or looks like a placeholder
+			$upload_dir = wp_upload_dir();
+			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
+			if (file_exists($default_path)) {
+				return true;
+			}
+		} else {
+			// Convert relative paths to absolute paths
+			if ( substr( $path, 0, 1 ) !== '/' && strpos( $path, ':' ) === false ) {
+				// This is a relative path, convert to absolute
+				$path = ABSPATH . $path;
+			}
 		}
-		
-		return $header . $audio_data;
+		return ! empty( $path ) && file_exists( $path );
 	}
 
 	/**

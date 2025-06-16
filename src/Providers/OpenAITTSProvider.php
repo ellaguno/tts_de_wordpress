@@ -94,25 +94,83 @@ class OpenAITTSProvider implements TTSProviderInterface {
 	 */
 	public function generateSpeech( string $text, array $options = [] ): array {
 		if ( ! $this->isConfigured() ) {
-			throw new ProviderException( 'OpenAI TTS provider is not properly configured' );
+			$this->logger->error( 'OpenAI TTS provider is not configured. API key is missing.' );
+			throw new ProviderException( 'OpenAI TTS provider is not properly configured (API key missing)' );
+		}
+		
+		$api_key = $this->config['api_key'];
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'alloy');
+		$model = $options['model'] ?? $this->config['default_model'] ?? 'tts-1'; // Allow model override from config
+		$output_format = $options['output_format'] ?? 'mp3'; // OpenAI supports mp3, opus, aac, flac
+		
+		// Handle OpenAI's 4096 character limit
+		$max_chars = 4000; // Leave some margin
+		if ( strlen( $text ) > $max_chars ) {
+			$this->logger->warning( 'Text too long for OpenAI TTS, truncating', [
+				'original_length' => strlen( $text ),
+				'truncated_to' => $max_chars
+			] );
+			// Truncate at word boundary to avoid cutting words
+			$text = substr( $text, 0, $max_chars );
+			$last_space = strrpos( $text, ' ' );
+			if ( $last_space !== false ) {
+				$text = substr( $text, 0, $last_space );
+			}
+			$text .= '...'; // Indicate truncation
 		}
 
 		$this->logger->info( 'Starting OpenAI TTS generation', [
 			'text_length' => strlen( $text ),
-			'voice' => $options['voice'] ?? $this->config['default_voice'] ?? 'alloy',
+			'voice' => $voice_id,
+			'model' => $model,
+			'format' => $output_format,
 		] );
-
+		
 		try {
-			// Prepare request parameters
-			$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'alloy';
-			$model = $options['model'] ?? 'tts-1';
-			$output_format = $options['output_format'] ?? 'mp3';
+			$api_url = 'https://api.openai.com/v1/audio/speech';
+			$request_body = json_encode( [
+				'model' => $model,
+				'input' => $text,
+				'voice' => $voice_id,
+				'response_format' => $output_format,
+			] );
 
-			// For now, generate mock audio since we don't have OpenAI API integration
-			$audio_data = $this->generateMockAudioData();
+			$this->logger->debug( 'OpenAI API Request', [ 'url' => $api_url, 'body_preview' => substr($request_body, 0, 100) . '...' ] );
 
+			$response = wp_remote_post( $api_url, [
+				'method'    => 'POST',
+				'headers'   => [
+					'Authorization' => 'Bearer ' . $api_key,
+					'Content-Type'  => 'application/json',
+				],
+				'body'      => $request_body,
+				'timeout'   => 60, // Increased timeout for potentially long audio generation
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				$this->logger->error( 'OpenAI API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+				throw new ProviderException( 'OpenAI API request failed: ' . $response->get_error_message() );
+			}
+
+			$response_code = wp_remote_retrieve_response_code( $response );
+			$response_body = wp_remote_retrieve_body( $response );
+
+			if ( $response_code !== 200 ) {
+				$error_details = json_decode( $response_body, true );
+				$error_message = $error_details['error']['message'] ?? $response_body;
+				$this->logger->error( 'OpenAI API returned an error', [
+					'response_code' => $response_code,
+					'error_message' => $error_message,
+					'response_body' => $response_body,
+				] );
+				throw new ProviderException( "OpenAI API error ({$response_code}): {$error_message}" );
+			}
+			
+			// At this point, $response_body contains the audio data
+			$audio_data = $response_body;
+			
 			// Generate unique filename
-			$filename = 'openai_' . md5( $text . time() ) . '.' . $output_format;
+			$filename = 'openai_' . md5( $text . $voice_id . $model . time() ) . '.' . $output_format;
 			$upload_dir = wp_upload_dir();
 			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
 			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
@@ -208,7 +266,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 			'default_voice' => [
 				'type' => 'select',
 				'label' => 'Default Voice',
-				'required' => false,
+				'required' => true, // A default voice should be selected
 				'options' => [
 					'alloy' => 'Alloy (Neutral)',
 					'echo' => 'Echo (Male)',
@@ -218,11 +276,22 @@ class OpenAITTSProvider implements TTSProviderInterface {
 					'shimmer' => 'Shimmer (Female)',
 				],
 				'default' => 'alloy',
-				'description' => 'Default voice to use when none is specified',
+				'description' => 'Default voice to use when none is specified for a post.',
+			],
+			'default_model' => [
+				'type' => 'select',
+				'label' => 'Default Model',
+				'required' => true,
+				'options' => [
+					'tts-1' => 'tts-1 (Optimized for real-time, lower latency)',
+					'tts-1-hd' => 'tts-1-hd (Optimized for quality)',
+				],
+				'default' => 'tts-1',
+				'description' => 'Default model to use for synthesis.',
 			],
 		];
 	}
-
+	
 	/**
 	 * Get provider name
 	 *
@@ -342,34 +411,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 	 * @return bool True if configured.
 	 */
 	public function isConfigured(): bool {
-		// Allow mock mode even without credentials for testing
-		return true;
-	}
-
-	/**
-	 * Generate mock audio data for testing
-	 *
-	 * @return string Mock audio data.
-	 */
-	private function generateMockAudioData(): string {
-		// Create a simple MP3-like header for testing
-		$sample_rate = 22050;
-		$channels = 1;
-		$bits_per_sample = 16;
-		$duration = 3; // 3 seconds
-		$data_size = $sample_rate * $channels * $bits_per_sample / 8 * $duration;
-		
-		// Simple MP3 header simulation
-		$header = 'ID3' . chr(3) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0);
-		
-		// Generate simple tone data
-		$audio_data = '';
-		for ( $i = 0; $i < $data_size / 2; $i++ ) {
-			$sample = sin( 2 * M_PI * 523 * $i / $sample_rate ) * 16383; // 523Hz tone (C5)
-			$audio_data .= pack( 's', $sample );
-		}
-		
-		return $header . $audio_data;
+		return ! empty( $this->config['api_key'] );
 	}
 
 	/**

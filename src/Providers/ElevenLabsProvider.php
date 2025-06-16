@@ -94,25 +94,76 @@ class ElevenLabsProvider implements TTSProviderInterface {
 	 */
 	public function generateSpeech( string $text, array $options = [] ): array {
 		if ( ! $this->isConfigured() ) {
-			throw new ProviderException( 'ElevenLabs provider is not properly configured' );
+			$this->logger->error( 'ElevenLabs provider is not configured. API key is missing.' );
+			throw new ProviderException( 'ElevenLabs provider is not properly configured (API key missing)' );
 		}
+		
+		$api_key = $this->config['api_key'];
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'Rachel'); // Default to Rachel if nothing else is set
+		$model_id = $options['model_id'] ?? $this->config['default_model'] ?? 'eleven_multilingual_v2'; // Or 'eleven_monolingual_v1' etc.
+		$output_format = 'mp3_44100_128'; // ElevenLabs specific format for mp3
+		
+		// Stability and Similarity Boost are common ElevenLabs parameters
+		$stability = $options['stability'] ?? $this->config['stability'] ?? 0.75;
+		$similarity_boost = $options['similarity_boost'] ?? $this->config['similarity_boost'] ?? 0.75;
+
 
 		$this->logger->info( 'Starting ElevenLabs TTS generation', [
 			'text_length' => strlen( $text ),
-			'voice' => $options['voice'] ?? $this->config['default_voice'] ?? 'Rachel',
+			'voice_id' => $voice_id,
+			'model_id' => $model_id,
+			'stability' => $stability,
+			'similarity_boost' => $similarity_boost,
 		] );
-
+		
 		try {
-			// Prepare request parameters
-			$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'Rachel';
-			$model_id = $options['model_id'] ?? 'eleven_monolingual_v1';
-			$output_format = $options['output_format'] ?? 'mp3';
+			$api_url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
+			
+			$request_body = json_encode( [
+				'text' => $text,
+				'model_id' => $model_id,
+				'voice_settings' => [
+					'stability' => (float) $stability,
+					'similarity_boost' => (float) $similarity_boost,
+				],
+			] );
 
-			// For now, generate mock audio since we don't have ElevenLabs API integration
-			$audio_data = $this->generateMockAudioData();
+			$this->logger->debug( 'ElevenLabs API Request', [ 'url' => $api_url, 'body_preview' => substr($request_body, 0, 100) . '...' ] );
 
-			// Generate unique filename
-			$filename = 'elevenlabs_' . md5( $text . time() ) . '.' . $output_format;
+			$response = wp_remote_post( $api_url, [
+				'method'    => 'POST',
+				'headers'   => [
+					'Accept'        => 'audio/mpeg',
+					'Content-Type'  => 'application/json',
+					'xi-api-key'    => $api_key,
+				],
+				'body'      => $request_body,
+				'timeout'   => 60, // Increased timeout
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				$this->logger->error( 'ElevenLabs API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+				throw new ProviderException( 'ElevenLabs API request failed: ' . $response->get_error_message() );
+			}
+
+			$response_code = wp_remote_retrieve_response_code( $response );
+			$response_body = wp_remote_retrieve_body( $response );
+
+			if ( $response_code !== 200 ) {
+				$error_details = json_decode( $response_body, true );
+				$error_message = $error_details['detail']['message'] ?? $error_details['detail'] ?? $response_body;
+				$this->logger->error( 'ElevenLabs API returned an error', [
+					'response_code' => $response_code,
+					'error_message' => $error_message,
+					'response_body' => $response_body,
+				] );
+				throw new ProviderException( "ElevenLabs API error ({$response_code}): {$error_message}" );
+			}
+			
+			$audio_data = $response_body;
+			
+			// Generate unique filename, use 'mp3' for extension as $output_format is specific to API
+			$filename = 'elevenlabs_' . md5( $text . $voice_id . $model_id . time() ) . '.mp3';
 			$upload_dir = wp_upload_dir();
 			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
 			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
@@ -209,26 +260,57 @@ class ElevenLabsProvider implements TTSProviderInterface {
 				'description' => 'Your ElevenLabs API key for TTS services',
 			],
 			'default_voice' => [
+				'type' => 'select', // This should ideally be populated via API in a real scenario
+				'label' => 'Default Voice ID',
+				'required' => true,
+				'options' => $this->getSimplifiedVoiceList(), // Dynamically populate or keep a static list
+				'default' => 'Rachel', // A common default voice
+				'description' => 'Default ElevenLabs voice ID. Find IDs via ElevenLabs documentation or API.',
+			],
+			'default_model' => [
 				'type' => 'select',
-				'label' => 'Default Voice',
-				'required' => false,
+				'label' => 'Default Model ID',
+				'required' => true,
 				'options' => [
-					'Rachel' => 'Rachel (Female, American)',
-					'Domi' => 'Domi (Female, American)',
-					'Bella' => 'Bella (Female, American)',
-					'Antoni' => 'Antoni (Male, American)',
-					'Elli' => 'Elli (Female, American)',
-					'Josh' => 'Josh (Male, American)',
-					'Arnold' => 'Arnold (Male, American)',
-					'Adam' => 'Adam (Male, American)',
-					'Sam' => 'Sam (Male, American)',
+					'eleven_multilingual_v2' => 'Eleven Multilingual v2 (Supports multiple languages)',
+					'eleven_monolingual_v1' => 'Eleven Monolingual v1 (English only, high quality)',
+					// Add other models as needed
 				],
-				'default' => 'Rachel',
-				'description' => 'Default voice to use when none is specified',
+				'default' => 'eleven_multilingual_v2',
+				'description' => 'Default ElevenLabs model ID.',
+			],
+			'stability' => [
+				'type' => 'number',
+				'label' => 'Default Stability (0.0 - 1.0)',
+				'required' => false,
+				'default' => 0.75,
+				'min' => 0,
+				'max' => 1,
+				'step' => 0.01,
+				'description' => 'Controls randomness. Lower values are more expressive but less stable.',
+			],
+			'similarity_boost' => [
+				'type' => 'number',
+				'label' => 'Default Similarity Boost (0.0 - 1.0)',
+				'required' => false,
+				'default' => 0.75,
+				'min' => 0,
+				'max' => 1,
+				'step' => 0.01,
+				'description' => 'Higher values make the voice more similar to the original but can introduce artifacts.',
 			],
 		];
 	}
 
+	private function getSimplifiedVoiceList(): array {
+		$voices = $this->getAvailableVoices();
+		$list = [];
+		foreach ($voices as $voice) {
+			$list[$voice['id']] = $voice['name'];
+		}
+		return $list;
+	}
+	
 	/**
 	 * Get provider name
 	 *
@@ -349,34 +431,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 	 * @return bool True if configured.
 	 */
 	public function isConfigured(): bool {
-		// Allow mock mode even without credentials for testing
-		return true;
-	}
-
-	/**
-	 * Generate mock audio data for testing
-	 *
-	 * @return string Mock audio data.
-	 */
-	private function generateMockAudioData(): string {
-		// Create a simple MP3-like header for testing
-		$sample_rate = 22050;
-		$channels = 1;
-		$bits_per_sample = 16;
-		$duration = 3; // 3 seconds
-		$data_size = $sample_rate * $channels * $bits_per_sample / 8 * $duration;
-		
-		// Simple MP3 header simulation
-		$header = 'ID3' . chr(3) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0) . chr(0);
-		
-		// Generate simple tone data with different frequency for ElevenLabs
-		$audio_data = '';
-		for ( $i = 0; $i < $data_size / 2; $i++ ) {
-			$sample = sin( 2 * M_PI * 659 * $i / $sample_rate ) * 16383; // 659Hz tone (E5)
-			$audio_data .= pack( 's', $sample );
-		}
-		
-		return $header . $audio_data;
+		return ! empty( $this->config['api_key'] );
 	}
 
 	/**

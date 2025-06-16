@@ -57,4 +57,14 @@ class Logger {
 			error_log( '[WP_TTS DEBUG] ' . $message . ( ! empty( $context ) ? ' ' . wp_json_encode( $context ) : '' ) );
 		}
 	}
+	
+	/**
+	 * Log warning message (alias for warning)
+	 *
+	 * @param string $message Log message.
+	 * @param array  $context Additional context.
+	 */
+	public function warn( string $message, array $context = [] ): void {
+		$this->warning( $message, $context );
+	}
 }

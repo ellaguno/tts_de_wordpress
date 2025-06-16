@@ -27,13 +27,32 @@ define('WP_TTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TTS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_TTS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-// Autoload classes using Composer
+// Include required classes directly for activation/deactivation
+require_once WP_TTS_PLUGIN_DIR . 'src/Core/Activator.php';
+require_once WP_TTS_PLUGIN_DIR . 'src/Core/Deactivator.php';
+
+// Manual autoloader for plugin classes
+spl_autoload_register(function ($class) {
+    // Check if the class belongs to our namespace
+    if (strpos($class, 'WP_TTS\\') !== 0) {
+        return;
+    }
+    
+    // Convert namespace to file path
+    $class_file = str_replace('WP_TTS\\', '', $class);
+    $class_file = str_replace('\\', '/', $class_file);
+    $file_path = WP_TTS_PLUGIN_DIR . 'src/' . $class_file . '.php';
+    
+    // Include the file if it exists
+    if (file_exists($file_path)) {
+        require_once $file_path;
+    }
+});
+
+// Autoload classes using Composer (if available)
 if (file_exists(WP_TTS_PLUGIN_DIR . 'vendor/autoload.php')) {
     require_once WP_TTS_PLUGIN_DIR . 'vendor/autoload.php';
 }
-
-// Include the main plugin class
-require_once WP_TTS_PLUGIN_DIR . 'src/Core/Plugin.php';
 
 use WP_TTS\Core\Plugin;
 use WP_TTS\Core\Activator;
