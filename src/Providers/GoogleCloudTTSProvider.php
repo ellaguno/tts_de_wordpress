@@ -136,7 +136,7 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			throw new ProviderException( 'Google Cloud SDK for PHP not found. Run "composer require google/cloud-text-to-speech".' );
 		}
 		
-		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-ES-Standard-A');
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-MX-Wavenet-A');
 		// Google voice names are like 'es-MX-Wavenet-A'. We need language code and name separately.
 		$language_code = substr( $voice_id, 0, 5 ); // e.g., es-MX
 		$voice_name = $voice_id;
