@@ -196,9 +196,11 @@ class Plugin {
 
 		// AJAX handlers
 		add_action( 'wp_ajax_tts_generate_audio', array( $this, 'handleGenerateAudio' ) );
-		add_action( 'wp_ajax_tts_preview_voice', array( $this, 'handlePreviewVoice' ) );
-		add_action( 'wp_ajax_tts_get_voices', array( $this, 'handleGetVoices' ) );
 		add_action( 'wp_ajax_tts_validate_provider', array( $this, 'handleValidateProvider' ) );
+		add_action( 'wp_ajax_tts_delete_audio', array( $this, 'handleDeleteAudio' ) );
+		
+		// Register meta-box specific AJAX handler with different action name to avoid conflicts
+		add_action( 'wp_ajax_tts_get_voices_metabox', array( $this, 'handleGetVoicesForMetaBox' ) );
 
 		// Custom hooks for extensibility
 		do_action( 'wp_tts_plugin_loaded', $this );
@@ -249,13 +251,26 @@ class Plugin {
 		// Security nonce
 		wp_nonce_field( 'wp_tts_meta_box', 'wp_tts_meta_nonce' );
 
-		// Get current settings
-		$enabled     = get_post_meta( $post->ID, '_tts_enabled', true );
-		$provider    = get_post_meta( $post->ID, '_tts_voice_provider', true );
-		$voice_id    = get_post_meta( $post->ID, '_tts_voice_id', true );
-		$custom_text = get_post_meta( $post->ID, '_tts_custom_text', true );
-		$audio_url   = get_post_meta( $post->ID, '_tts_audio_url', true );
-		$status      = get_post_meta( $post->ID, '_tts_generation_status', true );
+		// Get current settings with fallback
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			// Use unified system
+			$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post->ID );
+			
+			$enabled     = $tts_data['enabled'];
+			$provider    = $tts_data['voice']['provider'];
+			$voice_id    = $tts_data['voice']['voice_id'];
+			$custom_text = $tts_data['content']['custom_text'];
+			$audio_url   = $tts_data['audio']['url'];
+			$status      = $tts_data['audio']['status'];
+		} else {
+			// Fallback to old system
+			$enabled     = get_post_meta( $post->ID, '_tts_enabled', true );
+			$provider    = get_post_meta( $post->ID, '_tts_voice_provider', true );
+			$voice_id    = get_post_meta( $post->ID, '_tts_voice_id', true );
+			$custom_text = get_post_meta( $post->ID, '_tts_custom_text', true );
+			$audio_url   = get_post_meta( $post->ID, '_tts_audio_url', true );
+			$status      = get_post_meta( $post->ID, '_tts_generation_status', true );
+		}
 
 		// Include meta box template
 		include WP_TTS_PLUGIN_DIR . 'templates/admin/meta-box.php';
@@ -285,23 +300,45 @@ class Plugin {
 
 		$security = $this->container->get( 'security' );
 
-		// Save TTS settings
-		$enabled = isset( $_POST['tts_enabled'] ) ? 1 : 0;
-		update_post_meta( $post_id, '_tts_enabled', $enabled );
+		// Save TTS settings with fallback
+		$enabled = isset( $_POST['tts_enabled'] ) ? true : false;
+		
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			// Use unified system
+			\WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
 
-		if ( isset( $_POST['tts_voice_provider'] ) ) {
-			$provider = $security->sanitizeInput( $_POST['tts_voice_provider'] );
-			update_post_meta( $post_id, '_tts_voice_provider', $provider );
-		}
+			if ( isset( $_POST['tts_voice_provider'] ) ) {
+				$provider = $security->sanitizeInput( $_POST['tts_voice_provider'] );
+				$voice_id = '';
+				if ( isset( $_POST['tts_voice_id'] ) ) {
+					$voice_id = $security->sanitizeInput( $_POST['tts_voice_id'] );
+				}
+				\WP_TTS\Utils\TTSMetaManager::setVoiceConfig( $post_id, $provider, $voice_id );
+			}
 
-		if ( isset( $_POST['tts_voice_id'] ) ) {
-			$voice_id = $security->sanitizeInput( $_POST['tts_voice_id'] );
-			update_post_meta( $post_id, '_tts_voice_id', $voice_id );
-		}
+			if ( isset( $_POST['tts_custom_text'] ) ) {
+				$custom_text = $security->sanitizeTextForTTS( $_POST['tts_custom_text'] );
+				$use_custom = !empty( $custom_text );
+				\WP_TTS\Utils\TTSMetaManager::setCustomText( $post_id, $custom_text, $use_custom );
+			}
+		} else {
+			// Fallback to old system
+			update_post_meta( $post_id, '_tts_enabled', $enabled );
 
-		if ( isset( $_POST['tts_custom_text'] ) ) {
-			$custom_text = $security->sanitizeTextForTTS( $_POST['tts_custom_text'] );
-			update_post_meta( $post_id, '_tts_custom_text', $custom_text );
+			if ( isset( $_POST['tts_voice_provider'] ) ) {
+				$provider = $security->sanitizeInput( $_POST['tts_voice_provider'] );
+				update_post_meta( $post_id, '_tts_voice_provider', $provider );
+				
+				if ( isset( $_POST['tts_voice_id'] ) ) {
+					$voice_id = $security->sanitizeInput( $_POST['tts_voice_id'] );
+					update_post_meta( $post_id, '_tts_voice_id', $voice_id );
+				}
+			}
+
+			if ( isset( $_POST['tts_custom_text'] ) ) {
+				$custom_text = $security->sanitizeTextForTTS( $_POST['tts_custom_text'] );
+				update_post_meta( $post_id, '_tts_custom_text', $custom_text );
+			}
 		}
 
 		// Trigger audio generation if enabled and settings changed
@@ -319,105 +356,66 @@ class Plugin {
 		// Verify nonce and permissions
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_generate_audio' ) ||
 			! current_user_can( 'edit_posts' ) ) {
-			wp_die( __( 'Security check failed', 'TTS de Wordpress' ) );
+			wp_send_json_error( [
+				'message' => __( 'Security check failed', 'TTS de Wordpress' )
+			], 403 );
+			return;
 		}
 
 		$post_id = intval( $_POST['post_id'] );
+
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid post ID', 'TTS de Wordpress' )
+			] );
+			return;
+		}
+
+		$this->container->get( 'logger' )->info( 'Starting audio generation from AJAX', [
+			'post_id' => $post_id
+		] );
 
 		try {
 			$tts_service = $this->container->get( 'tts_service' );
 			$result      = $tts_service->generateAudioForPost( $post_id );
 
-			wp_send_json_success(
-				array(
-					'audio_url' => $result->url,
-					'duration'  => $result->duration,
-					'message'   => __( 'Audio generated successfully', 'TTS de Wordpress' ),
-				)
-			);
-		} catch ( \Exception $e ) {
-			$this->container->get( 'logger' )->error(
-				'Audio generation failed',
-				array(
+			if ( $result && isset( $result->url ) && ! empty( $result->url ) ) {
+				$this->container->get( 'logger' )->info( 'Audio generation successful via AJAX', [
 					'post_id' => $post_id,
-					'error'   => $e->getMessage(),
-				)
-			);
+					'audio_url' => $result->url
+				] );
 
-			wp_send_json_error(
-				array(
-					'message' => __( 'Audio generation failed', 'TTS de Wordpress' ),
-					'error'   => $e->getMessage(),
-				)
-			);
-		}
-	}
-
-	/**
-	 * Handle AJAX voice preview request
-	 */
-	public function handlePreviewVoice(): void {
-		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_preview_voice' ) ||
-			! current_user_can( 'edit_posts' ) ) {
-			wp_die( __( 'Security check failed', 'TTS de Wordpress' ) );
-		}
-
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
-		$voice = sanitize_text_field( $_POST['voice'] ?? '' );
-
-		try {
-			$tts_service = $this->container->get( 'tts_service' );
-			$preview_text = __( 'This is a voice preview sample.', 'TTS de Wordpress' );
-			$result = $tts_service->generatePreview( $preview_text, $provider, $voice );
-
-			wp_send_json_success(
-				array(
+				wp_send_json_success( [
 					'audio_url' => $result->url,
-					'message'   => __( 'Preview generated successfully', 'TTS de Wordpress' ),
-				)
-			);
+					'duration'  => $result->duration ?? 0,
+					'provider'  => $result->provider ?? '',
+					'message'   => __( 'Audio generated successfully', 'TTS de Wordpress' ),
+				] );
+			} else {
+				$this->container->get( 'logger' )->error( 'Audio generation returned invalid result', [
+					'post_id' => $post_id,
+					'result' => $result
+				] );
+
+				wp_send_json_error( [
+					'message' => __( 'Audio generation failed: Invalid result returned', 'TTS de Wordpress' ),
+				] );
+			}
 		} catch ( \Exception $e ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Preview generation failed', 'TTS de Wordpress' ),
-					'error'   => $e->getMessage(),
-				)
-			);
+			$this->container->get( 'logger' )->error( 'Audio generation failed with exception', [
+				'post_id' => $post_id,
+				'error'   => $e->getMessage(),
+				'trace'   => $e->getTraceAsString()
+			] );
+
+			wp_send_json_error( [
+				'message' => __( 'Audio generation failed', 'TTS de Wordpress' ),
+				'error'   => $e->getMessage(),
+			] );
 		}
 	}
 
-	/**
-	 * Handle AJAX get voices request
-	 */
-	public function handleGetVoices(): void {
-		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_get_voices' ) ||
-			! current_user_can( 'edit_posts' ) ) {
-			wp_die( __( 'Security check failed', 'TTS de Wordpress' ) );
-		}
 
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
-
-		try {
-			$tts_service = $this->container->get( 'tts_service' );
-			$voices = $tts_service->getAvailableVoices( $provider );
-
-			wp_send_json_success(
-				array(
-					'voices' => $voices,
-					'message' => __( 'Voices loaded successfully', 'TTS de Wordpress' ),
-				)
-			);
-		} catch ( \Exception $e ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Failed to load voices', 'TTS de Wordpress' ),
-					'error'   => $e->getMessage(),
-				)
-			);
-		}
-	}
 
 	/**
 	 * Handle AJAX provider validation request
@@ -454,6 +452,122 @@ class Plugin {
 	}
 
 	/**
+	 * Handle get voices AJAX request for meta box
+	 */
+	public function handleGetVoicesForMetaBox(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_admin' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+
+		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+
+		try {
+			$tts_service = $this->container->get( 'tts_service' );
+			$voices = $tts_service->getAvailableVoices( $provider );
+
+			wp_send_json_success( [
+				'provider' => $provider,
+				'voices' => $voices,
+				'count' => count($voices)
+			] );
+
+		} catch ( \Exception $e ) {
+			$this->container->get( 'logger' )->error( 'Failed to get voices for meta box', [
+				'provider' => $provider,
+				'error' => $e->getMessage()
+			] );
+
+			wp_send_json_error( [
+				'message' => 'Failed to load voices: ' . $e->getMessage(),
+				'provider' => $provider
+			] );
+		}
+	}
+
+	/**
+	 * Handle AJAX delete audio request
+	 */
+	public function handleDeleteAudio(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_delete_audio' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_die( __( 'Security check failed', 'TTS de Wordpress' ) );
+		}
+
+		$post_id = intval( $_POST['post_id'] );
+
+		try {
+			// Get audio URL and file path with fallback
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+			} else {
+				$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+			}
+			
+			if ( $audio_url ) {
+				// Parse file path from URL
+				$upload_dir = wp_upload_dir();
+				$file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $audio_url );
+				
+				// Delete physical file if it exists
+				if ( file_exists( $file_path ) ) {
+					unlink( $file_path );
+					$this->container->get( 'logger' )->info( 'Audio file deleted', [
+						'post_id' => $post_id,
+						'file_path' => $file_path
+					] );
+				}
+			}
+
+			// Reset audio data with fallback
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				\WP_TTS\Utils\TTSMetaManager::updateTTSSection( $post_id, 'audio', [
+					'url' => '',
+					'generated_at' => null,
+					'status' => 'pending',
+					'duration' => 0,
+					'file_size' => 0
+				] );
+			} else {
+				// Fallback to old system
+				delete_post_meta( $post_id, '_tts_audio_url' );
+				delete_post_meta( $post_id, '_tts_generated_at' );
+				update_post_meta( $post_id, '_tts_generation_status', 'pending' );
+			}
+
+			$this->container->get( 'logger' )->info( 'Audio deleted for post', [
+				'post_id' => $post_id
+			] );
+
+			wp_send_json_success(
+				array(
+					'message' => __( 'Audio deleted successfully', 'TTS de Wordpress' ),
+				)
+			);
+		} catch ( \Exception $e ) {
+			$this->container->get( 'logger' )->error(
+				'Audio deletion failed',
+				array(
+					'post_id' => $post_id,
+					'error'   => $e->getMessage(),
+				)
+			);
+
+			wp_send_json_error(
+				array(
+					'message' => __( 'Audio deletion failed', 'TTS de Wordpress' ),
+					'error'   => $e->getMessage(),
+				)
+			);
+		}
+	}
+
+	/**
 	 * Enqueue frontend assets
 	 */
 	public function enqueueFrontendAssets(): void {
@@ -463,6 +577,28 @@ class Plugin {
 			array(),
 			$this->version
 		);
+
+		// Enqueue player styles only when needed
+		if ( is_single() || is_page() ) {
+			$post_id = get_the_ID();
+			
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$enabled = \WP_TTS\Utils\TTSMetaManager::isTTSEnabled( $post_id );
+				$audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+			} else {
+				$enabled = get_post_meta( $post_id, '_tts_enabled', true );
+				$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+			}
+			
+			if ( $enabled && $audio_url ) {
+				wp_enqueue_style(
+					'wp-tts-player',
+					WP_TTS_PLUGIN_URL . 'assets/css/frontend-player.css',
+					array(),
+					$this->version
+				);
+			}
+		}
 
 		wp_enqueue_script(
 			'wp-tts-frontend',
@@ -488,13 +624,20 @@ class Plugin {
 			$atts
 		);
 
-		$post_id   = intval( $atts['post_id'] );
-		$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		$post_id = intval( $atts['post_id'] );
+		$style   = $atts['style'];
+		
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			$audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+		} else {
+			$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		}
 
 		if ( ! $audio_url ) {
 			return '';
 		}
 
+		// Make variables available to the template
 		ob_start();
 		include WP_TTS_PLUGIN_DIR . 'templates/frontend/audio-player.php';
 		return ob_get_clean();
@@ -511,9 +654,15 @@ class Plugin {
 			return $content;
 		}
 
-		$post_id   = get_the_ID();
-		$enabled   = get_post_meta( $post_id, '_tts_enabled', true );
-		$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		$post_id = get_the_ID();
+		
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			$enabled   = \WP_TTS\Utils\TTSMetaManager::isTTSEnabled( $post_id );
+			$audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+		} else {
+			$enabled   = get_post_meta( $post_id, '_tts_enabled', true );
+			$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		}
 
 		if ( $enabled && $audio_url ) {
 			$player  = $this->renderAudioPlayerShortcode( array( 'post_id' => $post_id ) );
@@ -530,10 +679,21 @@ class Plugin {
 	 * @return bool
 	 */
 	private function shouldRegenerateAudio( $post_id ): bool {
-		$last_modified  = get_post_modified_time( 'U', false, $post_id );
-		$last_generated = get_post_meta( $post_id, '_tts_last_generated', true );
+		$last_modified = get_post_modified_time( 'U', false, $post_id );
+		
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
+			$last_generated = $tts_data['generation']['last_attempt'];
+		} else {
+			$last_generated = get_post_meta( $post_id, '_tts_generated_at', true );
+		}
 
-		return ! $last_generated || $last_modified > strtotime( $last_generated );
+		if ( ! $last_generated ) {
+			return true;
+		}
+
+		$last_generated_timestamp = strtotime( $last_generated );
+		return $last_modified > $last_generated_timestamp;
 	}
 
 	/**

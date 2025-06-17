@@ -58,7 +58,9 @@ class AdminInterface {
 		add_action( 'admin_init', [ $this, 'registerSettings' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAdminAssets' ] );
 		add_action( 'wp_ajax_wp_tts_test_provider', [ $this, 'handleTestProvider' ] );
-		add_action( 'wp_ajax_wp_tts_get_voices', [ $this, 'handleGetVoices' ] );
+		add_action( 'wp_ajax_tts_get_voices', [ $this, 'handleGetVoices' ] );
+		add_action( 'wp_ajax_tts_preview_voice', [ $this, 'handlePreviewVoice' ] );
+		add_action( 'wp_ajax_tts_generate_custom', [ $this, 'handleGenerateCustom' ] );
 	}
 	
 	/**
@@ -325,23 +327,348 @@ class AdminInterface {
 		}
 		
 		$stats = $this->tts_service->getStats();
+		$config = get_option( 'wp_tts_config', [] );
+		
+		// Only show providers that are actually configured, plus some for testing
+		$all_providers = ['google', 'openai', 'elevenlabs', 'azure_tts', 'amazon_polly'];
+		$enabled_providers = [];
+		
+		foreach ($all_providers as $provider) {
+			$is_valid = $this->tts_service->validateProvider($provider);
+			error_log("[TTS Tools] Provider validation - $provider: " . ($is_valid ? 'VALID' : 'INVALID'));
+			
+			// Show configured providers, or some specific ones for testing even if not configured
+			if ($is_valid || in_array($provider, ['google', 'openai', 'elevenlabs', 'azure_tts'])) {
+				$enabled_providers[] = $provider;
+			}
+		}
 		
 		echo '<div class="wrap">';
 		echo '<h1>' . esc_html__( 'TTS Tools', 'TTS de Wordpress' ) . '</h1>';
 		
+		// Voice Preview Tool
+		echo '<div class="card">';
+		echo '<h2>' . esc_html__( 'Voice Preview', 'TTS de Wordpress' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Test different voices and providers before using them in your posts.', 'TTS de Wordpress' ) . '</p>';
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row"><label for="preview_provider">' . esc_html__( 'Provider', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<select id="preview_provider" class="regular-text">';
+		echo '<option value="">' . esc_html__( 'Select a provider', 'TTS de Wordpress' ) . '</option>';
+		foreach ($enabled_providers as $provider) {
+			echo '<option value="' . esc_attr($provider) . '">' . esc_html(ucfirst($provider)) . '</option>';
+		}
+		echo '</select>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"><label for="preview_voice">' . esc_html__( 'Voice', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<select id="preview_voice" class="regular-text" disabled>';
+		echo '<option value="">' . esc_html__( 'Select a provider first', 'TTS de Wordpress' ) . '</option>';
+		echo '</select>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"><label for="preview_text">' . esc_html__( 'Sample Text', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<textarea id="preview_text" rows="3" class="large-text" placeholder="' . esc_attr__( 'Enter text to preview...', 'TTS de Wordpress' ) . '">' . esc_textarea('Hola, esta es una muestra de voz para probar el sistema de texto a voz.') . '</textarea>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"></th>';
+		echo '<td>';
+		echo '<button type="button" class="button button-primary" id="generate_preview" disabled>';
+		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Preview', 'TTS de Wordpress' );
+		echo '</button>';
+		echo '<div id="preview_result" style="margin-top: 15px; display: none;">';
+		echo '<audio controls style="width: 100%;">';
+		echo '<source id="preview_audio_source" src="" type="audio/mpeg">';
+		echo esc_html__( 'Your browser does not support the audio element.', 'TTS de Wordpress' );
+		echo '</audio>';
+		echo '</div>';
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+		echo '</div>';
+		
+		// Custom Text Generator
+		echo '<div class="card">';
+		echo '<h2>' . esc_html__( 'Custom Text Generator', 'TTS de Wordpress' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Generate audio from custom text with detailed configuration options.', 'TTS de Wordpress' ) . '</p>';
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row"><label for="custom_provider">' . esc_html__( 'Provider', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<select id="custom_provider" class="regular-text">';
+		echo '<option value="">' . esc_html__( 'Use default provider', 'TTS de Wordpress' ) . '</option>';
+		foreach ($enabled_providers as $provider) {
+			echo '<option value="' . esc_attr($provider) . '">' . esc_html(ucfirst($provider)) . '</option>';
+		}
+		echo '</select>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"><label for="custom_voice">' . esc_html__( 'Voice', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<select id="custom_voice" class="regular-text">';
+		echo '<option value="">' . esc_html__( 'Use default voice', 'TTS de Wordpress' ) . '</option>';
+		echo '</select>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"><label for="custom_text">' . esc_html__( 'Custom Text', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<td>';
+		echo '<textarea id="custom_text" rows="8" class="large-text" placeholder="' . esc_attr__( 'Enter your custom text here...', 'TTS de Wordpress' ) . '"></textarea>';
+		echo '<div class="wp-tts-text-stats" style="margin-top: 5px; font-size: 12px; color: #666;">';
+		echo '<span id="custom_character_count">0</span> ' . esc_html__( 'characters', 'TTS de Wordpress' );
+		echo '<span style="margin: 0 10px;">|</span>';
+		echo '<span id="custom_estimated_cost">$0.00</span> ' . esc_html__( 'estimated cost', 'TTS de Wordpress' );
+		echo '</div>';
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row"></th>';
+		echo '<td>';
+		echo '<button type="button" class="button button-primary" id="generate_custom">';
+		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Audio', 'TTS de Wordpress' );
+		echo '</button>';
+		echo '<div id="custom_generation_progress" style="display: none; margin-top: 15px;">';
+		echo '<div style="width: 100%; height: 20px; background-color: #f0f0f0; border-radius: 10px; overflow: hidden;">';
+		echo '<div id="custom_progress_fill" style="height: 100%; background-color: #0073aa; width: 0%; transition: width 0.3s ease;"></div>';
+		echo '</div>';
+		echo '<p style="margin: 5px 0 0 0; font-size: 12px; color: #666;" id="custom_progress_text">' . esc_html__( 'Preparing...', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '<div id="custom_result" style="margin-top: 15px; display: none;">';
+		echo '<audio controls style="width: 100%;">';
+		echo '<source id="custom_audio_source" src="" type="audio/mpeg">';
+		echo esc_html__( 'Your browser does not support the audio element.', 'TTS de Wordpress' );
+		echo '</audio>';
+		echo '<p style="margin-top: 10px;">';
+		echo '<a id="custom_download_link" href="#" download class="button button-secondary">' . esc_html__( 'Download Audio', 'TTS de Wordpress' ) . '</a>';
+		echo '</p>';
+		echo '</div>';
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+		echo '</div>';
+		
+		// Service Statistics
 		echo '<div class="card">';
 		echo '<h2>' . esc_html__( 'Service Statistics', 'TTS de Wordpress' ) . '</h2>';
 		echo '<pre>' . esc_html( wp_json_encode( $stats, JSON_PRETTY_PRINT ) ) . '</pre>';
 		echo '</div>';
 		
-		echo '<div class="card">';
-		echo '<h2>' . esc_html__( 'Test TTS Generation', 'TTS de Wordpress' ) . '</h2>';
-		echo '<p><textarea id="test-text" rows="4" cols="50" placeholder="' . esc_attr__( 'Enter text to test...', 'TTS de Wordpress' ) . '"></textarea></p>';
-		echo '<p><button type="button" class="button button-primary" id="test-tts">' . esc_html__( 'Generate Test Audio', 'TTS de Wordpress' ) . '</button></p>';
-		echo '<div id="test-result"></div>';
 		echo '</div>';
 		
-		echo '</div>';
+		// Add JavaScript for tools functionality
+		echo '<script>';
+		echo 'var ajaxurl = "' . admin_url('admin-ajax.php') . '";';
+		echo 'jQuery(document).ready(function($) {';
+		
+		// Preview functionality
+		echo '$(\'#preview_provider\').on(\'change\', function() {';
+		echo 'const provider = $(this).val();';
+		echo 'const $voiceSelect = $(\'#preview_voice\');';
+		echo 'if (!provider) {';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Select a provider first', 'TTS de Wordpress' ) . '</option>\').prop(\'disabled\', true);';
+		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
+		echo 'return;';
+		echo '}';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$.ajax({';
+		echo 'url: ajaxurl,';
+		echo 'type: \'POST\',' ;
+		echo 'data: { action: \'tts_get_voices\', provider: provider, nonce: \''. wp_create_nonce('wp_tts_admin') .'\' },';
+		echo 'beforeSend: function() {';
+		echo 'console.log("[TTS Preview] Sending AJAX request for provider:", provider);';
+		echo '},';
+		echo 'success: function(response) {';
+		echo 'console.log("[TTS Preview] AJAX Response received:", response);';
+		echo 'if (response.success && response.data && response.data.voices) {';
+		echo 'console.log("[TTS Preview] Success! Found " + response.data.voices.length + " voices");';
+		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'if (response.data.voices.length > 0) {';
+		echo 'response.data.voices.forEach(function(voice) {';
+		echo 'console.log("[TTS Preview] Adding voice:", voice);';
+		echo 'options += `<option value="${voice.id}">${voice.name}${voice.language ? \' (\' + voice.language + \')\' : \'\'}</option>`;';
+		echo '});';
+		echo '} else {';
+		echo 'console.log("[TTS Preview] No voices found in response");';
+		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS de Wordpress' ) . '</option>\';';
+		echo '}';
+		echo '$voiceSelect.html(options).prop(\'disabled\', false);';
+		echo '$(\'#generate_preview\').prop(\'disabled\', false);';
+		echo '} else {';
+		echo 'console.error("[TTS Preview] AJAX Error - Invalid response structure:", response);';
+		echo 'if (response.data && response.data.message) {';
+		echo 'console.error("[TTS Preview] Error message:", response.data.message);';
+		echo '}';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
+		echo '}';
+		echo '},';
+		echo 'error: function(xhr, status, error) {';
+		echo 'console.error("[TTS Preview] AJAX Call Failed:", {xhr: xhr, status: status, error: error});';
+		echo 'console.error("[TTS Preview] Response text:", xhr.responseText);';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
+		echo '}';
+		echo '});';
+		echo '});';
+		
+		// Generate preview
+		echo '$(\'#generate_preview\').on(\'click\', function() {';
+		echo 'const provider = $(\'#preview_provider\').val();';
+		echo 'const voice = $(\'#preview_voice\').val();';
+		echo 'const text = $(\'#preview_text\').val();';
+		echo 'if (!text.trim()) {';
+		echo 'alert(\''. esc_js__( 'Please enter some text to preview', 'TTS de Wordpress' ) .'\');';
+		echo 'return;';
+		echo '}';
+		echo 'const $button = $(this);';
+		echo 'const originalText = $button.html();';
+		echo '$button.prop(\'disabled\', true).html(\'<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> '. esc_js__( 'Generating...', 'TTS de Wordpress' ) .'\');';
+		echo '$.ajax({';
+		echo 'url: ajaxurl,';
+		echo 'type: \'POST\',' ;
+		echo 'data: { action: \'tts_preview_voice\', provider: provider, voice: voice, text: text, nonce: \''. wp_create_nonce('wp_tts_admin') .'\' },';
+		echo 'success: function(response) {';
+		echo 'if (response.success) {';
+		echo '$(\'#preview_audio_source\').attr(\'src\', response.data.audio_url);';
+		echo '$(\'#preview_result\').show();';
+		echo '$(\'#preview_result audio\')[0].load();';
+		echo '} else {';
+		echo 'alert(response.data.message || \''. esc_js__( 'Preview failed', 'TTS de Wordpress' ) .'\');';
+		echo '}';
+		echo '},';
+		echo 'error: function() { alert(\''. esc_js__( 'Preview failed', 'TTS de Wordpress' ) .'\'); },';
+		echo 'complete: function() { $button.prop(\'disabled\', false).html(originalText); }';
+		echo '});';
+		echo '});';
+		
+		// Custom text functionality
+		echo '$(\'#custom_provider\').on(\'change\', function() {';
+		echo 'const provider = $(this).val();';
+		echo 'const $voiceSelect = $(\'#custom_voice\');';
+		echo 'if (!provider) {';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\');';
+		echo 'return;';
+		echo '}';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$.ajax({';
+		echo 'url: ajaxurl,';
+		echo 'type: \'POST\',' ;
+		echo 'data: { action: \'tts_get_voices\', provider: provider, nonce: \''. wp_create_nonce('wp_tts_admin') .'\' },';
+		echo 'beforeSend: function() {';
+		echo 'console.log("[TTS Custom] Sending AJAX request for provider:", provider);';
+		echo '},';
+		echo 'success: function(response) {';
+		echo 'console.log("[TTS Custom] AJAX Response received:", response);';
+		echo 'if (response.success && response.data && response.data.voices) {';
+		echo 'console.log("[TTS Custom] Success! Found " + response.data.voices.length + " voices");';
+		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'if (response.data.voices.length > 0) {';
+		echo 'response.data.voices.forEach(function(voice) {';
+		echo 'console.log("[TTS Custom] Adding voice:", voice);';
+		echo 'options += `<option value="${voice.id}">${voice.name}${voice.language ? \' (\' + voice.language + \')\' : \'\'}</option>`;';
+		echo '});';
+		echo '} else {';
+		echo 'console.log("[TTS Custom] No voices found in response");';
+		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS de Wordpress' ) . '</option>\';';
+		echo '}';
+		echo '$voiceSelect.html(options).prop(\'disabled\', false);';
+		echo '} else {';
+		echo 'console.error("[TTS Custom] AJAX Error - Invalid response structure:", response);';
+		echo 'if (response.data && response.data.message) {';
+		echo 'console.error("[TTS Custom] Error message:", response.data.message);';
+		echo '}';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS de Wordpress' ) . '</option>\');';
+		echo '}';
+		echo '},';
+		echo 'error: function(xhr, status, error) {';
+		echo 'console.error("[TTS Custom] AJAX Call Failed:", {xhr: xhr, status: status, error: error});';
+		echo 'console.error("[TTS Custom] Response text:", xhr.responseText);';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS de Wordpress' ) . '</option>\');';
+		echo '}';
+		echo '});';
+		echo '});';
+		
+		// Character count and cost estimation
+		echo '$(\'#custom_text\').on(\'input\', function() {';
+		echo 'const text = $(this).val();';
+		echo 'const charCount = text.length;';
+		echo 'const estimatedCost = (charCount / 1000000 * 15).toFixed(4);';
+		echo '$(\'#custom_character_count\').text(charCount.toLocaleString());';
+		echo '$(\'#custom_estimated_cost\').text(\'$\' + estimatedCost);';
+		echo '});';
+		
+		// Generate custom audio
+		echo '$(\'#generate_custom\').on(\'click\', function() {';
+		echo 'const provider = $(\'#custom_provider\').val();';
+		echo 'const voice = $(\'#custom_voice\').val();';
+		echo 'const text = $(\'#custom_text\').val();';
+		echo 'if (!text.trim()) {';
+		echo 'alert(\''. esc_js__( 'Please enter some text to generate', 'TTS de Wordpress' ) .'\');';
+		echo 'return;';
+		echo '}';
+		echo 'const $button = $(this);';
+		echo 'const originalText = $button.html();';
+		echo '$button.prop(\'disabled\', true);';
+		echo '$(\'#custom_generation_progress\').show();';
+		echo 'let progress = 0;';
+		echo 'const progressInterval = setInterval(function() {';
+		echo 'progress += Math.random() * 20;';
+		echo 'if (progress > 90) progress = 90;';
+		echo '$(\'#custom_progress_fill\').css(\'width\', progress + \'%\');';
+		echo '}, 500);';
+		echo '$.ajax({';
+		echo 'url: ajaxurl,';
+		echo 'type: \'POST\',' ;
+		echo 'data: { action: \'tts_generate_custom\', provider: provider, voice: voice, text: text, nonce: \''. wp_create_nonce('wp_tts_admin') .'\' },';
+		echo 'beforeSend: function() {';
+		echo 'console.log("[TTS Custom Generate] Starting audio generation with:", {provider: provider, voice: voice, textLength: text.length});';
+		echo '},';
+		echo 'success: function(response) {';
+		echo 'console.log("[TTS Custom Generate] Response received:", response);';
+		echo 'clearInterval(progressInterval);';
+		echo '$(\'#custom_progress_fill\').css(\'width\', \'100%\');';
+		echo 'if (response.success) {';
+		echo 'console.log("[TTS Custom Generate] Success! Audio URL:", response.data.audio_url);';
+		echo 'setTimeout(function() {';
+		echo '$(\'#custom_audio_source\').attr(\'src\', response.data.audio_url);';
+		echo '$(\'#custom_download_link\').attr(\'href\', response.data.audio_url);';
+		echo '$(\'#custom_result\').show();';
+		echo '$(\'#custom_result audio\')[0].load();';
+		echo '$(\'#custom_generation_progress\').hide();';
+		echo '}, 1000);';
+		echo '} else {';
+		echo 'console.error("[TTS Custom Generate] Generation failed:", response);';
+		echo 'const errorMsg = response.data ? response.data.message : \''. esc_js__( 'Generation failed', 'TTS de Wordpress' ) .'\';';
+		echo 'alert(errorMsg);';
+		echo '$(\'#custom_generation_progress\').hide();';
+		echo '}';
+		echo '},';
+		echo 'error: function(xhr, status, error) {';
+		echo 'console.error("[TTS Custom Generate] AJAX Error:", {xhr: xhr, status: status, error: error});';
+		echo 'console.error("[TTS Custom Generate] Response text:", xhr.responseText);';
+		echo 'clearInterval(progressInterval);';
+		echo 'alert(\''. esc_js__( 'Generation failed', 'TTS de Wordpress' ) .'\');';
+		echo '$(\'#custom_generation_progress\').hide();';
+		echo '},';
+		echo 'complete: function() { $button.prop(\'disabled\', false).html(originalText); }';
+		echo '});';
+		echo '});';
+		
+		echo '});';
+		echo '</script>';
+		
+		// Add CSS
+		echo '<style>';
+		echo '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+		echo '.wp-tts-text-stats { margin-top: 5px; font-size: 12px; color: #666; }';
+		echo '</style>';
 	}
 	
 	/**
@@ -618,8 +945,6 @@ class AdminInterface {
 		$voices = [
 			'es-MX-Wavenet-A' => 'Wavenet A (Mexican Spanish Female)',
 			'es-MX-Wavenet-B' => 'Wavenet B (Mexican Spanish Male)',
-			'es-MX-Wavenet-C' => 'Wavenet C (Mexican Spanish Female)',
-			'es-MX-Wavenet-D' => 'Wavenet D (Mexican Spanish Male)',
 			'es-ES-Wavenet-A' => 'Wavenet A (Spanish Female)',
 			'es-ES-Wavenet-B' => 'Wavenet B (Spanish Male)',
 			'es-ES-Wavenet-C' => 'Wavenet C (Spanish Female)',
@@ -666,17 +991,16 @@ class AdminInterface {
 	 */
 	public function renderElevenLabsDefaultVoiceField(): void {
 		$config = get_option( 'wp_tts_config', [] );
-		$current = $config['providers']['elevenlabs']['default_voice'] ?? 'Rachel';
+		$current = $config['providers']['elevenlabs']['default_voice'] ?? 'EXAVITQu4vr4xnSDxMaL';
 		$voices = [
-			'Rachel' => 'Rachel (Female, American)',
-			'Domi' => 'Domi (Female, American)',
-			'Bella' => 'Bella (Female, American)',
-			'Antoni' => 'Antoni (Male, American)',
-			'Elli' => 'Elli (Female, American)',
-			'Josh' => 'Josh (Male, American)',
-			'Arnold' => 'Arnold (Male, American)',
-			'Adam' => 'Adam (Male, American)',
-			'Sam' => 'Sam (Male, American)',
+			'EXAVITQu4vr4xnSDxMaL' => 'Bella (Spanish Female)',
+			'pNInz6obpgDQGcFmaJgB' => 'Adam (Spanish Male)',
+			'TxGEqnHWrfWFTfGW9XjX' => 'Josh (Spanish Male)',
+			'VR6AewLTigWG4xSOukaG' => 'Arnold (Spanish Male)',
+			'MF3mGyEYCl7XYWbV9V6O' => 'Elli (Spanish Female)',
+			'XrExE9yKIg1WjnnlVkGX' => 'Matilda (Spanish Female)',
+			'ErXwobaYiN019PkySvjV' => 'Antoni (Spanish Male)',
+			'21m00Tcm4TlvDq8ikWAM' => 'Rachel (English Female)',
 		];
 		
 		echo '<select name="wp_tts_config[providers][elevenlabs][default_voice]">';
@@ -806,11 +1130,164 @@ class AdminInterface {
 		}
 		
 		$provider = isset($_POST['provider']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['provider'])) ) : '';
-		$voices = $this->tts_service->getAvailableVoices( $provider );
 		
-		wp_send_json_success( [
-			'provider' => $provider,
-			'voices' => $voices,
-		] );
+		// Add comprehensive debugging
+		error_log('[TTS Tools Debug] ========== GET VOICES REQUEST ==========');
+		error_log('[TTS Tools Debug] Provider requested: ' . $provider);
+		error_log('[TTS Tools Debug] POST data: ' . wp_json_encode($_POST));
+		error_log('[TTS Tools Debug] Nonce verification passed');
+		
+		// Validate provider name
+		$valid_providers = ['google', 'openai', 'elevenlabs', 'azure_tts', 'amazon_polly'];
+		if ( !in_array($provider, $valid_providers) ) {
+			error_log('[TTS Tools Debug] Invalid provider: ' . $provider);
+			wp_send_json_error( [
+				'message' => 'Invalid provider: ' . $provider,
+				'provider' => $provider,
+				'valid_providers' => $valid_providers,
+				'debug' => 'Invalid provider in AdminInterface::handleGetVoices'
+			] );
+			return;
+		}
+		
+		try {
+			error_log('[TTS Tools Debug] Calling tts_service->getAvailableVoices() for provider: ' . $provider);
+			$voices = $this->tts_service->getAvailableVoices( $provider );
+			
+			error_log('[TTS Tools Debug] Voices retrieved: ' . count($voices) . ' voices');
+			error_log('[TTS Tools Debug] Voices data type: ' . gettype($voices));
+			error_log('[TTS Tools Debug] First voice sample: ' . wp_json_encode(array_slice($voices, 0, 2)));
+			
+			wp_send_json_success( [
+				'provider' => $provider,
+				'voices' => $voices,
+				'count' => count($voices),
+				'debug' => 'Success from AdminInterface::handleGetVoices',
+				'timestamp' => current_time('mysql')
+			] );
+			
+		} catch ( \Exception $e ) {
+			error_log('[TTS Tools Debug] Exception in getAvailableVoices: ' . $e->getMessage());
+			error_log('[TTS Tools Debug] Exception trace: ' . $e->getTraceAsString());
+			
+			wp_send_json_error( [
+				'message' => 'Failed to load voices: ' . $e->getMessage(),
+				'provider' => $provider,
+				'debug' => 'Exception in AdminInterface::handleGetVoices',
+				'error_details' => [
+					'message' => $e->getMessage(),
+					'file' => $e->getFile(),
+					'line' => $e->getLine()
+				]
+			] );
+		}
+	}
+	
+	/**
+	 * Handle voice preview AJAX request
+	 */
+	public function handlePreviewVoice(): void {
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+		
+		// Check permissions
+		if ( ! $this->security->canUser( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+
+		$provider = isset($_POST['provider']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['provider'])) ) : '';
+		$voice = isset($_POST['voice']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['voice'])) ) : '';
+		$text = isset($_POST['text']) ? $this->security->sanitizeTextForTTS( sanitize_textarea_field(wp_unslash($_POST['text'])) ) : '';
+
+		if ( empty( $text ) ) {
+			$text = __( 'This is a voice preview sample.', 'TTS de Wordpress' );
+		}
+
+		try {
+			$result = $this->tts_service->generatePreview( $text, $provider, $voice );
+
+			if ( $result && isset($result->url) && ! empty($result->url) ) {
+				wp_send_json_success( [
+					'audio_url' => $result->url,
+					'provider' => $provider,
+					'duration' => $result->duration ?? 0,
+					'message' => __( 'Preview generated successfully', 'TTS de Wordpress' ),
+				] );
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'Preview generation failed - No audio URL returned', 'TTS de Wordpress' ),
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Preview generation failed', 'TTS de Wordpress' ),
+				'error' => $e->getMessage(),
+			] );
+		}
+	}
+
+	/**
+	 * Handle custom audio generation
+	 */
+	public function handleGenerateCustom(): void {
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+		
+		// Check permissions
+		if ( ! $this->security->canUser( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+			], 403 );
+			return;
+		}
+
+		$provider = isset($_POST['provider']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['provider'])) ) : '';
+		$voice = isset($_POST['voice']) ? $this->security->sanitizeText( sanitize_text_field(wp_unslash($_POST['voice'])) ) : '';
+		$text = isset($_POST['text']) ? $this->security->sanitizeTextForTTS( sanitize_textarea_field(wp_unslash($_POST['text'])) ) : '';
+
+		if ( empty( $text ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Text is required', 'TTS de Wordpress' ),
+			] );
+			return;
+		}
+
+		try {
+			$options = [
+				'provider' => $provider,
+				'voice' => $voice,
+				'custom' => true,
+			];
+
+			$result = $this->tts_service->generateAudio( $text, $options );
+
+			if ( $result && $result['success'] ) {
+				wp_send_json_success( [
+					'audio_url' => $result['audio_url'],
+					'provider' => $result['provider'] ?? $provider,
+					'message' => __( 'Audio generated successfully', 'TTS de Wordpress' ),
+				] );
+			} else {
+				wp_send_json_error( [
+					'message' => $result['message'] ?? __( 'Generation failed', 'TTS de Wordpress' ),
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Generation failed', 'TTS de Wordpress' ),
+				'error' => $e->getMessage(),
+			] );
+		}
 	}
 }

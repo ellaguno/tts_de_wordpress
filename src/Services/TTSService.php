@@ -8,6 +8,7 @@
 namespace WP_TTS\Services;
 
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TTSMetaManager;
 use WP_TTS\Interfaces\CacheServiceInterface;
 
 /**
@@ -58,7 +59,7 @@ class TTSService {
 	 */
 	public function generateAudio( string $text, array $options = [] ): ?array {
 		try {
-			$this->logger->info( 'Starting TTS generation', [ 'text_length' => strlen( $text ) ] );
+			$this->logger->info( 'Starting TTS generation (Round Robin DISABLED)', [ 'text_length' => strlen( $text ) ] );
 			$this->logger->debug( '[generateAudio] Initial options received', $options );
 			
 			// Check cache first
@@ -78,38 +79,32 @@ class TTSService {
 			$current_provider_name = null;
 			$provider_instance = null;
 
-			// 1. Try provider from $options (post settings)
+			// 1. Try provider from $options (post settings) - HIGHEST PRIORITY
 			if ( ! empty( $options['provider'] ) ) {
-				$this->logger->info( '[generateAudio] Attempting to use provider from post options', [ 'options_provider' => $options['provider'] ] );
+				$this->logger->info( '[generateAudio] Using provider from post options', [ 'provider' => $options['provider'] ] );
 				$instance = $this->getProviderInstance( $options['provider'] );
-				$this->logger->debug( '[generateAudio] Result of getProviderInstance for options_provider', [ 'options_provider' => $options['provider'], 'instance_is_null' => is_null($instance) ] );
 				if ( $instance ) {
-					// TODO: Add a health/configuration check here if possible, e.g., $instance->isConfiguredAndHealthy()
 					$current_provider_name = $options['provider'];
 					$provider_instance = $instance;
 					$this->logger->info( '[generateAudio] Successfully set provider from post options', [ 'provider' => $current_provider_name ] );
 				} else {
-					$this->logger->warn( '[generateAudio] Provider from post options FAILED to instantiate. Falling back to round robin.', [ 'options_provider' => $options['provider'] ] );
+					$this->logger->warn( '[generateAudio] Provider from post options FAILED to instantiate', [ 'provider' => $options['provider'] ] );
 				}
 			}
 
-			// 2. If no provider from options, or if it failed to instantiate, try round robin
+			// 2. If no provider from options, use the DEFAULT provider (NO Round Robin)
 			if ( ! $provider_instance ) {
-				$this->logger->info( '[generateAudio] No provider from post options or instantiation failed/not specified. Trying round robin.' );
-				$provider_from_round_robin = $this->round_robin->getNextProvider();
-				if ( $provider_from_round_robin ) {
-					$this->logger->info( '[generateAudio] Round robin selected provider', [ 'rr_provider' => $provider_from_round_robin ] );
-					$instance = $this->getProviderInstance( $provider_from_round_robin );
-					$this->logger->debug( '[generateAudio] Result of getProviderInstance for round_robin_provider', [ 'rr_provider' => $provider_from_round_robin, 'instance_is_null' => is_null($instance) ] );
-					if ( $instance ) {
-						$current_provider_name = $provider_from_round_robin;
-						$provider_instance = $instance;
-						$this->logger->info( '[generateAudio] Successfully set provider from round robin', [ 'provider' => $current_provider_name ] );
-					} else {
-						$this->logger->error( '[generateAudio] Round robin provider FAILED to instantiate.', [ 'rr_provider' => $provider_from_round_robin ] );
-					}
+				$config = get_option( 'wp_tts_config', [] );
+				$default_provider = $config['default_provider'] ?? 'google';
+				
+				$this->logger->info( '[generateAudio] No provider specified, using default provider', [ 'default_provider' => $default_provider ] );
+				$instance = $this->getProviderInstance( $default_provider );
+				if ( $instance ) {
+					$current_provider_name = $default_provider;
+					$provider_instance = $instance;
+					$this->logger->info( '[generateAudio] Successfully set default provider', [ 'provider' => $current_provider_name ] );
 				} else {
-					$this->logger->warn( '[generateAudio] Round robin did not return any provider.' );
+					$this->logger->error( '[generateAudio] Default provider FAILED to instantiate', [ 'default_provider' => $default_provider ] );
 				}
 			}
 			
@@ -155,7 +150,7 @@ class TTSService {
 						'voice' => $speech_call_options['voice'] ?? null, // Log the voice used or attempted
 					] );
 					
-					$this->round_robin->recordUsage( $current_provider_name, true );
+					// Success - no round robin tracking needed
 					
 					$this->logger->info( 'TTS generation completed successfully', [
 						'provider' => $current_provider_name,
@@ -167,6 +162,7 @@ class TTSService {
 						'audio_url' => $audio_result['audio_url'],
 						'source' => 'generated',
 						'provider' => $current_provider_name,
+						'voice' => $speech_call_options['voice'] ?? null,
 						'hash' => $textHash,
 					];
 				} else {
@@ -185,8 +181,7 @@ class TTSService {
 					'trace' => $e->getTraceAsString()
 				] );
 				
-				// Record failure and continue to return null (no fallback)
-				$this->round_robin->recordUsage( $current_provider_name, false );
+				// Record failure - no round robin tracking needed
 				
 				return [
 					'success' => false,
@@ -201,7 +196,6 @@ class TTSService {
 			}
 			
 			// If we reach here, it means generation failed 
-			$this->round_robin->recordUsage( $current_provider_name, false );
 			$this->logger->error( 'Failed to generate audio with provider', [ 'provider' => $current_provider_name ] );
 			
 			return [
@@ -230,18 +224,35 @@ class TTSService {
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $provider ): array {
+		$this->logger->info( '[getAvailableVoices] Fetching voices for provider', [ 'provider' => $provider ] );
+		
 		// Try to get voices from the actual provider first
 		$provider_instance = $this->getProviderInstance( $provider );
 		
 		if ( $provider_instance && method_exists( $provider_instance, 'getAvailableVoices' ) ) {
+			$this->logger->info( '[getAvailableVoices] Provider instance found, trying API voices', [ 'provider' => $provider ] );
 			try {
-				return $provider_instance->getAvailableVoices();
+				$api_voices = $provider_instance->getAvailableVoices();
+				if ( !empty($api_voices) ) {
+					$this->logger->info( '[getAvailableVoices] Got API voices successfully', [ 
+						'provider' => $provider, 
+						'count' => count($api_voices) 
+					] );
+					return $api_voices;
+				}
+				$this->logger->info( '[getAvailableVoices] API returned empty voices, falling back to static', [ 'provider' => $provider ] );
 			} catch ( \Exception $e ) {
-				$this->logger->error( 'Failed to get voices from provider', [
+				$this->logger->error( '[getAvailableVoices] Failed to get voices from provider API', [
 					'provider' => $provider,
 					'error' => $e->getMessage()
 				] );
 			}
+		} else {
+			$this->logger->info( '[getAvailableVoices] No provider instance or method, using static list', [ 
+				'provider' => $provider,
+				'instance_exists' => !!$provider_instance,
+				'method_exists' => $provider_instance ? method_exists($provider_instance, 'getAvailableVoices') : false
+			] );
 		}
 		
 		// Fallback to static voice lists
@@ -251,20 +262,26 @@ class TTSService {
 				[ 'id' => 'es-MX-Wavenet-B', 'name' => 'Mexican Spanish B (Male)', 'language' => 'es-MX' ],
 				[ 'id' => 'es-ES-Wavenet-A', 'name' => 'Spanish A (Female)', 'language' => 'es-ES' ],
 				[ 'id' => 'es-ES-Wavenet-B', 'name' => 'Spanish B (Male)', 'language' => 'es-ES' ],
+				[ 'id' => 'es-ES-Wavenet-C', 'name' => 'Spanish C (Female)', 'language' => 'es-ES' ],
+				[ 'id' => 'es-ES-Wavenet-D', 'name' => 'Spanish D (Female)', 'language' => 'es-ES' ],
 			],
 			'openai' => [
-				[ 'id' => 'alloy', 'name' => 'Alloy', 'language' => 'en-US' ],
-				[ 'id' => 'echo', 'name' => 'Echo', 'language' => 'en-US' ],
-				[ 'id' => 'fable', 'name' => 'Fable', 'language' => 'en-US' ],
-				[ 'id' => 'onyx', 'name' => 'Onyx', 'language' => 'en-US' ],
-				[ 'id' => 'nova', 'name' => 'Nova', 'language' => 'en-US' ],
-				[ 'id' => 'shimmer', 'name' => 'Shimmer', 'language' => 'en-US' ],
+				[ 'id' => 'alloy', 'name' => 'Alloy (Neutral, Multilingual)', 'language' => 'es-ES' ],
+				[ 'id' => 'echo', 'name' => 'Echo (Male, Multilingual)', 'language' => 'es-ES' ],
+				[ 'id' => 'fable', 'name' => 'Fable (British Male, Multilingual)', 'language' => 'es-ES' ],
+				[ 'id' => 'onyx', 'name' => 'Onyx (Deep Male, Multilingual)', 'language' => 'es-ES' ],
+				[ 'id' => 'nova', 'name' => 'Nova (Female, Multilingual)', 'language' => 'es-ES' ],
+				[ 'id' => 'shimmer', 'name' => 'Shimmer (Soft Female, Multilingual)', 'language' => 'es-ES' ],
 			],
 			'elevenlabs' => [
-				[ 'id' => 'spanish-female-1', 'name' => 'Spanish Female 1', 'language' => 'es-ES' ],
-				[ 'id' => 'spanish-male-1', 'name' => 'Spanish Male 1', 'language' => 'es-ES' ],
-				[ 'id' => 'english-female-1', 'name' => 'English Female 1', 'language' => 'en-US' ],
-				[ 'id' => 'english-male-1', 'name' => 'English Male 1', 'language' => 'en-US' ],
+				[ 'id' => 'EXAVITQu4vr4xnSDxMaL', 'name' => 'Bella (Spanish Female)', 'language' => 'es-ES' ],
+				[ 'id' => 'pNInz6obpgDQGcFmaJgB', 'name' => 'Adam (Spanish Male)', 'language' => 'es-ES' ],
+				[ 'id' => 'TxGEqnHWrfWFTfGW9XjX', 'name' => 'Josh (Spanish Male)', 'language' => 'es-ES' ],
+				[ 'id' => 'VR6AewLTigWG4xSOukaG', 'name' => 'Arnold (Spanish Male)', 'language' => 'es-ES' ],
+				[ 'id' => 'MF3mGyEYCl7XYWbV9V6O', 'name' => 'Elli (Spanish Female)', 'language' => 'es-ES' ],
+				[ 'id' => 'XrExE9yKIg1WjnnlVkGX', 'name' => 'Matilda (Spanish Female)', 'language' => 'es-ES' ],
+				[ 'id' => 'ErXwobaYiN019PkySvjV', 'name' => 'Antoni (Spanish Male)', 'language' => 'es-ES' ],
+				[ 'id' => '21m00Tcm4TlvDq8ikWAM', 'name' => 'Rachel (English Female)', 'language' => 'en-US' ],
 			],
 			'amazon_polly' => [
 				[ 'id' => 'Joanna', 'name' => 'Joanna (English US Female)', 'language' => 'en-US' ],
@@ -303,7 +320,14 @@ class TTSService {
 			],
 		];
 		
-		return $voices[ $provider ] ?? [];
+		$static_voices = $voices[ $provider ] ?? [];
+		$this->logger->info( '[getAvailableVoices] Returning static voices', [ 
+			'provider' => $provider, 
+			'count' => count($static_voices),
+			'sample' => array_slice($static_voices, 0, 2)
+		] );
+		
+		return $static_voices;
 	}
 	
 	/**
@@ -325,10 +349,23 @@ class TTSService {
 	 * @return array Service stats.
 	 */
 	public function getStats(): array {
+		$config = get_option( 'wp_tts_config', [] );
+		$default_provider = $config['default_provider'] ?? 'google';
+		
+		// Get list of configured providers
+		$configured_providers = [];
+		$all_providers = ['google', 'openai', 'elevenlabs', 'azure_tts', 'amazon_polly'];
+		foreach ($all_providers as $provider) {
+			if ($this->validateProvider($provider)) {
+				$configured_providers[] = $provider;
+			}
+		}
+		
 		return [
 			'cache_stats' => $this->cache->getCacheStats(),
-			'provider_stats' => $this->round_robin->getStats(),
-			'active_providers' => $this->round_robin->getActiveProviders(),
+			'default_provider' => $default_provider,
+			'configured_providers' => $configured_providers,
+			'round_robin_disabled' => true,
 		];
 	}
 	
@@ -359,17 +396,81 @@ class TTSService {
 				'content_length' => strlen( $content )
 			] );
 			
-			// Get TTS settings for this post
-			$provider_from_meta = get_post_meta( $post_id, '_tts_voice_provider', true );
-			// If $provider_from_meta is empty, TTSService::generateAudio will handle it
-			// (e.g., use round-robin or a global default if that logic is implemented there).
-			// We no longer default to 'google' directly here.
-			$voice = get_post_meta( $post_id, '_tts_voice_id', true );
+			// Get TTS settings for this post - with fallback to old system
+			$provider_from_meta = '';
+			$voice = '';
+			$voice_config = [];
+			$custom_text_config = [];
 			
-			$this->logger->info( 'TTS settings for post (from post_meta)', [
+			try {
+				if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+					// Use new unified system
+					$voice_config = TTSMetaManager::getVoiceConfig( $post_id );
+					$custom_text_config = TTSMetaManager::getCustomTextConfig( $post_id );
+					
+					$provider_from_meta = $voice_config['provider'] ?? '';
+					$voice = $voice_config['voice_id'] ?? '';
+					
+					$this->logger->info( 'Using unified metadata system', [
+						'post_id' => $post_id,
+						'provider' => $provider_from_meta,
+						'voice' => $voice
+					] );
+				} else {
+					// Fallback to old system
+					$provider_from_meta = get_post_meta( $post_id, '_tts_voice_provider', true );
+					$voice = get_post_meta( $post_id, '_tts_voice_id', true );
+					$custom_text = get_post_meta( $post_id, '_tts_custom_text', true );
+					
+					$voice_config = [
+						'provider' => $provider_from_meta,
+						'voice_id' => $voice,
+						'language' => 'es-MX'
+					];
+					
+					$custom_text_config = [
+						'custom_text' => $custom_text,
+						'use_custom_text' => !empty($custom_text)
+					];
+					
+					$this->logger->info( 'Using fallback old metadata system', [
+						'post_id' => $post_id,
+						'provider' => $provider_from_meta,
+						'voice' => $voice
+					] );
+				}
+				
+				// Check if should use custom text instead of post content
+				if ( !empty($custom_text_config['use_custom_text']) && !empty($custom_text_config['custom_text']) ) {
+					$full_text = $custom_text_config['custom_text'];
+					$this->logger->info( 'Using custom text for TTS generation', [
+						'post_id' => $post_id,
+						'custom_text_length' => strlen( $full_text )
+					] );
+				}
+				
+			} catch ( \Exception $e ) {
+				$this->logger->error( 'Error getting TTS settings, using fallback', [
+					'post_id' => $post_id,
+					'error' => $e->getMessage()
+				] );
+				
+				// Fallback to old system
+				$provider_from_meta = get_post_meta( $post_id, '_tts_voice_provider', true );
+				$voice = get_post_meta( $post_id, '_tts_voice_id', true );
+				
+				$voice_config = [
+					'provider' => $provider_from_meta,
+					'voice_id' => $voice,
+					'language' => 'es-MX'
+				];
+			}
+			
+			$this->logger->info( 'TTS settings for post', [
 				'post_id' => $post_id,
-				'provider_meta_value' => $provider_from_meta, // Log what was actually in meta
-				'voice_meta_value' => $voice
+				'provider' => $provider_from_meta,
+				'voice' => $voice,
+				'using_custom_text' => !empty($custom_text_config['use_custom_text'])
 			] );
 			
 			$options = [
@@ -385,10 +486,126 @@ class TTSService {
 				throw new \Exception( 'Failed to generate audio for post' );
 			}
 			
-			// Save audio URL to post meta (using the correct meta keys)
-			update_post_meta( $post_id, '_tts_audio_url', $result['audio_url'] );
-			update_post_meta( $post_id, '_tts_generated_at', time() );
-			update_post_meta( $post_id, '_tts_generation_status', 'completed' );
+			// Save audio URL and generation details using unified system
+			try {
+				$this->logger->info( 'Saving TTS metadata using unified system', [
+					'post_id' => $post_id,
+					'audio_url' => $result['audio_url']
+				] );
+				
+				// Check if TTSMetaManager class exists
+				if ( ! class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+					$this->logger->error( 'TTSMetaManager class not found, falling back to old system' );
+					// Fallback to old system
+					update_post_meta( $post_id, '_tts_audio_url', $result['audio_url'] );
+					update_post_meta( $post_id, '_tts_generated_at', time() );
+					update_post_meta( $post_id, '_tts_generation_status', 'completed' );
+					
+					if ( isset( $result['provider'] ) ) {
+						update_post_meta( $post_id, '_tts_voice_provider', $result['provider'] );
+					}
+					if ( isset( $result['voice'] ) ) {
+						update_post_meta( $post_id, '_tts_voice_id', $result['voice'] );
+					}
+				} else {
+					$this->logger->info( 'TTSMetaManager class found, using unified system' );
+					
+					// Use new unified system with detailed logging
+					try {
+						$this->logger->info( 'Calling TTSMetaManager::setAudioInfo', [
+							'post_id' => $post_id,
+							'audio_url' => $result['audio_url'],
+							'metadata' => [
+								'status' => 'completed',
+								'duration' => $result['duration'] ?? 0,
+								'format' => 'mp3'
+							]
+						] );
+						
+						$audio_result = TTSMetaManager::setAudioInfo( $post_id, $result['audio_url'], [
+							'status' => 'completed',
+							'duration' => $result['duration'] ?? 0,
+							'format' => 'mp3'
+						] );
+						
+						$this->logger->info( 'TTSMetaManager::setAudioInfo result', [
+							'result' => $audio_result
+						] );
+						
+						// Update voice config with actual provider and voice used
+						if ( isset( $result['provider'] ) ) {
+							$this->logger->info( 'Calling TTSMetaManager::setVoiceConfig', [
+								'post_id' => $post_id,
+								'provider' => $result['provider'],
+								'voice' => $result['voice'] ?? $voice,
+								'language' => $voice_config['language'] ?? 'es-MX'
+							] );
+							
+							$voice_result = TTSMetaManager::setVoiceConfig( 
+								$post_id, 
+								$result['provider'], 
+								$result['voice'] ?? $voice,
+								$voice_config['language'] ?? 'es-MX'
+							);
+							
+							$this->logger->info( 'TTSMetaManager::setVoiceConfig result', [
+								'result' => $voice_result
+							] );
+						}
+						
+						// Record successful generation attempt
+						$this->logger->info( 'Calling TTSMetaManager::recordGenerationAttempt' );
+						$generation_result = TTSMetaManager::recordGenerationAttempt( 
+							$post_id, 
+							true, 
+							'', 
+							0 // We'll calculate this later if needed
+						);
+						
+						$this->logger->info( 'TTSMetaManager::recordGenerationAttempt result', [
+							'result' => $generation_result
+						] );
+						
+						// Mark content as processed (not modified)
+						$this->logger->info( 'Calling TTSMetaManager::markContentModified' );
+						$content_result = TTSMetaManager::markContentModified( $post_id, $content );
+						
+						$this->logger->info( 'TTSMetaManager::markContentModified result', [
+							'result' => $content_result
+						] );
+						
+					} catch ( \Throwable $meta_error ) {
+						$this->logger->error( 'Error in TTSMetaManager operations', [
+							'error' => $meta_error->getMessage(),
+							'trace' => $meta_error->getTraceAsString(),
+							'file' => $meta_error->getFile(),
+							'line' => $meta_error->getLine()
+						] );
+						throw $meta_error; // Re-throw to trigger outer catch
+					}
+				}
+				
+				$this->logger->info( 'TTS metadata saved successfully', [ 'post_id' => $post_id ] );
+				
+			} catch ( \Exception $e ) {
+				$this->logger->error( 'Error saving TTS metadata, falling back to old system', [
+					'post_id' => $post_id,
+					'error' => $e->getMessage(),
+					'trace' => $e->getTraceAsString()
+				] );
+				
+				// Fallback to old system in case of any errors
+				update_post_meta( $post_id, '_tts_audio_url', $result['audio_url'] );
+				update_post_meta( $post_id, '_tts_generated_at', time() );
+				update_post_meta( $post_id, '_tts_generation_status', 'completed' );
+				
+				if ( isset( $result['provider'] ) ) {
+					update_post_meta( $post_id, '_tts_voice_provider', $result['provider'] );
+				}
+				if ( isset( $result['voice'] ) ) {
+					update_post_meta( $post_id, '_tts_voice_id', $result['voice'] );
+				}
+			}
 			
 			$this->logger->info( 'Audio generation completed for post', [
 				'post_id' => $post_id,
@@ -407,6 +624,27 @@ class TTSService {
 				'error' => $e->getMessage(),
 				'trace' => $e->getTraceAsString()
 			] );
+			
+			// Record failed generation attempt (only if class exists)
+			try {
+				if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+					TTSMetaManager::recordGenerationAttempt( 
+						$post_id, 
+						false, 
+						$e->getMessage()
+					);
+				} else {
+					// Fallback: record failure using old system
+					update_post_meta( $post_id, '_tts_generation_status', 'failed' );
+					update_post_meta( $post_id, '_tts_last_error', $e->getMessage() );
+				}
+			} catch ( \Exception $meta_error ) {
+				$this->logger->error( 'Failed to record generation attempt', [
+					'post_id' => $post_id,
+					'meta_error' => $meta_error->getMessage()
+				] );
+			}
+			
 			throw $e;
 		}
 	}
@@ -421,6 +659,19 @@ class TTSService {
 	 * @throws \Exception If generation fails.
 	 */
 	public function generatePreview( string $text, string $provider, string $voice = '' ) {
+		$this->logger->info( '[generatePreview] Starting preview generation', [
+			'text_length' => strlen( $text ),
+			'provider' => $provider,
+			'voice' => $voice
+		] );
+		
+		// If no provider specified, use default
+		if ( empty( $provider ) ) {
+			$config = get_option( 'wp_tts_config', [] );
+			$provider = $config['default_provider'] ?? 'google';
+			$this->logger->info( '[generatePreview] Using default provider', [ 'provider' => $provider ] );
+		}
+		
 		$options = [
 			'provider' => $provider,
 			'voice' => $voice,
@@ -430,8 +681,14 @@ class TTSService {
 		$result = $this->generateAudio( $text, $options );
 		
 		if ( ! $result || ! $result['success'] ) {
-			throw new \Exception( 'Failed to generate preview audio' );
+			$this->logger->error( '[generatePreview] Preview generation failed', [ 'result' => $result ] );
+			throw new \Exception( 'Failed to generate preview audio: ' . ( $result['message'] ?? 'Unknown error' ) );
 		}
+		
+		$this->logger->info( '[generatePreview] Preview generation completed successfully', [
+			'audio_url' => $result['audio_url'],
+			'provider' => $result['provider'] ?? $provider
+		] );
 		
 		return (object) [
 			'url' => $result['audio_url'],
