@@ -30,76 +30,72 @@ if (empty($enabled_providers)) {
 ?>
 
 <div class="wp-tts-meta-box">
-    <table class="form-table">
-        <tbody>
-            <!-- Enable/Disable TTS -->
-            <tr>
-                <th scope="row">
-                    <label for="tts_enabled"><?php _e('Enable TTS', 'TTS de Wordpress'); ?></label>
-                </th>
-                <td>
-                    <label class="wp-tts-toggle">
-                        <input type="checkbox" 
-                               id="tts_enabled" 
-                               name="tts_enabled" 
-                               value="1" 
-                               <?php checked($enabled, 1); ?> />
-                        <span class="wp-tts-toggle-slider"></span>
-                    </label>
-                    <p class="description">
-                        <?php _e('Enable text-to-speech conversion for this post', 'TTS de Wordpress'); ?>
-                    </p>
-                </td>
-            </tr>
+    <!-- Enable/Disable TTS -->
+    <div class="wp-tts-field">
+        <div class="wp-tts-field-header">
+            <label for="tts_enabled" class="wp-tts-field-label"><?php _e('Enable TTS', 'TTS SesoLibre'); ?></label>
+            <label class="wp-tts-toggle">
+                <input type="checkbox" 
+                       id="tts_enabled" 
+                       name="tts_enabled" 
+                       value="1" 
+                       <?php checked($enabled, true); ?> />
+                <span class="wp-tts-toggle-slider"></span>
+            </label>
+        </div>
+        <p class="wp-tts-field-description">
+            <?php _e('Enable text-to-speech conversion for this post', 'TTS SesoLibre'); ?>
+        </p>
+    </div>
 
-            <!-- TTS Provider Selection -->
-            <tr class="wp-tts-conditional" data-depends="tts_enabled">
-                <th scope="row">
-                    <label for="tts_voice_provider"><?php _e('TTS Provider', 'TTS de Wordpress'); ?></label>
-                </th>
-                <td>
-                    <select id="tts_voice_provider" name="tts_voice_provider" class="regular-text">
-                        <option value=""><?php _e('Use default provider', 'TTS de Wordpress'); ?></option>
-                        <?php foreach ($enabled_providers as $provider_name): ?>
-                            <?php $provider_config = $config->getProviderConfig($provider_name); ?>
-                            <option value="<?php echo esc_attr($provider_name); ?>" 
-                                    <?php selected($provider, $provider_name); ?>>
-                                <?php echo esc_html(ucfirst($provider_name)); ?>
-                                <?php if ($provider_name === $defaults['default_provider']): ?>
-                                    (<?php _e('Default', 'TTS de Wordpress'); ?>)
-                                <?php endif; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <p class="description">
-                        <?php _e('Select the TTS provider for this post', 'TTS de Wordpress'); ?>
-                    </p>
-                </td>
-            </tr>
+    <!-- TTS Provider Selection -->
+    <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
+        <div class="wp-tts-field-header">
+            <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'TTS SesoLibre'); ?></label>
+        </div>
+        <div class="wp-tts-field-content">
+            <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select">
+                <option value=""><?php _e('Use default provider', 'TTS SesoLibre'); ?></option>
+                <?php foreach ($enabled_providers as $provider_name): ?>
+                    <?php $provider_config = $config->getProviderConfig($provider_name); ?>
+                    <option value="<?php echo esc_attr($provider_name); ?>" 
+                            <?php selected($provider, $provider_name); ?>>
+                        <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider_name))); ?>
+                        <?php if ($provider_name === $defaults['default_provider']): ?>
+                            (<?php _e('Default', 'TTS SesoLibre'); ?>)
+                        <?php endif; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <p class="wp-tts-field-description">
+                <?php _e('Select the TTS provider for this post', 'TTS SesoLibre'); ?>
+            </p>
+        </div>
+    </div>
 
-            <!-- Voice Selection -->
-            <tr class="wp-tts-conditional" data-depends="tts_enabled">
-                <th scope="row">
-                    <label for="tts_voice_id"><?php _e('Voice', 'TTS de Wordpress'); ?></label>
-                </th>
-                <td>
-                    <select id="tts_voice_id" name="tts_voice_id" class="regular-text">
-                        <option value=""><?php _e('Use default voice', 'TTS de Wordpress'); ?></option>
-                        <!-- Voices will be loaded via AJAX based on provider selection -->
-                    </select>
-                    <p class="description">
-                        <?php _e('Select the voice for text-to-speech conversion', 'TTS de Wordpress'); ?>
-                    </p>
-                </td>
-            </tr>
+    <!-- Voice Selection -->
+    <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
+        <div class="wp-tts-field-header">
+            <label for="tts_voice_id" class="wp-tts-field-label"><?php _e('Voice', 'TTS SesoLibre'); ?></label>
+        </div>
+        <div class="wp-tts-field-content">
+            <select id="tts_voice_id" name="tts_voice_id" class="wp-tts-select">
+                <option value=""><?php _e('Use default voice', 'TTS SesoLibre'); ?></option>
+                <!-- Voices will be loaded via AJAX based on provider selection -->
+            </select>
+            <p class="wp-tts-field-description">
+                <?php _e('Select the voice for text-to-speech conversion', 'TTS SesoLibre'); ?>
+            </p>
+        </div>
+    </div>
 
 
-            <!-- Generation Status and Controls -->
-            <tr class="wp-tts-conditional" data-depends="tts_enabled">
-                <th scope="row">
-                    <?php _e('Audio Status', 'TTS de Wordpress'); ?>
-                </th>
-                <td>
+    <!-- Generation Status and Controls -->
+    <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
+        <div class="wp-tts-field-header">
+            <label class="wp-tts-field-label"><?php _e('Audio Status', 'TTS SesoLibre'); ?></label>
+        </div>
+        <div class="wp-tts-field-content">
                     <div class="wp-tts-status-container">
                         <?php if ($audio_url): ?>
                             <div class="wp-tts-status wp-tts-status-success">
@@ -174,7 +170,7 @@ if (empty($enabled_providers)) {
                             
                             <audio controls style="width: 100%; margin-top: 10px;">
                                 <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-                                <?php _e('Your browser does not support the audio element.', 'TTS de Wordpress'); ?>
+                                <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
                             </audio>
                         <?php elseif ($status === 'processing'): ?>
                             <div class="wp-tts-status wp-tts-status-processing">
@@ -217,29 +213,74 @@ if (empty($enabled_providers)) {
                         <div class="wp-tts-progress-bar">
                             <div class="wp-tts-progress-fill" style="width: 0%;"></div>
                         </div>
-                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'TTS de Wordpress'); ?></p>
+                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'TTS SesoLibre'); ?></p>
                     </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        </div>
+    </div>
 </div>
 
 <style>
-.wp-tts-meta-box .form-table th {
-    width: 150px;
-    padding: 15px 10px 15px 0;
+/* Responsive Meta Box Design */
+.wp-tts-meta-box {
+    max-width: 100%;
 }
 
-.wp-tts-meta-box .form-table td {
-    padding: 15px 10px;
+.wp-tts-field {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 15px;
 }
 
+.wp-tts-field:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.wp-tts-field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.wp-tts-field-label {
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+    flex: 1;
+    min-width: 120px;
+}
+
+.wp-tts-field-content {
+    width: 100%;
+}
+
+.wp-tts-select {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+}
+
+.wp-tts-field-description {
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: #646970;
+    font-style: italic;
+}
+
+/* Toggle Switch */
 .wp-tts-toggle {
     position: relative;
     display: inline-block;
     width: 50px;
     height: 24px;
+    flex-shrink: 0;
 }
 
 .wp-tts-toggle input {
@@ -273,29 +314,36 @@ if (empty($enabled_providers)) {
 }
 
 .wp-tts-toggle input:checked + .wp-tts-toggle-slider {
-    background-color: #0073aa;
+    background-color: #007cba;
 }
 
 .wp-tts-toggle input:checked + .wp-tts-toggle-slider:before {
     transform: translateX(26px);
 }
 
+/* Conditional visibility */
 .wp-tts-conditional {
     display: none;
 }
 
 .wp-tts-conditional.active {
-    display: table-row;
+    display: block;
 }
 
-.wp-tts-text-stats {
-    margin-top: 5px;
-    font-size: 12px;
-    color: #666;
-}
-
-.wp-tts-separator {
-    margin: 0 10px;
+/* Responsive breakpoints */
+@media (max-width: 600px) {
+    .wp-tts-field-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .wp-tts-field-label {
+        margin-bottom: 5px;
+    }
+    
+    .wp-tts-toggle {
+        align-self: flex-end;
+    }
 }
 
 .wp-tts-status {
@@ -376,7 +424,32 @@ jQuery(document).ready(function($) {
         $('.wp-tts-conditional').toggleClass('active', isEnabled);
     }
     
-    $('#tts_enabled').on('change', toggleConditionalFields);
+    $('#tts_enabled').on('change', function() {
+        toggleConditionalFields();
+        
+        // Auto-save TTS enabled state
+        const postId = $('#post_ID').val();
+        const isEnabled = $(this).is(':checked');
+        
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_auto_save_enabled',
+                    post_id: postId,
+                    enabled: isEnabled ? '1' : '0',
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                },
+                success: function(response) {
+                    console.log('TTS enabled state saved:', response);
+                },
+                error: function() {
+                    console.log('Failed to save TTS enabled state');
+                }
+            });
+        }
+    });
     toggleConditionalFields(); // Initial state
     
     
@@ -385,12 +458,33 @@ jQuery(document).ready(function($) {
         const provider = $(this).val();
         const $voiceSelect = $('#tts_voice_id');
         
+        // Auto-save provider selection
+        const postId = $('#post_ID').val();
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_auto_save_provider',
+                    post_id: postId,
+                    provider: provider,
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                },
+                success: function(response) {
+                    console.log('TTS provider saved:', response);
+                },
+                error: function() {
+                    console.log('Failed to save TTS provider');
+                }
+            });
+        }
+        
         if (!provider) {
-            $voiceSelect.html('<option value=""><?php _e("Use default voice", "TTS de Wordpress"); ?></option>');
+            $voiceSelect.html('<option value=""><?php _e("Use default voice", "TTS SesoLibre"); ?></option>');
             return;
         }
         
-        $voiceSelect.html('<option value=""><?php _e("Loading voices...", "TTS de Wordpress"); ?></option>');
+        $voiceSelect.html('<option value=""><?php _e("Loading voices...", "TTS SesoLibre"); ?></option>');
         
         $.ajax({
             url: ajaxurl,
@@ -408,15 +502,41 @@ jQuery(document).ready(function($) {
                     });
                     $voiceSelect.html(options);
                 } else {
-                    $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS de Wordpress"); ?></option>');
+                    $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS SesoLibre"); ?></option>');
                 }
             },
             error: function() {
-                $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS de Wordpress"); ?></option>');
+                $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS SesoLibre"); ?></option>');
             }
         });
     });
     
+    // Auto-save voice selection
+    $(document).on('change', '#tts_voice_id', function() {
+        const postId = $('#post_ID').val();
+        const voiceId = $(this).val();
+        const provider = $('#tts_voice_provider').val();
+        
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_auto_save_voice',
+                    post_id: postId,
+                    provider: provider,
+                    voice_id: voiceId,
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                },
+                success: function(response) {
+                    console.log('TTS voice saved:', response);
+                },
+                error: function() {
+                    console.log('Failed to save TTS voice');
+                }
+            });
+        }
+    });
     
     // Generate audio
     $('#tts_generate_now, #tts_regenerate').on('click', function() {

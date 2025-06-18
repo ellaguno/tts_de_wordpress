@@ -166,7 +166,7 @@ class Plugin {
 	 */
 	public function loadTextDomain(): void {
 		load_plugin_textdomain(
-			'TTS de Wordpress',
+			'TTS SesoLibre',
 			false,
 			dirname( WP_TTS_PLUGIN_BASENAME ) . '/languages'
 		);
@@ -201,6 +201,11 @@ class Plugin {
 		
 		// Register meta-box specific AJAX handler with different action name to avoid conflicts
 		add_action( 'wp_ajax_tts_get_voices_metabox', array( $this, 'handleGetVoicesForMetaBox' ) );
+		
+		// Auto-save handlers for meta box
+		add_action( 'wp_ajax_tts_auto_save_enabled', array( $this, 'handleAutoSaveEnabled' ) );
+		add_action( 'wp_ajax_tts_auto_save_provider', array( $this, 'handleAutoSaveProvider' ) );
+		add_action( 'wp_ajax_tts_auto_save_voice', array( $this, 'handleAutoSaveVoice' ) );
 
 		// Custom hooks for extensibility
 		do_action( 'wp_tts_plugin_loaded', $this );
@@ -233,7 +238,7 @@ class Plugin {
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
 				'wp-tts-settings',
-				__( 'Text-to-Speech Settings', 'TTS de Wordpress' ),
+				__( 'Text-to-Speech Settings', 'TTS SesoLibre' ),
 				array( $this, 'renderTTSMetaBox' ),
 				$post_type,
 				'side',
@@ -256,15 +261,17 @@ class Plugin {
 			// Use unified system
 			$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post->ID );
 			
-			$enabled     = $tts_data['enabled'];
+			$enabled     = (bool) $tts_data['enabled']; // Ensure boolean
 			$provider    = $tts_data['voice']['provider'];
 			$voice_id    = $tts_data['voice']['voice_id'];
 			$custom_text = $tts_data['content']['custom_text'];
 			$audio_url   = $tts_data['audio']['url'];
 			$status      = $tts_data['audio']['status'];
+			
+			error_log("[Plugin] renderTTSMetaBox for post {$post->ID}: enabled=" . ($enabled ? 'true' : 'false'));
 		} else {
 			// Fallback to old system
-			$enabled     = get_post_meta( $post->ID, '_tts_enabled', true );
+			$enabled     = (bool) get_post_meta( $post->ID, '_tts_enabled', true );
 			$provider    = get_post_meta( $post->ID, '_tts_voice_provider', true );
 			$voice_id    = get_post_meta( $post->ID, '_tts_voice_id', true );
 			$custom_text = get_post_meta( $post->ID, '_tts_custom_text', true );
@@ -738,5 +745,169 @@ class Plugin {
 	 */
 	public function getVersion(): string {
 		return $this->version;
+	}
+
+	/**
+	 * Handle auto-save for TTS enabled state
+	 */
+	public function handleAutoSaveEnabled(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+
+		$post_id = intval( $_POST['post_id'] );
+		$enabled = $_POST['enabled'] === '1';
+
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid post ID', 'TTS SesoLibre' )
+			] );
+			return;
+		}
+
+		try {
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$result = \WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
+				
+				if ( $result ) {
+					wp_send_json_success( [
+						'message' => __( 'TTS enabled state saved', 'TTS SesoLibre' ),
+						'enabled' => $enabled
+					] );
+				} else {
+					wp_send_json_error( [
+						'message' => __( 'Failed to save TTS enabled state', 'TTS SesoLibre' )
+					] );
+				}
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'TTSMetaManager not available', 'TTS SesoLibre' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Error saving TTS enabled state', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
+	}
+
+	/**
+	 * Handle auto-save for TTS provider
+	 */
+	public function handleAutoSaveProvider(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+
+		$post_id = intval( $_POST['post_id'] );
+		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid post ID', 'TTS SesoLibre' )
+			] );
+			return;
+		}
+
+		try {
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				// Get current voice config and update only provider
+				$current_config = \WP_TTS\Utils\TTSMetaManager::getVoiceConfig( $post_id );
+				$result = \WP_TTS\Utils\TTSMetaManager::setVoiceConfig( 
+					$post_id, 
+					$provider, 
+					$current_config['voice_id'] ?? '',
+					$current_config['language'] ?? 'es-MX'
+				);
+				
+				if ( $result ) {
+					wp_send_json_success( [
+						'message' => __( 'TTS provider saved', 'TTS SesoLibre' ),
+						'provider' => $provider
+					] );
+				} else {
+					wp_send_json_error( [
+						'message' => __( 'Failed to save TTS provider', 'TTS SesoLibre' )
+					] );
+				}
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'TTSMetaManager not available', 'TTS SesoLibre' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Error saving TTS provider', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
+	}
+
+	/**
+	 * Handle auto-save for TTS voice
+	 */
+	public function handleAutoSaveVoice(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+
+		$post_id = intval( $_POST['post_id'] );
+		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+		$voice_id = sanitize_text_field( $_POST['voice_id'] ?? '' );
+
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid post ID', 'TTS SesoLibre' )
+			] );
+			return;
+		}
+
+		try {
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$result = \WP_TTS\Utils\TTSMetaManager::setVoiceConfig( 
+					$post_id, 
+					$provider, 
+					$voice_id, 
+					'es-MX'
+				);
+				
+				if ( $result ) {
+					wp_send_json_success( [
+						'message' => __( 'TTS voice saved', 'TTS SesoLibre' ),
+						'provider' => $provider,
+						'voice_id' => $voice_id
+					] );
+				} else {
+					wp_send_json_error( [
+						'message' => __( 'Failed to save TTS voice', 'TTS SesoLibre' )
+					] );
+				}
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'TTSMetaManager not available', 'TTS SesoLibre' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Error saving TTS voice', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
 	}
 }

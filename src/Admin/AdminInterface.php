@@ -303,19 +303,454 @@ class AdminInterface {
 	 */
 	public function renderSettingsPage(): void {
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS de Wordpress' ) );
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS SesoLibre' ) );
 		}
 		
+		$active_tab = $_GET['tab'] ?? 'defaults';
+		$config = get_option( 'wp_tts_config', [] );
+		
 		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( 'TTS Settings', 'TTS de Wordpress' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'TTS SesoLibre Settings', 'TTS SesoLibre' ) . '</h1>';
+		
+		// Render tabs navigation
+		$this->renderTabsNavigation( $active_tab );
+		
 		echo '<form method="post" action="options.php">';
-		
 		settings_fields( 'wp_tts_settings' );
-		do_settings_sections( 'wp-tts-settings' );
-		submit_button();
 		
+		// Render active tab content
+		switch ( $active_tab ) {
+			case 'defaults':
+				$this->renderDefaultsTab( $config );
+				break;
+			case 'providers':
+				$this->renderProvidersTab( $config );
+				break;
+			case 'storage':
+				$this->renderStorageTab( $config );
+				break;
+			default:
+				$this->renderDefaultsTab( $config );
+		}
+		
+		submit_button();
 		echo '</form>';
 		echo '</div>';
+		
+		// Add CSS and JavaScript for tabs
+		$this->renderTabsAssets();
+	}
+
+	/**
+	 * Render tabs navigation
+	 */
+	private function renderTabsNavigation( string $active_tab ): void {
+		$tabs = [
+			'defaults' => __( 'Defaults', 'TTS SesoLibre' ),
+			'providers' => __( 'TTS Providers', 'TTS SesoLibre' ),
+			'storage' => __( 'Storage', 'TTS SesoLibre' )
+		];
+
+		echo '<div class="nav-tab-wrapper">';
+		foreach ( $tabs as $tab => $name ) {
+			$class = ( $tab === $active_tab ) ? 'nav-tab nav-tab-active' : 'nav-tab';
+			echo '<a href="?page=wp-tts-settings&tab=' . esc_attr( $tab ) . '" class="' . esc_attr( $class ) . '">';
+			echo esc_html( $name );
+			echo '</a>';
+		}
+		echo '</div>';
+	}
+
+	/**
+	 * Render Defaults tab
+	 */
+	private function renderDefaultsTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'Default Settings', 'TTS SesoLibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure the default TTS provider and general settings.', 'TTS SesoLibre' ) . '</p>';
+		
+		echo '<table class="form-table">';
+		
+		// Default Provider
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default TTS Provider', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderDefaultProviderField();
+		echo '<p class="description">' . esc_html__( 'Select the default TTS provider to use when no specific provider is chosen for a post.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Cache Settings
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Cache Duration', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderCacheDurationField();
+		echo '<p class="description">' . esc_html__( 'How long to keep generated audio files cached (in hours).', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Max Cache Size', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderMaxCacheSizeField();
+		echo '<p class="description">' . esc_html__( 'Maximum cache size in megabytes.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render TTS Providers tab
+	 */
+	private function renderProvidersTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'TTS Providers Configuration', 'TTS SesoLibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure your TTS providers with API keys and default voices.', 'TTS SesoLibre' ) . '</p>';
+		
+		// Provider cards container
+		echo '<div class="tts-providers-grid">';
+		
+		$this->renderProviderCard( 'google', __( 'Google Cloud TTS', 'TTS SesoLibre' ), $config );
+		$this->renderProviderCard( 'openai', __( 'OpenAI TTS', 'TTS SesoLibre' ), $config );
+		$this->renderProviderCard( 'elevenlabs', __( 'ElevenLabs', 'TTS SesoLibre' ), $config );
+		$this->renderProviderCard( 'azure_tts', __( 'Microsoft Azure TTS', 'TTS SesoLibre' ), $config );
+		$this->renderProviderCard( 'amazon_polly', __( 'Amazon Polly', 'TTS SesoLibre' ), $config );
+		
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render Storage tab
+	 */
+	private function renderStorageTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'Storage Configuration', 'TTS SesoLibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure where and how audio files are stored.', 'TTS SesoLibre' ) . '</p>';
+		
+		echo '<div class="tts-storage-section">';
+		echo '<h3>' . esc_html__( 'Storage Provider', 'TTS SesoLibre' ) . '</h3>';
+		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Storage Provider', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderStorageProviderField();
+		echo '<p class="description">' . esc_html__( 'Choose where to store generated audio files.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+		
+		// Buzzsprout configuration
+		echo '<div class="tts-storage-provider-config" id="buzzsprout-config">';
+		echo '<h3>' . esc_html__( 'Buzzsprout Configuration', 'TTS SesoLibre' ) . '</h3>';
+		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'API Token', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutApiTokenField();
+		echo '<p class="description">' . esc_html__( 'Your Buzzsprout API token for uploading audio files.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Podcast ID', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutPodcastIdField();
+		echo '<p class="description">' . esc_html__( 'Your Buzzsprout podcast ID.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render individual provider card
+	 */
+	private function renderProviderCard( string $provider, string $title, array $config ): void {
+		$provider_config = $config['providers'][$provider] ?? [];
+		$is_configured = $this->isProviderConfigured( $provider, $provider_config );
+		
+		echo '<div class="tts-provider-card ' . ( $is_configured ? 'configured' : 'not-configured' ) . '">';
+		echo '<div class="card-header">';
+		echo '<h3>' . esc_html( $title ) . '</h3>';
+		echo '<span class="status-indicator">' . ( $is_configured ? '✅' : '❌' ) . '</span>';
+		echo '</div>';
+		
+		echo '<div class="card-content">';
+		
+		switch ( $provider ) {
+			case 'google':
+				$this->renderGoogleTTSFields();
+				break;
+			case 'openai':
+				$this->renderOpenAITTSFields();
+				break;
+			case 'elevenlabs':
+				$this->renderElevenLabsFields();
+				break;
+			case 'azure_tts':
+				$this->renderAzureTTSFields();
+				break;
+			case 'amazon_polly':
+				$this->renderAmazonPollyFields();
+				break;
+		}
+		
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Check if provider is configured
+	 */
+	private function isProviderConfigured( string $provider, array $provider_config ): bool {
+		switch ( $provider ) {
+			case 'google':
+				return ! empty( $provider_config['credentials_path'] );
+			case 'openai':
+				return ! empty( $provider_config['api_key'] );
+			case 'elevenlabs':
+				return ! empty( $provider_config['api_key'] );
+			case 'azure_tts':
+				return ! empty( $provider_config['subscription_key'] ) && ! empty( $provider_config['region'] );
+			case 'amazon_polly':
+				return ! empty( $provider_config['access_key'] ) && ! empty( $provider_config['secret_key'] );
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Render tabs CSS and JavaScript
+	 */
+	private function renderTabsAssets(): void {
+		?>
+		<style>
+		.tts-tab-content {
+			background: #fff;
+			border: 1px solid #c3c4c7;
+			border-top: none;
+			padding: 20px;
+			margin-bottom: 20px;
+		}
+		
+		.tts-providers-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+			gap: 20px;
+			margin-top: 20px;
+		}
+		
+		.tts-provider-card {
+			border: 1px solid #c3c4c7;
+			border-radius: 4px;
+			background: #fff;
+			overflow: hidden;
+		}
+		
+		.tts-provider-card.configured {
+			border-color: #00a32a;
+		}
+		
+		.tts-provider-card.not-configured {
+			border-color: #d63638;
+		}
+		
+		.card-header {
+			background: #f6f7f7;
+			padding: 15px 20px;
+			border-bottom: 1px solid #c3c4c7;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		
+		.card-header h3 {
+			margin: 0;
+			font-size: 16px;
+		}
+		
+		.status-indicator {
+			font-size: 18px;
+		}
+		
+		.card-content {
+			padding: 20px;
+		}
+		
+		.card-content .form-table {
+			margin: 0;
+		}
+		
+		.card-content .form-table th {
+			width: 140px;
+			padding: 10px 0;
+		}
+		
+		.card-content .form-table td {
+			padding: 10px 0;
+		}
+		
+		.tts-storage-section {
+			margin-bottom: 30px;
+		}
+		
+		.tts-storage-provider-config {
+			border: 1px solid #c3c4c7;
+			border-radius: 4px;
+			padding: 20px;
+			background: #f9f9f9;
+		}
+		
+		@media (max-width: 768px) {
+			.tts-providers-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+		</style>
+		
+		<script>
+		jQuery(document).ready(function($) {
+			// Show/hide storage provider configs based on selection
+			function toggleStorageConfig() {
+				var provider = $('select[name="wp_tts_config[storage][provider]"]').val();
+				$('.tts-storage-provider-config').hide();
+				if (provider === 'buzzsprout') {
+					$('#buzzsprout-config').show();
+				}
+			}
+			
+			$('select[name="wp_tts_config[storage][provider]"]').on('change', toggleStorageConfig);
+			toggleStorageConfig(); // Initial state
+		});
+		</script>
+		<?php
+	}
+
+	/**
+	 * Render Google TTS fields
+	 */
+	private function renderGoogleTTSFields(): void {
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Credentials Path', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderGoogleCredentialsField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderGoogleDefaultVoiceField();
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render OpenAI TTS fields
+	 */
+	private function renderOpenAITTSFields(): void {
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderOpenAIKeyField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderOpenAIDefaultVoiceField();
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render ElevenLabs fields
+	 */
+	private function renderElevenLabsFields(): void {
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderElevenLabsKeyField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderElevenLabsDefaultVoiceField();
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render Azure TTS fields
+	 */
+	private function renderAzureTTSFields(): void {
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Subscription Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAzureTTSSubscriptionKeyField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Region', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAzureTTSRegionField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAzureTTSVoiceField();
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render Amazon Polly fields
+	 */
+	private function renderAmazonPollyFields(): void {
+		echo '<table class="form-table">';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Access Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAmazonPollyAccessKeyField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Secret Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAmazonPollySecretKeyField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Region', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAmazonPollyRegionField();
+		echo '</td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAmazonPollyVoiceField();
+		echo '</td>';
+		echo '</tr>';
+		echo '</table>';
 	}
 	
 	/**

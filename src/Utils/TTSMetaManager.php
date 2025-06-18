@@ -146,13 +146,24 @@ class TTSMetaManager {
         
         if (!isset($current_data[$section])) {
             error_log("[TTSMetaManager] Section '$section' not found in current data structure");
-            return false;
+            // Initialize with defaults if section doesn't exist
+            $defaults = self::getDefaultData();
+            if (isset($defaults[$section])) {
+                $current_data[$section] = $defaults[$section];
+                error_log("[TTSMetaManager] Initialized section '$section' with defaults");
+            } else {
+                error_log("[TTSMetaManager] Section '$section' not found in defaults either - cannot proceed");
+                return false;
+            }
         }
         
         $current_data[$section] = array_merge($current_data[$section], $section_data);
         error_log("[TTSMetaManager] Data after merge: " . print_r($current_data, true));
         
-        return self::saveTTSData($post_id, $current_data);
+        $result = self::saveTTSData($post_id, $current_data);
+        error_log("[TTSMetaManager] updateTTSSection save result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        
+        return $result;
     }
     
     /**
@@ -174,10 +185,17 @@ class TTSMetaManager {
      * @return bool Success
      */
     public static function setTTSEnabled(int $post_id, bool $enabled): bool {
+        error_log("[TTSMetaManager] setTTSEnabled called for post $post_id, enabled: " . ($enabled ? 'true' : 'false'));
+        
         $data = self::getTTSData($post_id);
+        error_log("[TTSMetaManager] Current data before setting enabled: " . print_r($data, true));
+        
         $data['enabled'] = $enabled;
         
-        return self::saveTTSData($post_id, $data);
+        $result = self::saveTTSData($post_id, $data);
+        error_log("[TTSMetaManager] setTTSEnabled save result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        
+        return $result;
     }
     
     /**
@@ -230,13 +248,23 @@ class TTSMetaManager {
      * @return bool Success
      */
     public static function setVoiceConfig(int $post_id, string $provider, string $voice_id = '', string $language = 'es-MX'): bool {
+        error_log("[TTSMetaManager] setVoiceConfig called for post $post_id");
+        error_log("[TTSMetaManager] provider: '$provider', voice_id: '$voice_id', language: '$language'");
+        
         $voice_data = [
             'provider' => $provider,
             'voice_id' => $voice_id,
             'language' => $language
         ];
         
-        return self::updateTTSSection($post_id, 'voice', $voice_data);
+        // Ensure we have valid data structure first
+        $current_data = self::getTTSData($post_id);
+        error_log("[TTSMetaManager] Current data before voice config: " . print_r($current_data, true));
+        
+        $result = self::updateTTSSection($post_id, 'voice', $voice_data);
+        error_log("[TTSMetaManager] setVoiceConfig result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        
+        return $result;
     }
     
     /**

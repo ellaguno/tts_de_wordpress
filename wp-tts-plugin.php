@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name: WordPress Text-to-Speech
- * Plugin URI: https://github.com/ellaguno/tts_de_wordpress.git
+ * Plugin Name: TTS SesoLibre
+ * Plugin URI: https://github.com/ellaguno/tts_sesolibre.git
  * Description: Convert WordPress articles to audio using multiple TTS providers with cost optimization and Spanish language focus.
- * Version: 1.0.0
+ * Version: 1.5.0
  * Author: Eduardo Llaguno
  * Author URI: https://sesolibre.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: TTS de Wordpress
+ * Text Domain: TTS SesoLibre
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WP_TTS_PLUGIN_VERSION', '1.0.0');
+define('WP_TTS_PLUGIN_VERSION', '1.5.0');
 define('WP_TTS_PLUGIN_FILE', __FILE__);
 define('WP_TTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TTS_PLUGIN_URL', plugin_dir_url(__FILE__));
