@@ -408,13 +408,19 @@ class TTSService {
 					$voice_config = TTSMetaManager::getVoiceConfig( $post_id );
 					$custom_text_config = TTSMetaManager::getCustomTextConfig( $post_id );
 					
+					$this->logger->info( 'Raw voice_config from TTSMetaManager', [
+						'post_id' => $post_id,
+						'voice_config' => $voice_config
+					] );
+					
 					$provider_from_meta = $voice_config['provider'] ?? '';
 					$voice = $voice_config['voice_id'] ?? '';
 					
 					$this->logger->info( 'Using unified metadata system', [
 						'post_id' => $post_id,
 						'provider' => $provider_from_meta,
-						'voice' => $voice
+						'voice' => $voice,
+						'raw_voice_config' => $voice_config
 					] );
 				} else {
 					// Fallback to old system

@@ -79,7 +79,7 @@ class TTSMetaManager {
         }
         
         // Merge with defaults to ensure all keys exist
-        return array_merge_recursive(self::getDefaultData(), $data);
+        return array_replace_recursive(self::getDefaultData(), $data);
     }
     
     /**
@@ -346,8 +346,8 @@ class TTSMetaManager {
             $defaults = self::getDefaultData();
             error_log("[TTSMetaManager] Default data structure: " . print_r($defaults, true));
             
-            // Ensure all required keys exist
-            $data = array_merge_recursive($defaults, $data);
+            // Ensure all required keys exist - use array_merge, not array_merge_recursive
+            $data = array_replace_recursive($defaults, $data);
             error_log("[TTSMetaManager] Data after merge with defaults: " . print_r($data, true));
             
             // Sanitize specific fields

@@ -303,9 +303,18 @@ class Plugin {
 		// Save TTS settings with fallback
 		$enabled = isset( $_POST['tts_enabled'] ) ? true : false;
 		
+		// Debug: Log what we're receiving from the form
+		error_log("[Plugin] Saving TTS settings for post $post_id");
+		error_log("[Plugin] tts_enabled: " . ($enabled ? 'true' : 'false'));
+		error_log("[Plugin] tts_voice_provider: " . ($_POST['tts_voice_provider'] ?? 'NOT SET'));
+		error_log("[Plugin] tts_voice_id: " . ($_POST['tts_voice_id'] ?? 'NOT SET'));
+		error_log("[Plugin] POST data: " . print_r($_POST, true));
+		
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
 			// Use unified system
-			\WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
+			error_log("[Plugin] Setting TTS enabled to: " . ($enabled ? 'true' : 'false'));
+			$enabled_result = \WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
+			error_log("[Plugin] setTTSEnabled result: " . ($enabled_result ? 'SUCCESS' : 'FAILED'));
 
 			if ( isset( $_POST['tts_voice_provider'] ) ) {
 				$provider = $security->sanitizeInput( $_POST['tts_voice_provider'] );
@@ -313,7 +322,15 @@ class Plugin {
 				if ( isset( $_POST['tts_voice_id'] ) ) {
 					$voice_id = $security->sanitizeInput( $_POST['tts_voice_id'] );
 				}
-				\WP_TTS\Utils\TTSMetaManager::setVoiceConfig( $post_id, $provider, $voice_id );
+				error_log("[Plugin] Saving voice config - provider: '$provider', voice_id: '$voice_id'");
+				$voice_result = \WP_TTS\Utils\TTSMetaManager::setVoiceConfig( $post_id, $provider, $voice_id );
+				error_log("[Plugin] setVoiceConfig result: " . ($voice_result ? 'SUCCESS' : 'FAILED'));
+				
+				// Immediately verify what was saved
+				$verify_config = \WP_TTS\Utils\TTSMetaManager::getVoiceConfig( $post_id );
+				error_log("[Plugin] Verification - saved voice config: " . print_r($verify_config, true));
+			} else {
+				error_log("[Plugin] tts_voice_provider not set in POST data");
 			}
 
 			if ( isset( $_POST['tts_custom_text'] ) ) {
