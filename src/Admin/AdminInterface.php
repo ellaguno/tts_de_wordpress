@@ -61,6 +61,7 @@ class AdminInterface {
 		add_action( 'wp_ajax_tts_get_voices', [ $this, 'handleGetVoices' ] );
 		add_action( 'wp_ajax_tts_preview_voice', [ $this, 'handlePreviewVoice' ] );
 		add_action( 'wp_ajax_tts_generate_custom', [ $this, 'handleGenerateCustom' ] );
+		add_action( 'wp_ajax_tts_auto_save_audio_asset', [ $this, 'handleAutoSaveAudioAsset' ] );
 	}
 	
 	/**
@@ -265,6 +266,30 @@ class AdminInterface {
 			'wp-tts-settings',
 			'wp_tts_providers'
 		);
+		
+		// Audio Assets section
+		add_settings_section(
+			'wp_tts_audio_assets',
+			__( 'Audio Assets', 'TTS de Wordpress' ),
+			[ $this, 'renderAudioAssetsSection' ],
+			'wp-tts-settings'
+		);
+		
+		add_settings_field(
+			'default_intro_audio',
+			__( 'Default Intro Audio', 'TTS de Wordpress' ),
+			[ $this, 'renderDefaultIntroField' ],
+			'wp-tts-settings',
+			'wp_tts_audio_assets'
+		);
+		
+		add_settings_field(
+			'default_outro_audio',
+			__( 'Default Outro Audio', 'TTS de Wordpress' ),
+			[ $this, 'renderDefaultOutroField' ],
+			'wp-tts-settings',
+			'wp_tts_audio_assets'
+		);
 	}
 	
 	/**
@@ -277,6 +302,9 @@ class AdminInterface {
 			return;
 		}
 		
+		// Enqueue WordPress media library for audio asset management
+		wp_enqueue_media();
+		
 		wp_enqueue_style(
 			'wp-tts-admin',
 			WP_TTS_PLUGIN_URL . 'assets/css/admin.css',
@@ -287,7 +315,7 @@ class AdminInterface {
 		wp_enqueue_script(
 			'wp-tts-admin',
 			WP_TTS_PLUGIN_URL . 'assets/js/admin.js',
-			[ 'jquery' ],
+			[ 'jquery', 'media-upload', 'media-views' ],
 			WP_TTS_PLUGIN_VERSION,
 			true
 		);
@@ -295,6 +323,8 @@ class AdminInterface {
 		wp_localize_script( 'wp-tts-admin', 'wpTtsAdmin', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'wp_tts_admin' ),
+			'mediaTitle' => __( 'Select Audio File', 'TTS SesoLibre' ),
+			'mediaButton' => __( 'Use this audio', 'TTS SesoLibre' ),
 		] );
 	}
 	
@@ -318,6 +348,9 @@ class AdminInterface {
 		echo '<form method="post" action="options.php">';
 		settings_fields( 'wp_tts_settings' );
 		
+		// Include hidden fields for all tabs except the active one to preserve data
+		$this->renderHiddenFieldsForOtherTabs( $config, $active_tab );
+		
 		// Render active tab content
 		switch ( $active_tab ) {
 			case 'defaults':
@@ -328,6 +361,9 @@ class AdminInterface {
 				break;
 			case 'storage':
 				$this->renderStorageTab( $config );
+				break;
+			case 'audio_assets':
+				$this->renderAudioAssetsTab( $config );
 				break;
 			default:
 				$this->renderDefaultsTab( $config );
@@ -348,7 +384,8 @@ class AdminInterface {
 		$tabs = [
 			'defaults' => __( 'Defaults', 'TTS SesoLibre' ),
 			'providers' => __( 'TTS Providers', 'TTS SesoLibre' ),
-			'storage' => __( 'Storage', 'TTS SesoLibre' )
+			'storage' => __( 'Storage', 'TTS SesoLibre' ),
+			'audio_assets' => __( 'Audio Assets', 'TTS SesoLibre' )
 		];
 
 		echo '<div class="nav-tab-wrapper">';
@@ -610,9 +647,53 @@ class AdminInterface {
 			background: #f9f9f9;
 		}
 		
+		.tts-audio-assets-section {
+			margin-bottom: 30px;
+		}
+		
+		.tts-media-selector {
+			border: 1px solid #c3c4c7;
+			border-radius: 4px;
+			padding: 15px;
+			background: #f9f9f9;
+			max-width: 500px;
+		}
+		
+		.tts-media-preview {
+			margin-bottom: 15px;
+		}
+		
+		.tts-media-preview audio {
+			width: 100%;
+			margin-bottom: 10px;
+		}
+		
+		.tts-media-title {
+			font-weight: 500;
+			margin: 0;
+			color: #555;
+		}
+		
+		.tts-media-buttons {
+			display: flex;
+			gap: 10px;
+		}
+		
+		.tts-media-buttons .button {
+			margin: 0;
+		}
+		
 		@media (max-width: 768px) {
 			.tts-providers-grid {
 				grid-template-columns: 1fr;
+			}
+			
+			.tts-media-selector {
+				max-width: 100%;
+			}
+			
+			.tts-media-buttons {
+				flex-direction: column;
 			}
 		}
 		</style>
@@ -630,6 +711,72 @@ class AdminInterface {
 			
 			$('select[name="wp_tts_config[storage][provider]"]').on('change', toggleStorageConfig);
 			toggleStorageConfig(); // Initial state
+			
+			// Media Library Integration for Audio Assets
+			var mediaFrame;
+			
+			$(document).on('click', '.tts-select-media', function(e) {
+				e.preventDefault();
+				
+				var $button = $(this);
+				var $container = $button.closest('.tts-media-selector');
+				var type = $container.data('type');
+				
+				// Create media frame
+				mediaFrame = wp.media({
+					title: wpTtsAdmin.mediaTitle,
+					button: {
+						text: wpTtsAdmin.mediaButton
+					},
+					library: {
+						type: 'audio'
+					},
+					multiple: false
+				});
+				
+				// Handle media selection
+				mediaFrame.on('select', function() {
+					var attachment = mediaFrame.state().get('selection').first().toJSON();
+					
+					// Update hidden input
+					$container.find('.tts-media-id').val(attachment.id);
+					
+					// Update preview
+					var $preview = $container.find('.tts-media-preview');
+					var audioHtml = '<audio controls style="width: 100%; margin-bottom: 10px;">' +
+						'<source src="' + attachment.url + '" type="' + attachment.mime + '">' +
+						'Your browser does not support the audio element.' +
+						'</audio>';
+					
+					$preview.find('audio').remove();
+					$preview.prepend(audioHtml);
+					$preview.find('.tts-media-title').text(attachment.title);
+					$preview.show();
+					
+					// Show remove button
+					$container.find('.tts-remove-media').show();
+				});
+				
+				// Open media frame
+				mediaFrame.open();
+			});
+			
+			// Remove media
+			$(document).on('click', '.tts-remove-media', function(e) {
+				e.preventDefault();
+				
+				var $button = $(this);
+				var $container = $button.closest('.tts-media-selector');
+				
+				// Clear hidden input
+				$container.find('.tts-media-id').val('');
+				
+				// Hide preview
+				$container.find('.tts-media-preview').hide();
+				
+				// Hide remove button
+				$button.hide();
+			});
 		});
 		</script>
 		<?php
@@ -1723,6 +1870,317 @@ class AdminInterface {
 				'message' => __( 'Generation failed', 'TTS de Wordpress' ),
 				'error' => $e->getMessage(),
 			] );
+		}
+	}
+
+	/**
+	 * Render Audio Assets tab
+	 */
+	private function renderAudioAssetsTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'Audio Assets Configuration', 'TTS SesoLibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure default intro and outro audio files for TTS recordings. These will be added before and after the main content.', 'TTS SesoLibre' ) . '</p>';
+		
+		echo '<div class="tts-audio-assets-section">';
+		echo '<h3>' . esc_html__( 'Default Audio Assets', 'TTS SesoLibre' ) . '</h3>';
+		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Intro Audio', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderDefaultIntroField();
+		echo '<p class="description">' . esc_html__( 'Select the default intro audio file that will be added at the beginning of TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Outro Audio', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderDefaultOutroField();
+		echo '<p class="description">' . esc_html__( 'Select the default outro audio file that will be added at the end of TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render audio assets section description
+	 */
+	public function renderAudioAssetsSection(): void {
+		echo '<p>' . esc_html__( 'Configure intro and outro audio files for your TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+	}
+
+	/**
+	 * Render Default Intro field
+	 */
+	public function renderDefaultIntroField(): void {
+		$config = get_option( 'wp_tts_config', [] );
+		$intro_id = $config['audio_assets']['default_intro'] ?? '';
+		$intro_url = '';
+		$intro_title = '';
+		
+		if ( $intro_id ) {
+			$intro_url = wp_get_attachment_url( $intro_id );
+			$intro_title = get_the_title( $intro_id );
+		}
+		
+		echo '<div class="tts-media-selector" data-type="intro">';
+		echo '<input type="hidden" name="wp_tts_config[audio_assets][default_intro]" value="' . esc_attr( $intro_id ) . '" class="tts-media-id" />';
+		
+		echo '<div class="tts-media-preview" style="' . ( $intro_id ? '' : 'display: none;' ) . '">';
+		if ( $intro_url ) {
+			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
+			echo '<source src="' . esc_url( $intro_url ) . '" type="audio/mpeg">';
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo '</audio>';
+		}
+		echo '<p class="tts-media-title">' . esc_html( $intro_title ) . '</p>';
+		echo '</div>';
+		
+		echo '<div class="tts-media-buttons">';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Intro Audio', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $intro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render Default Outro field
+	 */
+	public function renderDefaultOutroField(): void {
+		$config = get_option( 'wp_tts_config', [] );
+		$outro_id = $config['audio_assets']['default_outro'] ?? '';
+		$outro_url = '';
+		$outro_title = '';
+		
+		if ( $outro_id ) {
+			$outro_url = wp_get_attachment_url( $outro_id );
+			$outro_title = get_the_title( $outro_id );
+		}
+		
+		echo '<div class="tts-media-selector" data-type="outro">';
+		echo '<input type="hidden" name="wp_tts_config[audio_assets][default_outro]" value="' . esc_attr( $outro_id ) . '" class="tts-media-id" />';
+		
+		echo '<div class="tts-media-preview" style="' . ( $outro_id ? '' : 'display: none;' ) . '">';
+		if ( $outro_url ) {
+			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
+			echo '<source src="' . esc_url( $outro_url ) . '" type="audio/mpeg">';
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo '</audio>';
+		}
+		echo '<p class="tts-media-title">' . esc_html( $outro_title ) . '</p>';
+		echo '</div>';
+		
+		echo '<div class="tts-media-buttons">';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Outro Audio', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $outro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
+	 * Handle auto-save for audio assets (intro/outro)
+	 */
+	public function handleAutoSaveAudioAsset(): void {
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_auto_save' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+		
+		$post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+		$asset_type = isset($_POST['asset_type']) ? sanitize_text_field(wp_unslash($_POST['asset_type'])) : '';
+		$attachment_id = isset($_POST['attachment_id']) ? intval($_POST['attachment_id']) : 0;
+		
+		if ( ! $post_id || ! in_array($asset_type, ['intro', 'outro']) ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid parameters.', 'TTS SesoLibre' )
+			] );
+			return;
+		}
+		
+		// Check permissions
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+		
+		try {
+			// Get existing TTS data
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData($post_id);
+				
+				// Update audio assets
+				if ( ! isset($tts_data['audio_assets']) ) {
+					$tts_data['audio_assets'] = [];
+				}
+				
+				$field_name = $asset_type . '_audio';
+				$tts_data['audio_assets'][$field_name] = $attachment_id ?: '';
+				$tts_data['updated_at'] = current_time('mysql');
+				
+				// Save updated data
+				\WP_TTS\Utils\TTSMetaManager::saveTTSData($post_id, $tts_data);
+				
+				wp_send_json_success( [
+					'message' => sprintf(
+						__( '%s audio updated successfully.', 'TTS SesoLibre' ),
+						ucfirst($asset_type)
+					),
+					'asset_type' => $asset_type,
+					'attachment_id' => $attachment_id
+				] );
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'TTS Meta Manager not available.', 'TTS SesoLibre' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Failed to save audio asset.', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
+	}
+
+	/**
+	 * Render hidden fields for other tabs to preserve their data
+	 *
+	 * @param array  $config Current configuration
+	 * @param string $active_tab Currently active tab
+	 */
+	private function renderHiddenFieldsForOtherTabs( array $config, string $active_tab ): void {
+		// Preserve data from all tabs except the active one
+		$tabs_to_preserve = [];
+		
+		switch ( $active_tab ) {
+			case 'defaults':
+				$tabs_to_preserve = ['providers', 'storage', 'audio_assets'];
+				break;
+			case 'providers':
+				$tabs_to_preserve = ['defaults', 'storage', 'audio_assets'];
+				break;
+			case 'storage':
+				$tabs_to_preserve = ['defaults', 'providers', 'audio_assets'];
+				break;
+			case 'audio_assets':
+				$tabs_to_preserve = ['defaults', 'providers', 'storage'];
+				break;
+		}
+		
+		foreach ( $tabs_to_preserve as $tab ) {
+			$this->renderHiddenFieldsForTab( $config, $tab );
+		}
+	}
+
+	/**
+	 * Render hidden fields for a specific tab
+	 *
+	 * @param array  $config Current configuration
+	 * @param string $tab Tab name
+	 */
+	private function renderHiddenFieldsForTab( array $config, string $tab ): void {
+		switch ( $tab ) {
+			case 'defaults':
+				$this->renderHiddenDefaultsFields( $config );
+				break;
+			case 'providers':
+				$this->renderHiddenProvidersFields( $config );
+				break;
+			case 'storage':
+				$this->renderHiddenStorageFields( $config );
+				break;
+			case 'audio_assets':
+				$this->renderHiddenAudioAssetsFields( $config );
+				break;
+		}
+	}
+
+	/**
+	 * Render hidden fields for defaults tab
+	 */
+	private function renderHiddenDefaultsFields( array $config ): void {
+		$defaults = $config['defaults'] ?? [];
+		
+		$fields = [
+			'default_provider', 'default_storage', 'auto_generate', 'voice_speed',
+			'voice_pitch', 'audio_format', 'audio_quality', 'enable_ssml',
+			'add_pauses', 'background_processing'
+		];
+		
+		foreach ( $fields as $field ) {
+			if ( isset( $defaults[$field] ) ) {
+				$value = is_bool( $defaults[$field] ) ? ($defaults[$field] ? '1' : '0') : $defaults[$field];
+				echo '<input type="hidden" name="wp_tts_config[defaults][' . esc_attr( $field ) . ']" value="' . esc_attr( $value ) . '" />';
+			}
+		}
+	}
+
+	/**
+	 * Render hidden fields for providers tab
+	 */
+	private function renderHiddenProvidersFields( array $config ): void {
+		$providers = $config['providers'] ?? [];
+		
+		foreach ( $providers as $provider => $provider_config ) {
+			if ( is_array( $provider_config ) ) {
+				foreach ( $provider_config as $key => $value ) {
+					if ( is_scalar( $value ) ) {
+						echo '<input type="hidden" name="wp_tts_config[providers][' . esc_attr( $provider ) . '][' . esc_attr( $key ) . ']" value="' . esc_attr( $value ) . '" />';
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Render hidden fields for storage tab
+	 */
+	private function renderHiddenStorageFields( array $config ): void {
+		$storage = $config['storage'] ?? [];
+		
+		foreach ( $storage as $storage_provider => $storage_config ) {
+			if ( is_array( $storage_config ) ) {
+				foreach ( $storage_config as $key => $value ) {
+					if ( is_scalar( $value ) ) {
+						echo '<input type="hidden" name="wp_tts_config[storage][' . esc_attr( $storage_provider ) . '][' . esc_attr( $key ) . ']" value="' . esc_attr( $value ) . '" />';
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Render hidden fields for audio assets tab
+	 */
+	private function renderHiddenAudioAssetsFields( array $config ): void {
+		$audio_assets = $config['audio_assets'] ?? [];
+		
+		$fields = [
+			'default_intro', 'default_background', 'default_outro',
+			'intro_volume', 'background_volume', 'outro_volume'
+		];
+		
+		foreach ( $fields as $field ) {
+			if ( isset( $audio_assets[$field] ) ) {
+				echo '<input type="hidden" name="wp_tts_config[audio_assets][' . esc_attr( $field ) . ']" value="' . esc_attr( $audio_assets[$field] ) . '" />';
+			}
+		}
+		
+		// Handle arrays for files
+		$array_fields = ['intro_files', 'background_music', 'outro_files'];
+		foreach ( $array_fields as $array_field ) {
+			if ( isset( $audio_assets[$array_field] ) && is_array( $audio_assets[$array_field] ) ) {
+				foreach ( $audio_assets[$array_field] as $key => $value ) {
+					echo '<input type="hidden" name="wp_tts_config[audio_assets][' . esc_attr( $array_field ) . '][' . esc_attr( $key ) . ']" value="' . esc_attr( $value ) . '" />';
+				}
+			}
 		}
 	}
 }

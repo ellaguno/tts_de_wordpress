@@ -89,6 +89,49 @@ if (empty($enabled_providers)) {
         </div>
     </div>
 
+    <!-- Custom Audio Upload -->
+    <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
+        <div class="wp-tts-field-header">
+            <label for="tts_custom_audio" class="wp-tts-field-label"><?php _e('Custom Audio', 'TTS SesoLibre'); ?></label>
+        </div>
+        <div class="wp-tts-field-content">
+            <?php
+            // Get custom audio configuration
+            $post_custom_audio = '';
+            if (class_exists('\\WP_TTS\\Utils\\TTSMetaManager')) {
+                $tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData($post->ID);
+                $post_custom_audio = $tts_data['audio_assets']['custom_audio'] ?? '';
+            }
+            
+            $custom_audio_url = $post_custom_audio ? wp_get_attachment_url($post_custom_audio) : '';
+            $custom_audio_title = $post_custom_audio ? get_the_title($post_custom_audio) : '';
+            ?>
+            
+            <div class="tts-media-selector" data-type="custom_audio">
+                <input type="hidden" name="tts_custom_audio" value="<?php echo esc_attr($post_custom_audio); ?>" class="tts-media-id" />
+                
+                <div class="tts-media-preview" style="<?php echo $post_custom_audio ? '' : 'display: none;'; ?>">
+                    <?php if ($custom_audio_url): ?>
+                        <audio controls style="width: 100%; margin-bottom: 10px;">
+                            <source src="<?php echo esc_url($custom_audio_url); ?>" type="audio/mpeg">
+                            <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
+                        </audio>
+                    <?php endif; ?>
+                    <p class="tts-media-title"><?php echo esc_html($custom_audio_title); ?></p>
+                </div>
+                
+                <div class="tts-media-buttons">
+                    <button type="button" class="button tts-select-media"><?php _e('Upload Custom Audio', 'TTS SesoLibre'); ?></button>
+                    <button type="button" class="button tts-remove-media" style="<?php echo $post_custom_audio ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS SesoLibre'); ?></button>
+                </div>
+            </div>
+            
+            <p class="wp-tts-field-description">
+                <?php _e('Upload a custom audio file to replace the auto-generated TTS audio. If provided, this will be used instead of generating TTS.', 'TTS SesoLibre'); ?>
+                <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'TTS SesoLibre'); ?></em>
+            </p>
+        </div>
+    </div>
 
     <!-- Generation Status and Controls -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
@@ -414,6 +457,56 @@ if (empty($enabled_providers)) {
 .wp-tts-actions .button .dashicons {
     margin-top: 3px;
 }
+
+/* Media Selector Styles */
+.tts-media-selector {
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 15px;
+    background: #f9f9f9;
+    margin-top: 8px;
+}
+
+.tts-media-preview {
+    margin-bottom: 15px;
+}
+
+.tts-media-preview audio {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.tts-media-title {
+    font-weight: 500;
+    margin: 0;
+    color: #555;
+    font-size: 13px;
+}
+
+.tts-media-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tts-media-buttons .button {
+    margin: 0;
+    font-size: 12px;
+    padding: 4px 8px;
+    height: auto;
+    line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+    .tts-media-buttons {
+        flex-direction: column;
+    }
+    
+    .tts-media-buttons .button {
+        width: 100%;
+        text-align: center;
+    }
+}
 </style>
 
 <script>
@@ -627,6 +720,145 @@ jQuery(document).ready(function($) {
                 $button.prop('disabled', false).text(originalText);
             }
         });
+    });
+    
+    // Media Library Integration for Intro/Outro in metabox
+    var mediaFrame;
+    
+    // Select media button click
+    $(document).on('click', '.wp-tts-field .tts-select-media', function(e) {
+        e.preventDefault();
+        
+        var $button = $(this);
+        var $container = $button.closest('.tts-media-selector');
+        var type = $container.data('type');
+        
+        // Create media frame
+        mediaFrame = wp.media({
+            title: '<?php _e("Select Audio File", "TTS SesoLibre"); ?>',
+            button: {
+                text: '<?php _e("Use this audio", "TTS SesoLibre"); ?>'
+            },
+            library: {
+                type: 'audio'
+            },
+            multiple: false
+        });
+        
+        // Handle media selection
+        mediaFrame.on('select', function() {
+            var attachment = mediaFrame.state().get('selection').first().toJSON();
+            
+            // Update hidden input
+            $container.find('.tts-media-id').val(attachment.id);
+            
+            // Update preview
+            var $preview = $container.find('.tts-media-preview');
+            var audioHtml = '<audio controls style="width: 100%; margin-bottom: 10px;">' +
+                '<source src="' + attachment.url + '" type="' + attachment.mime + '">' +
+                '<?php _e("Your browser does not support the audio element.", "TTS SesoLibre"); ?>' +
+                '</audio>';
+            
+            $preview.find('audio').remove();
+            $preview.prepend(audioHtml);
+            $preview.find('.tts-media-title').text(attachment.title);
+            $preview.show();
+            
+            // Show remove button
+            $container.find('.tts-remove-media').show();
+            
+            // Auto-save the selection
+            var postId = $('#post_ID').val();
+            var fieldName = type === 'intro' ? 'intro_audio' : 'outro_audio';
+            
+            if (postId) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'tts_auto_save_audio_asset',
+                        post_id: postId,
+                        asset_type: type,
+                        attachment_id: attachment.id,
+                        nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                    }
+                });
+            }
+        });
+        
+        // Open media frame
+        mediaFrame.open();
+    });
+    
+    // Remove media button click
+    $(document).on('click', '.wp-tts-field .tts-remove-media', function(e) {
+        e.preventDefault();
+        
+        var $button = $(this);
+        var $container = $button.closest('.tts-media-selector');
+        var type = $container.data('type');
+        
+        // Clear hidden input
+        $container.find('.tts-media-id').val('');
+        
+        // Hide preview
+        $container.find('.tts-media-preview').hide();
+        
+        // Hide remove button
+        $button.hide();
+        
+        // Auto-save the removal
+        var postId = $('#post_ID').val();
+        
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_auto_save_audio_asset',
+                    post_id: postId,
+                    asset_type: type,
+                    attachment_id: '',
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                }
+            });
+        }
+    });
+    
+    // Use default button click
+    $(document).on('click', '.wp-tts-field .tts-use-default', function(e) {
+        e.preventDefault();
+        
+        var $button = $(this);
+        var $container = $button.closest('.tts-media-selector');
+        var defaultId = $button.data('default-id');
+        var type = $container.data('type');
+        
+        if (defaultId) {
+            // Clear the custom selection to fall back to default
+            $container.find('.tts-media-id').val('');
+            
+            // Auto-save the change
+            var postId = $('#post_ID').val();
+            
+            if (postId) {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'tts_auto_save_audio_asset',
+                        post_id: postId,
+                        asset_type: type,
+                        attachment_id: '',
+                        nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                    },
+                    success: function() {
+                        // Reload to show default
+                        location.reload();
+                    }
+                });
+            }
+        }
     });
 });
 </script>

@@ -61,6 +61,11 @@ class TTSMetaManager {
                 'generation_time_ms' => 0,
                 'cost_estimate' => 0.0
             ],
+            'audio_assets' => [
+                'intro_audio' => '',
+                'outro_audio' => '',
+                'custom_audio' => ''
+            ],
             'updated_at' => null
         ];
     }

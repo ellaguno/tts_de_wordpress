@@ -193,6 +193,7 @@ class Plugin {
 		// Post meta box
 		add_action( 'add_meta_boxes', array( $this, 'addTTSMetaBox' ) );
 		add_action( 'save_post', array( $this, 'saveTTSSettings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueueMetaboxAssets' ) );
 
 		// AJAX handlers
 		add_action( 'wp_ajax_tts_generate_audio', array( $this, 'handleGenerateAudio' ) );
@@ -345,6 +346,14 @@ class Plugin {
 				$use_custom = !empty( $custom_text );
 				\WP_TTS\Utils\TTSMetaManager::setCustomText( $post_id, $custom_text, $use_custom );
 			}
+
+			// Process custom audio field
+			if ( isset( $_POST['tts_custom_audio'] ) ) {
+				$custom_audio_id = intval( $_POST['tts_custom_audio'] );
+				$current_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
+				$current_data['audio_assets']['custom_audio'] = $custom_audio_id;
+				\WP_TTS\Utils\TTSMetaManager::saveTTSData( $post_id, $current_data );
+			}
 		} else {
 			// Fallback to old system
 			update_post_meta( $post_id, '_tts_enabled', $enabled );
@@ -362,6 +371,12 @@ class Plugin {
 			if ( isset( $_POST['tts_custom_text'] ) ) {
 				$custom_text = $security->sanitizeTextForTTS( $_POST['tts_custom_text'] );
 				update_post_meta( $post_id, '_tts_custom_text', $custom_text );
+			}
+
+			// Process custom audio field (fallback)
+			if ( isset( $_POST['tts_custom_audio'] ) ) {
+				$custom_audio_id = intval( $_POST['tts_custom_audio'] );
+				update_post_meta( $post_id, '_tts_custom_audio', $custom_audio_id );
 			}
 		}
 
@@ -631,6 +646,33 @@ class Plugin {
 			$this->version,
 			true
 		);
+	}
+
+	/**
+	 * Enqueue metabox assets
+	 */
+	public function enqueueMetaboxAssets( $hook ): void {
+		// Only load on post edit screens
+		if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ] ) ) {
+			return;
+		}
+		
+		// Check if this post type supports TTS
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->post_type, [ 'post', 'page' ] ) ) {
+			return;
+		}
+		
+		// Enqueue WordPress media library
+		wp_enqueue_media();
+		
+		// Add inline script for media handling
+		wp_add_inline_script( 'jquery', '
+			// Ensure media library is loaded
+			if (typeof wp !== "undefined" && wp.media) {
+				console.log("[TTS] Media library loaded for metabox");
+			}
+		' );
 	}
 
 	/**

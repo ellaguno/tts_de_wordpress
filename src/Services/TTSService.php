@@ -396,6 +396,40 @@ class TTSService {
 				'content_length' => strlen( $content )
 			] );
 			
+			// Check for custom audio first - if present, use it instead of generating TTS
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$tts_data = TTSMetaManager::getTTSData( $post_id );
+				$custom_audio_id = $tts_data['audio_assets']['custom_audio'] ?? '';
+				
+				if ( !empty( $custom_audio_id ) ) {
+					$custom_audio_url = wp_get_attachment_url( $custom_audio_id );
+					if ( $custom_audio_url ) {
+						// Use custom audio instead of generating TTS
+						$this->logger->info( 'Using custom audio instead of TTS generation', [
+							'post_id' => $post_id,
+							'custom_audio_id' => $custom_audio_id,
+							'custom_audio_url' => $custom_audio_url
+						] );
+						
+						// Update audio metadata with custom audio info
+						TTSMetaManager::updateTTSSection( $post_id, 'audio', [
+							'url' => $custom_audio_url,
+							'generated_at' => current_time( 'mysql' ),
+							'status' => 'completed',
+							'duration' => 0,
+							'format' => 'custom'
+						] );
+						
+						return (object) [
+							'url' => $custom_audio_url,
+							'duration' => 0,
+							'provider' => 'custom_upload',
+							'source' => 'custom_audio'
+						];
+					}
+				}
+			}
+
 			// Get TTS settings for this post - with fallback to old system
 			$provider_from_meta = '';
 			$voice = '';
@@ -491,6 +525,9 @@ class TTSService {
 				$this->logger->error( 'Audio generation failed for post', [ 'post_id' => $post_id ] );
 				throw new \Exception( 'Failed to generate audio for post' );
 			}
+			
+			// Check for intro/outro and combine audio if needed
+			$result = $this->processIntroOutroAudio( $post_id, $result );
 			
 			// Save audio URL and generation details using unified system
 			try {
@@ -909,5 +946,261 @@ class TTSService {
 		$mock_data = $id3_header . $silence_frames;
 		
 		return $mock_data;
+	}
+	
+	/**
+	 * Process intro/outro audio for a post
+	 *
+	 * @param int   $post_id Post ID
+	 * @param array $result  Original TTS generation result
+	 * @return array Modified result with intro/outro if applicable
+	 */
+	private function processIntroOutroAudio( int $post_id, array $result ): array {
+		try {
+			$this->logger->info( 'Processing intro/outro audio for post', [ 'post_id' => $post_id ] );
+			
+			// Get intro/outro settings
+			$intro_audio_id = '';
+			$outro_audio_id = '';
+			
+			// Get post-specific intro/outro
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
+				$intro_audio_id = $tts_data['audio_assets']['intro_audio'] ?? '';
+				$outro_audio_id = $tts_data['audio_assets']['outro_audio'] ?? '';
+			}
+			
+			// If no post-specific audio, check for defaults
+			if ( ! $intro_audio_id || ! $outro_audio_id ) {
+				$config = get_option( 'wp_tts_config', [] );
+				$default_intro = $config['audio_assets']['default_intro'] ?? '';
+				$default_outro = $config['audio_assets']['default_outro'] ?? '';
+				
+				if ( ! $intro_audio_id ) {
+					$intro_audio_id = $default_intro;
+				}
+				if ( ! $outro_audio_id ) {
+					$outro_audio_id = $default_outro;
+				}
+			}
+			
+			// If no intro or outro, return original result
+			if ( ! $intro_audio_id && ! $outro_audio_id ) {
+				$this->logger->info( 'No intro/outro configured, returning original audio', [ 'post_id' => $post_id ] );
+				return $result;
+			}
+			
+			$this->logger->info( 'Found intro/outro configuration', [
+				'post_id' => $post_id,
+				'intro_id' => $intro_audio_id,
+				'outro_id' => $outro_audio_id
+			] );
+			
+			// Get file paths
+			$intro_path = $intro_audio_id ? $this->getAttachmentFilePath( $intro_audio_id ) : '';
+			$outro_path = $outro_audio_id ? $this->getAttachmentFilePath( $outro_audio_id ) : '';
+			$main_audio_path = $this->getAudioFilePathFromUrl( $result['audio_url'] );
+			
+			if ( ! $main_audio_path || ! file_exists( $main_audio_path ) ) {
+				$this->logger->error( 'Main audio file not found', [
+					'post_id' => $post_id,
+					'audio_url' => $result['audio_url'],
+					'expected_path' => $main_audio_path
+				] );
+				return $result;
+			}
+			
+			// Validate intro/outro files exist
+			if ( $intro_path && ! file_exists( $intro_path ) ) {
+				$this->logger->warning( 'Intro audio file not found, skipping', [
+					'post_id' => $post_id,
+					'intro_id' => $intro_audio_id,
+					'intro_path' => $intro_path
+				] );
+				$intro_path = '';
+			}
+			
+			if ( $outro_path && ! file_exists( $outro_path ) ) {
+				$this->logger->warning( 'Outro audio file not found, skipping', [
+					'post_id' => $post_id,
+					'outro_id' => $outro_audio_id,
+					'outro_path' => $outro_path
+				] );
+				$outro_path = '';
+			}
+			
+			// If no valid intro/outro files, return original
+			if ( ! $intro_path && ! $outro_path ) {
+				$this->logger->info( 'No valid intro/outro files found, returning original audio', [ 'post_id' => $post_id ] );
+				return $result;
+			}
+			
+			// Concatenate audio files
+			$concatenated_url = $this->concatenateAudioFiles( $intro_path, $main_audio_path, $outro_path, $post_id );
+			
+			if ( $concatenated_url ) {
+				$this->logger->info( 'Successfully concatenated audio with intro/outro', [
+					'post_id' => $post_id,
+					'original_url' => $result['audio_url'],
+					'concatenated_url' => $concatenated_url
+				] );
+				
+				// Update result with new URL
+				$result['audio_url'] = $concatenated_url;
+				$result['has_intro_outro'] = true;
+				$result['intro_file'] = $intro_path ? basename( $intro_path ) : '';
+				$result['outro_file'] = $outro_path ? basename( $outro_path ) : '';
+			} else {
+				$this->logger->error( 'Failed to concatenate audio files', [ 'post_id' => $post_id ] );
+			}
+			
+			return $result;
+			
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'Exception processing intro/outro audio', [
+				'post_id' => $post_id,
+				'error' => $e->getMessage(),
+				'trace' => $e->getTraceAsString()
+			] );
+			
+			// Return original result on error
+			return $result;
+		}
+	}
+	
+	/**
+	 * Get file path from attachment ID
+	 *
+	 * @param int $attachment_id Attachment ID
+	 * @return string File path or empty string if not found
+	 */
+	private function getAttachmentFilePath( int $attachment_id ): string {
+		if ( ! $attachment_id ) {
+			return '';
+		}
+		
+		$file_path = get_attached_file( $attachment_id );
+		return $file_path ?: '';
+	}
+	
+	/**
+	 * Get file path from audio URL
+	 *
+	 * @param string $audio_url Audio URL
+	 * @return string File path or empty string if not found
+	 */
+	private function getAudioFilePathFromUrl( string $audio_url ): string {
+		if ( ! $audio_url ) {
+			return '';
+		}
+		
+		$upload_dir = wp_upload_dir();
+		$file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $audio_url );
+		
+		return $file_path;
+	}
+	
+	/**
+	 * Concatenate audio files using PHP (fallback method)
+	 *
+	 * @param string $intro_path Intro audio file path
+	 * @param string $main_path  Main audio file path  
+	 * @param string $outro_path Outro audio file path
+	 * @param int    $post_id    Post ID for filename generation
+	 * @return string|null Concatenated audio URL or null on failure
+	 */
+	private function concatenateAudioFiles( string $intro_path, string $main_path, string $outro_path, int $post_id ): ?string {
+		try {
+			$this->logger->info( 'Starting audio concatenation', [
+				'post_id' => $post_id,
+				'intro' => $intro_path ? basename( $intro_path ) : 'none',
+				'main' => basename( $main_path ),
+				'outro' => $outro_path ? basename( $outro_path ) : 'none'
+			] );
+			
+			// Create output filename
+			$upload_dir = wp_upload_dir();
+			$tts_dir = $upload_dir['basedir'] . '/tts-audio';
+			
+			// Ensure TTS directory exists
+			if ( ! file_exists( $tts_dir ) ) {
+				wp_mkdir_p( $tts_dir );
+			}
+			
+			$hash = md5( $post_id . time() . 'intro_outro' );
+			$output_filename = "tts-{$post_id}-with-intro-outro-{$hash}.mp3";
+			$output_path = $tts_dir . '/' . $output_filename;
+			$output_url = $upload_dir['baseurl'] . '/tts-audio/' . $output_filename;
+			
+			// Simple concatenation: just combine the binary data
+			$combined_data = '';
+			
+			// Add intro
+			if ( $intro_path && file_exists( $intro_path ) ) {
+				$intro_data = file_get_contents( $intro_path );
+				if ( $intro_data !== false ) {
+					$combined_data .= $intro_data;
+					$this->logger->info( 'Added intro audio', [
+						'size' => strlen( $intro_data ),
+						'file' => basename( $intro_path )
+					] );
+				}
+			}
+			
+			// Add main audio
+			$main_data = file_get_contents( $main_path );
+			if ( $main_data !== false ) {
+				$combined_data .= $main_data;
+				$this->logger->info( 'Added main audio', [
+					'size' => strlen( $main_data ),
+					'file' => basename( $main_path )
+				] );
+			} else {
+				$this->logger->error( 'Failed to read main audio file', [ 'path' => $main_path ] );
+				return null;
+			}
+			
+			// Add outro
+			if ( $outro_path && file_exists( $outro_path ) ) {
+				$outro_data = file_get_contents( $outro_path );
+				if ( $outro_data !== false ) {
+					$combined_data .= $outro_data;
+					$this->logger->info( 'Added outro audio', [
+						'size' => strlen( $outro_data ),
+						'file' => basename( $outro_path )
+					] );
+				}
+			}
+			
+			// Save combined file
+			$result = file_put_contents( $output_path, $combined_data );
+			
+			if ( $result === false ) {
+				$this->logger->error( 'Failed to save concatenated audio file', [ 'output_path' => $output_path ] );
+				return null;
+			}
+			
+			$this->logger->info( 'Successfully created concatenated audio file', [
+				'output_path' => $output_path,
+				'output_url' => $output_url,
+				'total_size' => $result
+			] );
+			
+			// Clean up original main audio file to save space
+			if ( file_exists( $main_path ) ) {
+				unlink( $main_path );
+				$this->logger->info( 'Cleaned up original main audio file', [ 'path' => $main_path ] );
+			}
+			
+			return $output_url;
+			
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'Exception during audio concatenation', [
+				'post_id' => $post_id,
+				'error' => $e->getMessage(),
+				'trace' => $e->getTraceAsString()
+			] );
+			return null;
+		}
 	}
 }

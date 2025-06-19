@@ -137,27 +137,30 @@
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .wp-tts-audio-player {
-        padding: 2px;
+        padding: 8px;
         margin: 6px 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
     }
     
-    .wp-tts-player-header {
-        flex-wrap: wrap;
-        gap: 6px;
+    /* Hide all metadata and extra elements on mobile - show only audio player */
+    .wp-tts-player-meta,
+    .wp-tts-icon,
+    .wp-tts-label,
+    .wp-tts-provider,
+    .wp-tts-generated-date,
+    .wp-tts-download {
+        display: none !important;
     }
     
-    .wp-tts-player-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
+    .wp-tts-player-controls {
+        margin: 0;
     }
     
-    .wp-tts-icon {
-        font-size: 16px;
-    }
-    
-    .wp-tts-label {
-        font-size: 13px;
+    .wp-tts-audio-element {
+        width: 100%;
+        height: 35px;
     }
 }
 
