@@ -794,12 +794,27 @@ class Plugin {
 	 * @return string
 	 */
 	public function maybeAddAudioPlayer( $content ): string {
+		// Debug: Check if we're on the right page type
 		if ( ! is_single() && ! is_page() ) {
 			return $content;
 		}
 
-		// Check if auto-insert is enabled globally
+		// Reload configuration to ensure we have the latest settings
+		$this->config = new ConfigurationManager();
+		
+		// Debug: Check if auto-insert is enabled globally
 		$auto_insert = $this->config->get('player.auto_insert', false);
+		
+		// Debug for troubleshooting - now visible to all users when tts_debug is set
+		if ( isset($_GET['tts_debug']) ) {
+			$all_player_config = $this->config->get('player', []);
+			$wp_option_data = get_option('wp_tts_player_settings', 'NOT_FOUND');
+			$debug_info = "<!-- TTS DEBUG: auto_insert=" . ($auto_insert ? 'true' : 'false') . 
+			             ", full_player_config=" . print_r($all_player_config, true) . 
+			             ", wp_option_data=" . print_r($wp_option_data, true) . " -->";
+			$content = $debug_info . $content;
+		}
+		
 		if ( ! $auto_insert ) {
 			return $content;
 		}
@@ -812,6 +827,12 @@ class Plugin {
 		} else {
 			$enabled   = get_post_meta( $post_id, '_tts_enabled', true );
 			$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		}
+
+		// More debug info
+		if ( isset($_GET['tts_debug']) ) {
+			$debug_info2 = "<!-- TTS DEBUG: post_id=$post_id, enabled=" . ($enabled ? 'true' : 'false') . ", audio_url=" . ($audio_url ? 'exists' : 'empty') . " -->";
+			$content = $debug_info2 . $content;
 		}
 
 		if ( $enabled && $audio_url ) {
@@ -828,6 +849,12 @@ class Plugin {
 				'post_id' => $post_id,
 				'style'   => $player_style
 			) );
+			
+			// Debug the player output
+			if ( isset($_GET['tts_debug']) ) {
+				$debug_info3 = "<!-- TTS DEBUG: player_style=$player_style, player_position=$player_position, player_length=" . strlen($player) . " -->";
+				$content = $debug_info3 . $content;
+			}
 			
 			// Insert player based on configured position
 			if ( $player_position === 'after_content' ) {

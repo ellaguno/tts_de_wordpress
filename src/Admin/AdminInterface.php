@@ -63,6 +63,7 @@ class AdminInterface {
 		add_action( 'wp_ajax_tts_generate_custom', [ $this, 'handleGenerateCustom' ] );
 		add_action( 'wp_ajax_tts_auto_save_audio_asset', [ $this, 'handleAutoSaveAudioAsset' ] );
 		add_action( 'wp_ajax_tts_auto_save_background_volume', [ $this, 'handleAutoSaveBackgroundVolume' ] );
+		add_action( 'wp_ajax_tts_save_player_config', [ $this, 'handleSavePlayerConfig' ] );
 	}
 	
 	/**
@@ -90,7 +91,9 @@ class AdminInterface {
 	 * Register settings
 	 */
 	public function registerSettings(): void {
-		register_setting( 'wp_tts_settings', 'wp_tts_config' );
+		register_setting( 'wp_tts_settings', 'wp_tts_config', [
+			'sanitize_callback' => [ $this, 'sanitizeSettings' ]
+		] );
 		
 		// TTS Providers section
 		add_settings_section(
@@ -354,7 +357,14 @@ class AdminInterface {
 		}
 		
 		$active_tab = $_GET['tab'] ?? 'defaults';
-		$config = get_option( 'wp_tts_config', [] );
+		// Use ConfigurationManager to get current settings
+		$config = [
+			'providers' => $this->config->get('providers', []),
+			'defaults' => $this->config->get('defaults', []),
+			'storage' => $this->config->get('storage', []),
+			'audio_assets' => $this->config->get('audio_library', []),
+			'player' => $this->config->get('player', [])
+		];
 		
 		echo '<div class="wrap">';
 		echo '<h1>' . esc_html__( 'TTS SesoLibre Settings', 'TTS SesoLibre' ) . '</h1>';
@@ -2448,7 +2458,7 @@ class AdminInterface {
 	private function renderPlayerStyleField( array $config ): void {
 		$player_style = $config['player']['style'] ?? 'classic';
 		
-		echo '<select name="wp_tts_config[player][style]" id="player_style">';
+		echo '<select name="wp_tts_config[player][style]" id="player_style" class="tts-player-setting" data-setting="style">';
 		echo '<option value="classic"' . selected( $player_style, 'classic', false ) . '>' . esc_html__( 'Classic Player', 'TTS SesoLibre' ) . '</option>';
 		echo '<option value="sesolibre"' . selected( $player_style, 'sesolibre', false ) . '>' . esc_html__( 'SesoLibre Player (with Audio Mixing)', 'TTS SesoLibre' ) . '</option>';
 		echo '</select>';
@@ -2461,7 +2471,7 @@ class AdminInterface {
 		$auto_insert = $config['player']['auto_insert'] ?? false;
 		
 		echo '<label>';
-		echo '<input type="checkbox" name="wp_tts_config[player][auto_insert]" value="1" ' . checked( $auto_insert, true, false ) . ' />';
+		echo '<input type="checkbox" name="wp_tts_config[player][auto_insert]" value="1" class="tts-player-setting" data-setting="auto_insert" ' . checked( $auto_insert, true, false ) . ' />';
 		echo ' ' . esc_html__( 'Automatically insert TTS player in posts', 'TTS SesoLibre' );
 		echo '</label>';
 	}
@@ -2499,5 +2509,131 @@ class AdminInterface {
 		echo ' ' . esc_html__( 'Show Background Music Volume Control', 'TTS SesoLibre' );
 		echo '</label>';
 		echo '</div>';
+	}
+
+	/**
+	 * Sanitize and save settings
+	 */
+	public function sanitizeSettings( $input ): array {
+		// Get current configuration
+		$config = $this->config;
+		
+		// Process providers settings
+		if ( isset( $input['providers'] ) ) {
+			foreach ( $input['providers'] as $provider => $settings ) {
+				// Sanitize provider settings
+				$sanitized = [];
+				foreach ( $settings as $key => $value ) {
+					if ( in_array( $key, ['enabled'] ) ) {
+						$sanitized[$key] = (bool) $value;
+					} elseif ( in_array( $key, ['quota_limit', 'priority'] ) ) {
+						$sanitized[$key] = (int) $value;
+					} else {
+						$sanitized[$key] = sanitize_text_field( $value );
+					}
+				}
+				$config->setProviderConfig( $provider, $sanitized );
+			}
+		}
+		
+		// Process player settings
+		if ( isset( $input['player'] ) ) {
+			$player_settings = [];
+			$player_settings['style'] = sanitize_text_field( $input['player']['style'] ?? 'classic' );
+			$player_settings['auto_insert'] = isset( $input['player']['auto_insert'] ) ? true : false;
+			$player_settings['position'] = sanitize_text_field( $input['player']['position'] ?? 'before_content' );
+			$player_settings['show_voice_volume'] = isset( $input['player']['show_voice_volume'] ) ? true : false;
+			$player_settings['show_background_volume'] = isset( $input['player']['show_background_volume'] ) ? true : false;
+			
+			// Debug: Log what we're saving
+			error_log( 'TTS DEBUG: Saving player settings: ' . print_r( $player_settings, true ) );
+			
+			// Save player settings directly to ConfigurationManager
+			$config->set( 'player', $player_settings );
+			
+			// Debug: Verify what was saved
+			$saved_settings = $config->get( 'player' );
+			error_log( 'TTS DEBUG: Settings after save: ' . print_r( $saved_settings, true ) );
+		}
+		
+		// Process audio assets settings
+		if ( isset( $input['audio_assets'] ) ) {
+			$audio_assets = [];
+			foreach ( $input['audio_assets'] as $key => $value ) {
+				if ( in_array( $key, ['default_intro', 'default_background', 'default_outro'] ) ) {
+					$audio_assets[$key] = (int) $value;
+				} elseif ( $key === 'background_volume' ) {
+					$audio_assets[$key] = (float) $value;
+				} else {
+					$audio_assets[$key] = sanitize_text_field( $value );
+				}
+			}
+			$config->set( 'audio_library', array_merge( $config->get('audio_library', []), $audio_assets ) );
+		}
+		
+		// Process default settings
+		if ( isset( $input['defaults'] ) ) {
+			$defaults = [];
+			foreach ( $input['defaults'] as $key => $value ) {
+				if ( in_array( $key, ['auto_generate', 'enable_ssml', 'add_pauses', 'background_processing'] ) ) {
+					$defaults[$key] = (bool) $value;
+				} elseif ( in_array( $key, ['voice_speed'] ) ) {
+					$defaults[$key] = (float) $value;
+				} elseif ( in_array( $key, ['voice_pitch'] ) ) {
+					$defaults[$key] = (int) $value;
+				} else {
+					$defaults[$key] = sanitize_text_field( $value );
+				}
+			}
+			$config->updateDefaults( $defaults );
+		}
+		
+		// Return the input as-is (settings are saved via ConfigurationManager)
+		return $input;
+	}
+
+	/**
+	 * Handle save player config AJAX request
+	 */
+	public function handleSavePlayerConfig(): void {
+		try {
+			// Verify nonce
+			if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ) {
+				wp_send_json_error( [
+					'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+				] );
+				return;
+			}
+
+			// Check permissions
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [
+					'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+				] );
+				return;
+			}
+
+			// Process player settings from POST data
+			$player_settings = [];
+			$player_settings['style'] = sanitize_text_field( $_POST['style'] ?? 'classic' );
+			$player_settings['auto_insert'] = isset( $_POST['auto_insert'] ) && $_POST['auto_insert'] === '1';
+			$player_settings['position'] = sanitize_text_field( $_POST['position'] ?? 'before_content' );
+			$player_settings['show_voice_volume'] = isset( $_POST['show_voice_volume'] ) && $_POST['show_voice_volume'] === '1';
+			$player_settings['show_background_volume'] = isset( $_POST['show_background_volume'] ) && $_POST['show_background_volume'] === '1';
+			
+			// Save directly to ConfigurationManager
+			$this->config->set( 'player', $player_settings );
+			
+			wp_send_json_success( [
+				'message' => __( 'Player configuration saved successfully.', 'TTS SesoLibre' ),
+				'settings' => $player_settings
+			] );
+
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Failed to save player configuration.', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
 	}
 }

@@ -28,7 +28,7 @@
 
 /* Estilos básicos del reproductor */
 .tts-sesolibre-player {
-    background: #f5f5f5;
+    background: #d5d5d5;
     border: 1px solid #ddd;
     border-radius: 12px;
     padding: 16px 20px;
@@ -44,7 +44,7 @@
 
 .tts-branding {
     position: absolute;
-    top: 12px;
+    top: 2px;
     right: 16px;
     font-size: 12px;
     font-weight: 400;
@@ -99,7 +99,7 @@
 /* Barra de progreso */
 .tts-progress {
     flex-grow: 1;
-    background: #ddd;
+    background: #eee;
     height: 6px;
     border-radius: 3px;
     cursor: pointer;
@@ -118,9 +118,9 @@
 /* Controles de volumen */
 .tts-volume-controls {
     display: none; /* Hidden by default, only show if enabled */
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
+    margin-top: 1px;
+    padding-top: 1px;
+    /* border-top: 1px solid #eee; */
     gap: 16px;
     justify-content: center;
 }
@@ -129,7 +129,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 0px;
 }
 
 .tts-volume-control label {

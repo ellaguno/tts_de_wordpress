@@ -68,12 +68,12 @@ if (empty($main_audio_url)) {
      data-show-background-volume="<?php echo esc_attr($show_background_volume ? 'true' : 'false'); ?>">
      
     <div class="tts-branding">
-        SesoLibre Player
-    </div>
+        Reproductor SesoLibre 
+    </div> 
     
     <div class="tts-controls">
         <div class="tts-main-controls">
-            <button class="tts-play-pause" type="button" aria-label="<?php esc_attr_e('Play/Pause', 'TTS SesoLibre'); ?>">
+            <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Play/Pause', 'TTS SesoLibre'); ?>">
                 ▶
             </button>
             
@@ -84,38 +84,41 @@ if (empty($main_audio_url)) {
             <div class="tts-time-display">
                 <span class="tts-current-time">0:00</span> / <span class="tts-total-time">0:00</span>
             </div>
-        </div>
+
         
-        <?php if ($show_voice_volume || ($show_background_volume && !empty($background_url))): ?>
-        <div class="tts-volume-controls enabled">
-            <?php if ($show_voice_volume): ?>
-            <div class="tts-volume-control">
-                <label for="tts-voice-volume-<?php echo $post_id; ?>">
-                    <?php _e('Voice', 'TTS SesoLibre'); ?>
-                </label>
-                <input type="range" 
-                       id="tts-voice-volume-<?php echo $post_id; ?>"
-                       class="tts-volume-slider tts-voice-slider" 
-                       min="0" max="1" step="0.1" value="1"
-                       aria-label="<?php esc_attr_e('Voice Volume', 'TTS SesoLibre'); ?>">
-            </div>
-            <?php endif; ?>
-            
-            <?php if ($show_background_volume && !empty($background_url)): ?>
-            <div class="tts-volume-control">
-                <label for="tts-background-volume-<?php echo $post_id; ?>">
-                    <?php _e('Music', 'TTS SesoLibre'); ?>
-                </label>
-                <input type="range" 
-                       id="tts-background-volume-<?php echo $post_id; ?>"
-                       class="tts-volume-slider tts-background-slider" 
-                       min="0" max="1" step="0.1" 
-                       value="<?php echo esc_attr($background_volume); ?>"
-                       aria-label="<?php esc_attr_e('Background Music Volume', 'TTS SesoLibre'); ?>">
-            </div>
-            <?php endif; ?>
+            <?php if ($show_voice_volume || ($show_background_volume && !empty($background_url))): ?>
+            <div class="tts-volume-controls enabled">
+                <?php if ($show_voice_volume): ?>
+                <div class="tts-volume-control">
+                    <label for="tts-voice-volume-<?php echo $post_id; ?>">
+                        <?php _e('Voice', 'TTS SesoLibre'); ?>
+                    </label>
+                    <input type="range" 
+                           id="tts-voice-volume-<?php echo $post_id; ?>"
+                           class="tts-volume-slider tts-voice-slider" 
+                           min="0" max="1" step="0.1" value="1"
+                           aria-label="<?php esc_attr_e('Voice Volume', 'TTS SesoLibre'); ?>">
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($show_background_volume && !empty($background_url)): ?>
+                <div class="tts-volume-control">
+                    <label for="tts-background-volume-<?php echo $post_id; ?>">
+                        <?php _e('Music', 'TTS SesoLibre'); ?>
+                    </label>
+                    <input type="range" 
+                           id="tts-background-volume-<?php echo $post_id; ?>"
+                           class="tts-volume-slider tts-background-slider" 
+                           min="0" max="1" step="0.1" 
+                           value="<?php echo esc_attr($background_volume); ?>"
+                           aria-label="<?php esc_attr_e('Background Music Volume', 'TTS SesoLibre'); ?>">
+                </div>
+                <?php endif; ?>
+
         </div>
         <?php endif; ?>
+        </div> 
+
     </div>
     
     <div class="tts-error-container"></div>

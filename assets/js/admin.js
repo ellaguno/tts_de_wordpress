@@ -72,6 +72,49 @@ jQuery(document).ready(function($) {
     // Initialize the state on page load
     $('.tts-provider-toggle').trigger('change');
 
+    // Auto-save player settings
+    $('.tts-player-setting').on('change', function() {
+        const $field = $(this);
+        const setting = $field.data('setting');
+        const value = $field.is(':checkbox') ? ($field.is(':checked') ? '1' : '0') : $field.val();
+        
+        // Get all current player settings
+        const playerSettings = {};
+        $('.tts-player-setting').each(function() {
+            const settingName = $(this).data('setting');
+            const settingValue = $(this).is(':checkbox') ? ($(this).is(':checked') ? '1' : '0') : $(this).val();
+            playerSettings[settingName] = settingValue;
+        });
+        
+        // Add nonce
+        playerSettings.nonce = wpTtsAdmin.nonce;
+        playerSettings.action = 'tts_save_player_config';
+        
+        console.log('Saving player settings:', playerSettings);
+        
+        $.ajax({
+            url: wpTtsAdmin.ajaxUrl,
+            type: 'POST',
+            data: playerSettings,
+            success: function(response) {
+                if (response.success) {
+                    console.log('Player settings saved successfully');
+                    // Show a brief success indicator
+                    $field.css('background-color', '#d4edda').delay(1000).queue(function() {
+                        $(this).css('background-color', '').dequeue();
+                    });
+                } else {
+                    console.error('Failed to save player settings:', response.data.message);
+                    alert('Error saving settings: ' + response.data.message);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX error saving player settings:', textStatus, errorThrown);
+                alert('AJAX error saving settings');
+            }
+        });
+    });
+
     // Other admin JS can go here, e.g., for settings page interactions
     // Example: Test provider connection button
     $('.test-provider-connection').on('click', function() {

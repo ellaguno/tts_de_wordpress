@@ -309,10 +309,10 @@ class TTSSesoLibrePlayer {
         if (!this.elements.playButton) return;
         
         if (this.isPlaying) {
-            this.elements.playButton.innerHTML = '⏸️';
+            this.elements.playButton.innerHTML = '⏸';
             this.elements.playButton.classList.add('playing');
         } else {
-            this.elements.playButton.innerHTML = '▶️';
+            this.elements.playButton.innerHTML = '▶';
             this.elements.playButton.classList.remove('playing');
         }
     }
