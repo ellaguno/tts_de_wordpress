@@ -19,6 +19,7 @@ class ConfigurationManager {
 	private const OPTION_CACHE         = 'wp_tts_cache_settings';
 	private const OPTION_AUDIO_LIBRARY = 'wp_tts_audio_library';
 	private const OPTION_ANALYTICS     = 'wp_tts_analytics_settings';
+	private const OPTION_PLAYER        = 'wp_tts_player_settings';
 
 	/**
 	 * Default configuration values
@@ -118,6 +119,13 @@ class ConfigurationManager {
 			'retention_days' => 90,
 			'export_enabled' => true,
 		),
+		'player'        => array(
+			'style'                     => 'classic',
+			'auto_insert'               => false,
+			'position'                  => 'before_content',
+			'show_voice_volume'         => true,
+			'show_background_volume'    => true,
+		),
 	);
 
 	/**
@@ -153,6 +161,7 @@ class ConfigurationManager {
 			'cache'         => $this->getOption( self::OPTION_CACHE, $this->defaults['cache'] ),
 			'audio_library' => $this->getOption( self::OPTION_AUDIO_LIBRARY, $this->defaults['audio_library'] ),
 			'analytics'     => $this->getOption( self::OPTION_ANALYTICS, $this->defaults['analytics'] ),
+			'player'        => $this->getOption( self::OPTION_PLAYER, $this->defaults['player'] ),
 		);
 	}
 
@@ -445,6 +454,7 @@ class ConfigurationManager {
 		update_option( self::OPTION_CACHE, $this->config['cache'] );
 		update_option( self::OPTION_AUDIO_LIBRARY, $this->config['audio_library'] );
 		update_option( self::OPTION_ANALYTICS, $this->config['analytics'] );
+		update_option( self::OPTION_PLAYER, $this->config['player'] );
 	}
 
 	/**

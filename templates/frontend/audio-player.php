@@ -44,10 +44,12 @@ $post_title = get_the_title($post_id);
 if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
     $tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData($post_id);
     $provider = $tts_data['voice']['provider'];
+    $voice_id = $tts_data['voice']['voice_id'];
     $generated_at = $tts_data['audio']['generated_at'];
 } else {
     // Fallback to old system
     $provider = get_post_meta($post_id, '_tts_voice_provider', true);
+    $voice_id = get_post_meta($post_id, '_tts_voice_id', true);
     $generated_at = get_post_meta($post_id, '_tts_generated_at', true);
     if ($generated_at && is_numeric($generated_at)) {
         $generated_at = date('Y-m-d H:i:s', $generated_at);
@@ -72,20 +74,26 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
     
     <div class="wp-tts-player-meta">
         <span class="wp-tts-label"><?php _e('Escucha el artículo', 'TTS de SesoLibre'); ?></span>
-        <?php if ($generated_at): ?>
-            <span class="wp-tts-generated-date">
-                <?php echo sprintf(
-                    __('Generated: %s', 'TTS de Wordpress'), 
-                    $generated_at ? date_i18n(get_option('date_format'), strtotime($generated_at)) : __('Unknown', 'TTS de Wordpress')
-                ); ?>
-            </span>
-            <span class="wp-tts-download">
-            <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
-                <span class="dashicons dashicons-download"></span>
-                <?php _e('Descargar', 'TTS de Wordpress'); ?>
-                </a>
+        <?php if ($voice_id || $provider): ?>
+            <span class="wp-tts-voice-info">
+                <?php 
+                if ($voice_id) {
+                    echo sprintf(__('Voice: %s', 'TTS de Wordpress'), esc_html($voice_id));
+                    if ($provider) {
+                        echo ' (' . esc_html(ucfirst(str_replace('_', ' ', $provider))) . ')';
+                    }
+                } else if ($provider) {
+                    echo sprintf(__('Provider: %s', 'TTS de Wordpress'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
+                }
+                ?>
             </span>
         <?php endif; ?>
+        <span class="wp-tts-download">
+        <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
+            <span class="dashicons dashicons-download"></span>
+            <?php _e('Descargar', 'TTS de Wordpress'); ?>
+            </a>
+        </span>
     </div>
 </div>
 

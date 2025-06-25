@@ -64,6 +64,8 @@ class TTSMetaManager {
             'audio_assets' => [
                 'intro_audio' => '',
                 'outro_audio' => '',
+                'background_audio' => '',
+                'background_volume' => 0.3,
                 'custom_audio' => ''
             ],
             'updated_at' => null

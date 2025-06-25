@@ -46,6 +46,32 @@ jQuery(document).ready(function($) {
         });
     });
 
+    // TTS Provider Toggle Functionality
+    $('.tts-provider-toggle').on('change', function() {
+        const provider = $(this).data('provider');
+        const isEnabled = $(this).is(':checked');
+        const providerField = $(this).closest('.tts-provider-field');
+        
+        // Find all provider config sections for this provider
+        const configSections = providerField.find('.tts-provider-config')
+                              .add(providerField.siblings().find(`.tts-provider-config`));
+        
+        if (isEnabled) {
+            // Enable all fields in the provider config
+            configSections.css('opacity', '1');
+            configSections.find('input, select, textarea').prop('disabled', false);
+        } else {
+            // Disable all fields in the provider config
+            configSections.css('opacity', '0.5');
+            configSections.find('input, select, textarea').prop('disabled', true);
+        }
+        
+        console.log('Provider ' + provider + ' ' + (isEnabled ? 'enabled' : 'disabled'));
+    });
+    
+    // Initialize the state on page load
+    $('.tts-provider-toggle').trigger('change');
+
     // Other admin JS can go here, e.g., for settings page interactions
     // Example: Test provider connection button
     $('.test-provider-connection').on('click', function() {

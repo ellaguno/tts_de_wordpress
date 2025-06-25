@@ -636,6 +636,22 @@ class Plugin {
 					array(),
 					$this->version
 				);
+				
+				// Enqueue new TTS SesoLibre player assets
+				wp_enqueue_style(
+					'wp-tts-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
+					array(),
+					$this->version
+				);
+				
+				wp_enqueue_script(
+					'wp-tts-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
+					array( 'jquery' ),
+					$this->version,
+					true
+				);
 			}
 		}
 
@@ -666,6 +682,50 @@ class Plugin {
 		// Enqueue WordPress media library
 		wp_enqueue_media();
 		
+		// Enqueue admin styles
+		wp_enqueue_style(
+			'wp-tts-admin',
+			WP_TTS_PLUGIN_URL . 'assets/css/admin.css',
+			[],
+			$this->version
+		);
+		
+		// Enqueue admin scripts
+		wp_enqueue_script(
+			'wp-tts-admin',
+			WP_TTS_PLUGIN_URL . 'assets/js/admin.js',
+			[ 'jquery', 'media-upload', 'media-views' ],
+			$this->version,
+			true
+		);
+		
+		// Enqueue TTS Player assets for preview
+		wp_enqueue_style(
+			'wp-tts-player',
+			WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
+			[],
+			$this->version
+		);
+		
+		wp_enqueue_script(
+			'wp-tts-player-admin',
+			WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
+			[ 'jquery' ],
+			$this->version,
+			true
+		);
+		
+		// Localize script for AJAX calls
+		wp_localize_script( 'wp-tts-admin', 'wpTtsMetabox', [
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'wp_tts_auto_save' ),
+			'adminNonce' => wp_create_nonce( 'wp_tts_admin' ),
+			'generateNonce' => wp_create_nonce( 'wp_tts_generate_audio' ),
+			'deleteNonce' => wp_create_nonce( 'wp_tts_delete_audio' ),
+			'mediaTitle' => __( 'Select Audio File', 'TTS SesoLibre' ),
+			'mediaButton' => __( 'Use this audio', 'TTS SesoLibre' ),
+		] );
+		
 		// Add inline script for media handling
 		wp_add_inline_script( 'jquery', '
 			// Ensure media library is loaded
@@ -682,10 +742,14 @@ class Plugin {
 	 * @return string
 	 */
 	public function renderAudioPlayerShortcode( $atts ): string {
+		// Get configured player style
+		$config = new \WP_TTS\Core\ConfigurationManager();
+		$default_style = $config->get('player.style', 'classic');
+		
 		$atts = shortcode_atts(
 			array(
 				'post_id' => get_the_ID(),
-				'style'   => 'default',
+				'style'   => $default_style, // Use configured player style
 			),
 			$atts
 		);
@@ -693,19 +757,33 @@ class Plugin {
 		$post_id = intval( $atts['post_id'] );
 		$style   = $atts['style'];
 		
+		// Get main audio URL
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
-			$audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+			$main_audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+			$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
 		} else {
-			$audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+			$main_audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+			$tts_data = [];
 		}
 
-		if ( ! $audio_url ) {
+		if ( ! $main_audio_url ) {
 			return '';
 		}
+		
+		// Player configuration from global settings
+		$player_config = [
+			'show_voice_volume' => $config->get('player.show_voice_volume', true),
+			'show_background_volume' => $config->get('player.show_background_volume', true)
+		];
+
+		// Choose template based on style
+		$template_file = $style === 'sesolibre' ? 
+			'templates/frontend/tts-player.php' : 
+			'templates/frontend/audio-player.php';
 
 		// Make variables available to the template
 		ob_start();
-		include WP_TTS_PLUGIN_DIR . 'templates/frontend/audio-player.php';
+		include WP_TTS_PLUGIN_DIR . $template_file;
 		return ob_get_clean();
 	}
 
@@ -720,6 +798,12 @@ class Plugin {
 			return $content;
 		}
 
+		// Check if auto-insert is enabled globally
+		$auto_insert = $this->config->get('player.auto_insert', false);
+		if ( ! $auto_insert ) {
+			return $content;
+		}
+
 		$post_id = get_the_ID();
 		
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
@@ -731,8 +815,27 @@ class Plugin {
 		}
 
 		if ( $enabled && $audio_url ) {
-			$player  = $this->renderAudioPlayerShortcode( array( 'post_id' => $post_id ) );
-			$content = $player . $content;
+			// Get configured player style and position
+			$player_style = $this->config->get('player.style', 'classic');
+			$player_position = $this->config->get('player.position', 'before_content');
+			
+			// Don't auto-insert if position is set to manual
+			if ( $player_position === 'manual' ) {
+				return $content;
+			}
+			
+			$player = $this->renderAudioPlayerShortcode( array( 
+				'post_id' => $post_id,
+				'style'   => $player_style
+			) );
+			
+			// Insert player based on configured position
+			if ( $player_position === 'after_content' ) {
+				$content = $content . $player;
+			} else {
+				// Default: before_content
+				$content = $player . $content;
+			}
 		}
 
 		return $content;

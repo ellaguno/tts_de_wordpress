@@ -62,6 +62,7 @@ class AdminInterface {
 		add_action( 'wp_ajax_tts_preview_voice', [ $this, 'handlePreviewVoice' ] );
 		add_action( 'wp_ajax_tts_generate_custom', [ $this, 'handleGenerateCustom' ] );
 		add_action( 'wp_ajax_tts_auto_save_audio_asset', [ $this, 'handleAutoSaveAudioAsset' ] );
+		add_action( 'wp_ajax_tts_auto_save_background_volume', [ $this, 'handleAutoSaveBackgroundVolume' ] );
 	}
 	
 	/**
@@ -320,6 +321,22 @@ class AdminInterface {
 			true
 		);
 		
+		// Enqueue TTS Player assets for preview in admin
+		wp_enqueue_style(
+			'wp-tts-player',
+			WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
+			[],
+			WP_TTS_PLUGIN_VERSION
+		);
+		
+		wp_enqueue_script(
+			'wp-tts-player',
+			WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
+			[ 'jquery' ],
+			WP_TTS_PLUGIN_VERSION,
+			true
+		);
+		
 		wp_localize_script( 'wp-tts-admin', 'wpTtsAdmin', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'wp_tts_admin' ),
@@ -365,6 +382,9 @@ class AdminInterface {
 			case 'audio_assets':
 				$this->renderAudioAssetsTab( $config );
 				break;
+			case 'player':
+				$this->renderPlayerTab( $config );
+				break;
 			default:
 				$this->renderDefaultsTab( $config );
 		}
@@ -385,7 +405,8 @@ class AdminInterface {
 			'defaults' => __( 'Defaults', 'TTS SesoLibre' ),
 			'providers' => __( 'TTS Providers', 'TTS SesoLibre' ),
 			'storage' => __( 'Storage', 'TTS SesoLibre' ),
-			'audio_assets' => __( 'Audio Assets', 'TTS SesoLibre' )
+			'audio_assets' => __( 'Audio Assets', 'TTS SesoLibre' ),
+			'player' => __( 'Player', 'TTS SesoLibre' )
 		];
 
 		echo '<div class="nav-tab-wrapper">';
@@ -1273,8 +1294,18 @@ class AdminInterface {
 	public function renderOpenAIKeyField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['openai']['api_key'] ?? '';
-		echo '<input type="password" name="wp_tts_config[providers][openai][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['openai']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-field">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[providers][openai][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="openai" />';
+		echo ' ' . esc_html__( 'Enable OpenAI TTS', 'TTS de Wordpress' );
+		echo '</label>';
+		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<input type="password" name="wp_tts_config[providers][openai][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Enter your OpenAI API key for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1283,8 +1314,18 @@ class AdminInterface {
 	public function renderElevenLabsKeyField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['elevenlabs']['api_key'] ?? '';
-		echo '<input type="password" name="wp_tts_config[providers][elevenlabs][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['elevenlabs']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-field">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[providers][elevenlabs][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="elevenlabs" />';
+		echo ' ' . esc_html__( 'Enable ElevenLabs TTS', 'TTS de Wordpress' );
+		echo '</label>';
+		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<input type="password" name="wp_tts_config[providers][elevenlabs][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Enter your ElevenLabs API key for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1293,8 +1334,18 @@ class AdminInterface {
 	public function renderGoogleCredentialsField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['google']['credentials_path'] ?? '';
-		echo '<input type="text" name="wp_tts_config[providers][google][credentials_path]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['google']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-field">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[providers][google][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="google" />';
+		echo ' ' . esc_html__( 'Enable Google Cloud TTS', 'TTS de Wordpress' );
+		echo '</label>';
+		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<input type="text" name="wp_tts_config[providers][google][credentials_path]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Path to Google Cloud service account JSON file.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '</div>';
 	}
 /**
 	 * Render Amazon Polly Access Key field
@@ -1302,8 +1353,19 @@ class AdminInterface {
 	public function renderAmazonPollyAccessKeyField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['amazon_polly']['access_key'] ?? '';
-		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][access_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['amazon_polly']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-field">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[providers][amazon_polly][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="amazon_polly" />';
+		echo ' ' . esc_html__( 'Enable Amazon Polly TTS', 'TTS de Wordpress' );
+		echo '</label>';
+		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<label>' . esc_html__( 'AWS Access Key ID:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][access_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Enter your AWS Access Key ID for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1312,8 +1374,13 @@ class AdminInterface {
 	public function renderAmazonPollySecretKeyField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['amazon_polly']['secret_key'] ?? '';
-		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][secret_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['amazon_polly']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<label>' . esc_html__( 'AWS Secret Access Key:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][secret_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Enter your AWS Secret Access Key for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1322,6 +1389,7 @@ class AdminInterface {
 	public function renderAmazonPollyRegionField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$current = $config['providers']['amazon_polly']['region'] ?? 'us-east-1';
+		$enabled = $config['providers']['amazon_polly']['enabled'] ?? false;
 		$regions = [
 			'us-east-1' => 'US East (N. Virginia)',
 			'us-west-2' => 'US West (Oregon)',
@@ -1330,12 +1398,15 @@ class AdminInterface {
 			'ap-northeast-1' => 'Asia Pacific (Tokyo)',
 		];
 		
-		echo '<select name="wp_tts_config[providers][amazon_polly][region]">';
+		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<label>' . esc_html__( 'AWS Region:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<select name="wp_tts_config[providers][amazon_polly][region]" ' . ( $enabled ? '' : 'disabled' ) . '>';
 		foreach ( $regions as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
 		echo '<p class="description">' . esc_html__( 'Select the AWS region for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1435,8 +1506,19 @@ class AdminInterface {
 	public function renderAzureTTSSubscriptionKeyField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['providers']['azure_tts']['subscription_key'] ?? '';
-		echo '<input type="password" name="wp_tts_config[providers][azure_tts][subscription_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+		$enabled = $config['providers']['azure_tts']['enabled'] ?? false;
+		
+		echo '<div class="tts-provider-field">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[providers][azure_tts][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="azure_tts" />';
+		echo ' ' . esc_html__( 'Enable Azure TTS', 'TTS de Wordpress' );
+		echo '</label>';
+		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<label>' . esc_html__( 'Subscription Key:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<input type="password" name="wp_tts_config[providers][azure_tts][subscription_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
 		echo '<p class="description">' . esc_html__( 'Enter your Azure Cognitive Services subscription key for TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1445,6 +1527,7 @@ class AdminInterface {
 	public function renderAzureTTSRegionField(): void {
 		$config = get_option( 'wp_tts_config', [] );
 		$current = $config['providers']['azure_tts']['region'] ?? 'eastus';
+		$enabled = $config['providers']['azure_tts']['enabled'] ?? false;
 		$regions = [
 			'eastus' => 'East US',
 			'eastus2' => 'East US 2',
@@ -1476,12 +1559,15 @@ class AdminInterface {
 			'westindia' => 'West India',
 		];
 		
-		echo '<select name="wp_tts_config[providers][azure_tts][region]">';
+		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
+		echo '<label>' . esc_html__( 'Azure Region:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<select name="wp_tts_config[providers][azure_tts][region]" ' . ( $enabled ? '' : 'disabled' ) . '>';
 		foreach ( $regions as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
 		echo '<p class="description">' . esc_html__( 'Select the Azure region for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '</div>';
 	}
 	
 	/**
@@ -1894,6 +1980,14 @@ class AdminInterface {
 		echo '</tr>';
 		
 		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Default Background Music', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderDefaultBackgroundField();
+		echo '<p class="description">' . esc_html__( 'Select the default background music that will play during TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
 		echo '<th scope="row">' . esc_html__( 'Default Outro Audio', 'TTS SesoLibre' ) . '</th>';
 		echo '<td>';
 		$this->renderDefaultOutroField();
@@ -1948,6 +2042,50 @@ class AdminInterface {
 	}
 
 	/**
+	 * Render Default Background field
+	 */
+	public function renderDefaultBackgroundField(): void {
+		$config = get_option( 'wp_tts_config', [] );
+		$background_id = $config['audio_assets']['default_background'] ?? '';
+		$background_volume = $config['audio_assets']['background_volume'] ?? 0.3;
+		$background_url = '';
+		$background_title = '';
+		
+		if ( $background_id ) {
+			$background_url = wp_get_attachment_url( $background_id );
+			$background_title = get_the_title( $background_id );
+		}
+		
+		echo '<div class="tts-media-selector" data-type="background">';
+		echo '<input type="hidden" name="wp_tts_config[audio_assets][default_background]" value="' . esc_attr( $background_id ) . '" class="tts-media-id" />';
+		
+		echo '<div class="tts-media-preview" style="' . ( $background_id ? '' : 'display: none;' ) . '">';
+		if ( $background_url ) {
+			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
+			echo '<source src="' . esc_url( $background_url ) . '" type="audio/mpeg">';
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo '</audio>';
+		}
+		echo '<p class="tts-media-title">' . esc_html( $background_title ) . '</p>';
+		echo '</div>';
+		
+		echo '<div class="tts-media-buttons">';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Background Music', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $background_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '</div>';
+		
+		// Background Volume Control
+		echo '<div style="margin-top: 15px;">';
+		echo '<label>' . esc_html__( 'Default Volume:', 'TTS SesoLibre' ) . '</label>';
+		echo '<input type="range" name="wp_tts_config[audio_assets][background_volume]" ';
+		echo 'value="' . esc_attr( $background_volume ) . '" ';
+		echo 'min="0" max="1" step="0.1" style="width: 150px; margin-left: 10px;">';
+		echo '<span class="volume-display">' . esc_html( $background_volume ) . '</span>';
+		echo '</div>';
+		echo '</div>';
+	}
+
+	/**
 	 * Render Default Outro field
 	 */
 	public function renderDefaultOutroField(): void {
@@ -1996,7 +2134,7 @@ class AdminInterface {
 		$asset_type = isset($_POST['asset_type']) ? sanitize_text_field(wp_unslash($_POST['asset_type'])) : '';
 		$attachment_id = isset($_POST['attachment_id']) ? intval($_POST['attachment_id']) : 0;
 		
-		if ( ! $post_id || ! in_array($asset_type, ['intro', 'outro']) ) {
+		if ( ! $post_id || ! in_array($asset_type, ['intro_audio', 'outro_audio', 'background_audio', 'custom_audio']) ) {
 			wp_send_json_error( [
 				'message' => __( 'Invalid parameters.', 'TTS SesoLibre' )
 			] );
@@ -2021,8 +2159,7 @@ class AdminInterface {
 					$tts_data['audio_assets'] = [];
 				}
 				
-				$field_name = $asset_type . '_audio';
-				$tts_data['audio_assets'][$field_name] = $attachment_id ?: '';
+				$tts_data['audio_assets'][$asset_type] = $attachment_id ?: '';
 				$tts_data['updated_at'] = current_time('mysql');
 				
 				// Save updated data
@@ -2061,16 +2198,19 @@ class AdminInterface {
 		
 		switch ( $active_tab ) {
 			case 'defaults':
-				$tabs_to_preserve = ['providers', 'storage', 'audio_assets'];
+				$tabs_to_preserve = ['providers', 'storage', 'audio_assets', 'player'];
 				break;
 			case 'providers':
-				$tabs_to_preserve = ['defaults', 'storage', 'audio_assets'];
+				$tabs_to_preserve = ['defaults', 'storage', 'audio_assets', 'player'];
 				break;
 			case 'storage':
-				$tabs_to_preserve = ['defaults', 'providers', 'audio_assets'];
+				$tabs_to_preserve = ['defaults', 'providers', 'audio_assets', 'player'];
 				break;
 			case 'audio_assets':
-				$tabs_to_preserve = ['defaults', 'providers', 'storage'];
+				$tabs_to_preserve = ['defaults', 'providers', 'storage', 'player'];
+				break;
+			case 'player':
+				$tabs_to_preserve = ['defaults', 'providers', 'storage', 'audio_assets'];
 				break;
 		}
 		
@@ -2182,5 +2322,182 @@ class AdminInterface {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Handle auto save background volume AJAX request
+	 */
+	public function handleAutoSaveBackgroundVolume(): void {
+		// Security check with nonce verification
+		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_auto_save' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+		
+		// Get parameters
+		$post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+		$volume = isset($_POST['volume']) ? floatval($_POST['volume']) : 0.3;
+		
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'Invalid post ID.', 'TTS SesoLibre' )
+			] );
+			return;
+		}
+		
+		// Permission check
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+			], 403 );
+			return;
+		}
+		
+		// Validate volume range
+		$volume = max(0, min(1, $volume));
+		
+		try {
+			// Get existing TTS data
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData($post_id);
+				
+				// Initialize audio_assets if not exists
+				if ( ! isset($tts_data['audio_assets']) ) {
+					$tts_data['audio_assets'] = [];
+				}
+				
+				// Save the background volume
+				$tts_data['audio_assets']['background_volume'] = $volume;
+				$tts_data['updated_at'] = current_time('mysql');
+				
+				// Save updated data
+				\WP_TTS\Utils\TTSMetaManager::saveTTSData($post_id, $tts_data);
+				
+				wp_send_json_success( [
+					'message' => __( 'Background volume updated successfully.', 'TTS SesoLibre' ),
+					'volume' => $volume
+				] );
+			} else {
+				wp_send_json_error( [
+					'message' => __( 'TTS Meta Manager not available.', 'TTS SesoLibre' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Failed to save background volume.', 'TTS SesoLibre' ),
+				'error' => $e->getMessage()
+			] );
+		}
+	}
+
+	/**
+	 * Render Player tab
+	 */
+	private function renderPlayerTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'Player Settings', 'TTS SesoLibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Choose between different player styles and configure player behavior.', 'TTS SesoLibre' ) . '</p>';
+		
+		echo '<table class="form-table">';
+		
+		// Player Style Selection
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Player Style', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerStyleField( $config );
+		echo '<p class="description">' . esc_html__( 'Choose the player style for displaying TTS audio on your website.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Auto-insertion Settings
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Auto-insert Player', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderAutoInsertField( $config );
+		echo '<p class="description">' . esc_html__( 'Automatically insert the TTS player in posts and pages.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Player Position
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Player Position', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerPositionField( $config );
+		echo '<p class="description">' . esc_html__( 'Where to display the player when auto-inserting.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Volume Controls Section
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Volume Controls', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderVolumeControlsField( $config );
+		echo '<p class="description">' . esc_html__( 'Configure which volume controls to show in the SesoLibre player.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render player style field
+	 */
+	private function renderPlayerStyleField( array $config ): void {
+		$player_style = $config['player']['style'] ?? 'classic';
+		
+		echo '<select name="wp_tts_config[player][style]" id="player_style">';
+		echo '<option value="classic"' . selected( $player_style, 'classic', false ) . '>' . esc_html__( 'Classic Player', 'TTS SesoLibre' ) . '</option>';
+		echo '<option value="sesolibre"' . selected( $player_style, 'sesolibre', false ) . '>' . esc_html__( 'SesoLibre Player (with Audio Mixing)', 'TTS SesoLibre' ) . '</option>';
+		echo '</select>';
+	}
+
+	/**
+	 * Render auto-insert field
+	 */
+	private function renderAutoInsertField( array $config ): void {
+		$auto_insert = $config['player']['auto_insert'] ?? false;
+		
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][auto_insert]" value="1" ' . checked( $auto_insert, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Automatically insert TTS player in posts', 'TTS SesoLibre' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render player position field
+	 */
+	private function renderPlayerPositionField( array $config ): void {
+		$position = $config['player']['position'] ?? 'before_content';
+		
+		echo '<select name="wp_tts_config[player][position]" id="player_position">';
+		echo '<option value="before_content"' . selected( $position, 'before_content', false ) . '>' . esc_html__( 'Before Content', 'TTS SesoLibre' ) . '</option>';
+		echo '<option value="after_content"' . selected( $position, 'after_content', false ) . '>' . esc_html__( 'After Content', 'TTS SesoLibre' ) . '</option>';
+		echo '<option value="manual"' . selected( $position, 'manual', false ) . '>' . esc_html__( 'Manual (Shortcode)', 'TTS SesoLibre' ) . '</option>';
+		echo '</select>';
+	}
+
+	/**
+	 * Render volume controls field
+	 */
+	private function renderVolumeControlsField( array $config ): void {
+		$show_voice_volume = $config['player']['show_voice_volume'] ?? true;
+		$show_background_volume = $config['player']['show_background_volume'] ?? true;
+		
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_volume]" value="1" ' . checked( $show_voice_volume, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show Voice Volume Control', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
+		
+		echo '<div>';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_background_volume]" value="1" ' . checked( $show_background_volume, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show Background Music Volume Control', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
 	}
 }

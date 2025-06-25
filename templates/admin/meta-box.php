@@ -23,10 +23,21 @@ $config = new \WP_TTS\Core\ConfigurationManager();
 $enabled_providers = $config->getEnabledProviders();
 $defaults = $config->getDefaults();
 
-// If no providers are enabled, show default providers
-if (empty($enabled_providers)) {
-    $enabled_providers = ['google', 'openai', 'elevenlabs', 'azure_tts', 'amazon_polly'];
+// Debug: Check if providers are correctly loaded
+$all_providers = $config->get('providers', []);
+$debug_enabled = [];
+foreach ($all_providers as $name => $provider_config) {
+    if (!empty($provider_config['enabled'])) {
+        $debug_enabled[] = $name;
+    }
 }
+
+// If we have enabled providers but getEnabledProviders is empty, force refresh
+if (empty($enabled_providers) && !empty($debug_enabled)) {
+    $enabled_providers = $debug_enabled;
+}
+
+// Only show enabled providers - if none are enabled, show empty dropdown to encourage configuration
 ?>
 
 <div class="wp-tts-meta-box">
@@ -54,19 +65,34 @@ if (empty($enabled_providers)) {
             <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'TTS SesoLibre'); ?></label>
         </div>
         <div class="wp-tts-field-content">
-            <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select">
-                <option value=""><?php _e('Use default provider', 'TTS SesoLibre'); ?></option>
-                <?php foreach ($enabled_providers as $provider_name): ?>
-                    <?php $provider_config = $config->getProviderConfig($provider_name); ?>
-                    <option value="<?php echo esc_attr($provider_name); ?>" 
-                            <?php selected($provider, $provider_name); ?>>
-                        <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider_name))); ?>
-                        <?php if ($provider_name === $defaults['default_provider']): ?>
-                            (<?php _e('Default', 'TTS SesoLibre'); ?>)
-                        <?php endif; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <?php if (empty($enabled_providers)): ?>
+                <div class="notice notice-warning inline" style="margin: 0; padding: 8px 12px;">
+                    <p style="margin: 0;">
+                        <?php _e('No TTS providers are currently enabled. Please go to', 'TTS SesoLibre'); ?>
+                        <a href="<?php echo admin_url('options-general.php?page=wp-tts-settings'); ?>" target="_blank">
+                            <?php _e('TTS Settings', 'TTS SesoLibre'); ?>
+                        </a>
+                        <?php _e('to enable at least one provider.', 'TTS SesoLibre'); ?>
+                    </p>
+                </div>
+                <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select" disabled>
+                    <option value=""><?php _e('No providers enabled', 'TTS SesoLibre'); ?></option>
+                </select>
+            <?php else: ?>
+                <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select">
+                    <option value=""><?php _e('Use default provider', 'TTS SesoLibre'); ?></option>
+                    <?php foreach ($enabled_providers as $provider_name): ?>
+                        <?php $provider_config = $config->getProviderConfig($provider_name); ?>
+                        <option value="<?php echo esc_attr($provider_name); ?>" 
+                                <?php selected($provider, $provider_name); ?>>
+                            <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider_name))); ?>
+                            <?php if ($provider_name === $defaults['default_provider']): ?>
+                                (<?php _e('Default', 'TTS SesoLibre'); ?>)
+                            <?php endif; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            <?php endif; ?>
             <p class="wp-tts-field-description">
                 <?php _e('Select the TTS provider for this post', 'TTS SesoLibre'); ?>
             </p>
@@ -89,45 +115,78 @@ if (empty($enabled_providers)) {
         </div>
     </div>
 
-    <!-- Custom Audio Upload -->
+    <!-- Audio Assets Section -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
-        <div class="wp-tts-field-header">
-            <label for="tts_custom_audio" class="wp-tts-field-label"><?php _e('Custom Audio', 'TTS SesoLibre'); ?></label>
+        <div class="wp-tts-field-header" style="cursor: pointer;" onclick="toggleAudioAssets()">
+            <label class="wp-tts-field-label">
+                <span id="audio-assets-toggle" style="margin-right: 8px;">▶</span>
+                <?php _e('Audio Assets', 'TTS SesoLibre'); ?>
+                <small style="color: #666; font-weight: normal;"><?php _e('(Click to expand)', 'TTS SesoLibre'); ?></small>
+            </label>
         </div>
-        <div class="wp-tts-field-content">
+        <div class="wp-tts-field-content" id="audio-assets-content" style="display: none;">
             <?php
-            // Get custom audio configuration
-            $post_custom_audio = '';
+            // Get audio assets configuration
+            $audio_assets = [];
             if (class_exists('\\WP_TTS\\Utils\\TTSMetaManager')) {
                 $tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData($post->ID);
-                $post_custom_audio = $tts_data['audio_assets']['custom_audio'] ?? '';
+                $audio_assets = $tts_data['audio_assets'] ?? [];
             }
             
-            $custom_audio_url = $post_custom_audio ? wp_get_attachment_url($post_custom_audio) : '';
-            $custom_audio_title = $post_custom_audio ? get_the_title($post_custom_audio) : '';
+            $asset_types = [
+                'intro_audio' => __('Intro Audio', 'TTS SesoLibre'),
+                'background_audio' => __('Background Music', 'TTS SesoLibre'),
+                'outro_audio' => __('Outro Audio', 'TTS SesoLibre'),
+                'custom_audio' => __('Custom Audio (replaces TTS)', 'TTS SesoLibre')
+            ];
+            
+            foreach ($asset_types as $asset_key => $asset_label): 
+                $asset_id = $audio_assets[$asset_key] ?? '';
+                $asset_url = $asset_id ? wp_get_attachment_url($asset_id) : '';
+                $asset_title = $asset_id ? get_the_title($asset_id) : '';
             ?>
             
-            <div class="tts-media-selector" data-type="custom_audio">
-                <input type="hidden" name="tts_custom_audio" value="<?php echo esc_attr($post_custom_audio); ?>" class="tts-media-id" />
+            <div class="tts-audio-asset" style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e4e7; border-radius: 4px;">
+                <h4 style="margin: 0 0 10px 0;"><?php echo esc_html($asset_label); ?></h4>
                 
-                <div class="tts-media-preview" style="<?php echo $post_custom_audio ? '' : 'display: none;'; ?>">
-                    <?php if ($custom_audio_url): ?>
-                        <audio controls style="width: 100%; margin-bottom: 10px;">
-                            <source src="<?php echo esc_url($custom_audio_url); ?>" type="audio/mpeg">
-                            <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
-                        </audio>
-                    <?php endif; ?>
-                    <p class="tts-media-title"><?php echo esc_html($custom_audio_title); ?></p>
+                <div class="tts-media-selector" data-type="<?php echo esc_attr($asset_key); ?>">
+                    <input type="hidden" name="tts_<?php echo esc_attr($asset_key); ?>" value="<?php echo esc_attr($asset_id); ?>" class="tts-media-id" />
+                    
+                    <div class="tts-media-preview" style="<?php echo $asset_id ? '' : 'display: none;'; ?>">
+                        <?php if ($asset_url): ?>
+                            <audio controls style="width: 100%; margin-bottom: 10px;">
+                                <source src="<?php echo esc_url($asset_url); ?>" type="audio/mpeg">
+                                <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
+                            </audio>
+                        <?php endif; ?>
+                        <p class="tts-media-title"><?php echo esc_html($asset_title); ?></p>
+                    </div>
+                    
+                    <div class="tts-media-buttons">
+                        <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'TTS SesoLibre'); ?></button>
+                        <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS SesoLibre'); ?></button>
+                    </div>
                 </div>
                 
-                <div class="tts-media-buttons">
-                    <button type="button" class="button tts-select-media"><?php _e('Upload Custom Audio', 'TTS SesoLibre'); ?></button>
-                    <button type="button" class="button tts-remove-media" style="<?php echo $post_custom_audio ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS SesoLibre'); ?></button>
+                <?php if ($asset_key === 'background_audio'): ?>
+                <div style="margin-top: 10px;">
+                    <label><?php _e('Default Volume:', 'TTS SesoLibre'); ?></label>
+                    <input type="range" name="tts_background_volume" 
+                           value="<?php echo esc_attr($audio_assets['background_volume'] ?? 0.3); ?>" 
+                           min="0" max="1" step="0.1" style="width: 150px; margin-left: 10px;">
+                    <span class="volume-display"><?php echo esc_html($audio_assets['background_volume'] ?? 0.3); ?></span>
                 </div>
+                <?php endif; ?>
             </div>
             
+            <?php endforeach; ?>
+            
             <p class="wp-tts-field-description">
-                <?php _e('Upload a custom audio file to replace the auto-generated TTS audio. If provided, this will be used instead of generating TTS.', 'TTS SesoLibre'); ?>
+                <?php _e('Configure audio assets for enhanced playback experience:', 'TTS SesoLibre'); ?>
+                <br>• <strong><?php _e('Intro Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Plays before the main TTS audio', 'TTS SesoLibre'); ?>
+                <br>• <strong><?php _e('Background Music:', 'TTS SesoLibre'); ?></strong> <?php _e('Loops during main TTS audio playback', 'TTS SesoLibre'); ?>
+                <br>• <strong><?php _e('Outro Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Plays after the main TTS audio', 'TTS SesoLibre'); ?>
+                <br>• <strong><?php _e('Custom Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Replaces auto-generated TTS entirely', 'TTS SesoLibre'); ?>
                 <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'TTS SesoLibre'); ?></em>
             </p>
         </div>
@@ -769,7 +828,6 @@ jQuery(document).ready(function($) {
             
             // Auto-save the selection
             var postId = $('#post_ID').val();
-            var fieldName = type === 'intro' ? 'intro_audio' : 'outro_audio';
             
             if (postId) {
                 $.ajax({
@@ -860,5 +918,40 @@ jQuery(document).ready(function($) {
             }
         }
     });
+    
+    // Background volume slider update
+    $('input[name="tts_background_volume"]').on('input', function() {
+        const value = $(this).val();
+        $(this).siblings('.volume-display').text(value);
+        
+        // Auto-save volume setting
+        const postId = $('#post_ID').val();
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_auto_save_background_volume',
+                    post_id: postId,
+                    volume: value,
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                }
+            });
+        }
+    });
+    
+    // Toggle Audio Assets Section (outside jQuery)
+    window.toggleAudioAssets = function() {
+        const content = document.getElementById('audio-assets-content');
+        const toggle = document.getElementById('audio-assets-toggle');
+        
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            toggle.innerHTML = '▼';
+        } else {
+            content.style.display = 'none';
+            toggle.innerHTML = '▶';
+        }
+    };
 });
 </script>
