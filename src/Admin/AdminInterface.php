@@ -2435,7 +2435,9 @@ class AdminInterface {
 		echo '<th scope="row">' . esc_html__( 'Player Position', 'TTS SesoLibre' ) . '</th>';
 		echo '<td>';
 		$this->renderPlayerPositionField( $config );
-		echo '<p class="description">' . esc_html__( 'Where to display the player when auto-inserting.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Where to display the player when auto-inserting.', 'TTS SesoLibre' ) . '<br>' . 
+		     esc_html__( 'Manual option allows you to use the shortcode:', 'TTS SesoLibre' ) . ' <code>[wp_tts_player]</code><br>' .
+		     esc_html__( 'Optional parameters:', 'TTS SesoLibre' ) . ' <code>[wp_tts_player post_id="123" style="sesolibre"]</code>' . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -2563,6 +2565,27 @@ class AdminInterface {
 		echo ' ' . esc_html__( 'Show Article Title', 'TTS SesoLibre' );
 		echo '</label>';
 		echo '</div>';
+		echo '</div>';
+		
+		echo '</table>';
+		
+		// Shortcode documentation section
+		echo '<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px;">';
+		echo '<h3 style="margin-top: 0;">' . esc_html__( 'Shortcode Documentation', 'TTS SesoLibre' ) . '</h3>';
+		echo '<p>' . esc_html__( 'When using Manual position, you can place the TTS player anywhere in your content using the shortcode:', 'TTS SesoLibre' ) . '</p>';
+		
+		echo '<table class="widefat" style="margin: 15px 0;">';
+		echo '<thead><tr><th>' . esc_html__( 'Shortcode', 'TTS SesoLibre' ) . '</th><th>' . esc_html__( 'Description', 'TTS SesoLibre' ) . '</th></tr></thead>';
+		echo '<tbody>';
+		echo '<tr><td><code>[wp_tts_player]</code></td><td>' . esc_html__( 'Basic player for current post', 'TTS SesoLibre' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="classic"]</code></td><td>' . esc_html__( 'Force classic player style', 'TTS SesoLibre' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="sesolibre"]</code></td><td>' . esc_html__( 'Force SesoLibre player with audio mixing', 'TTS SesoLibre' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player post_id="123"]</code></td><td>' . esc_html__( 'Player for specific post ID', 'TTS SesoLibre' ) . '</td></tr>';
+		echo '</tbody>';
+		echo '</table>';
+		
+		echo '<p><strong>' . esc_html__( 'Note:', 'TTS SesoLibre' ) . '</strong> ' . 
+		     esc_html__( 'The shortcode will only display if TTS is enabled for the specified post and audio has been generated.', 'TTS SesoLibre' ) . '</p>';
 		echo '</div>';
 		
 		echo '</div>';

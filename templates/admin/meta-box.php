@@ -604,6 +604,46 @@ jQuery(document).ready(function($) {
     });
     toggleConditionalFields(); // Initial state
     
+    // Initialize voices for preselected provider
+    function initializeVoices() {
+        const provider = $('#tts_voice_provider').val();
+        const currentVoiceId = '<?php echo esc_js($voice_id); ?>';
+        
+        if (provider) {
+            console.log('Initializing voices for preselected provider:', provider);
+            const $voiceSelect = $('#tts_voice_id');
+            $voiceSelect.html('<option value=""><?php _e("Loading voices...", "TTS SesoLibre"); ?></option>');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_get_voices_metabox',
+                    provider: provider,
+                    nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        let options = '<option value=""><?php _e("Use default voice", "TTS de Wordpress"); ?></option>';
+                        response.data.voices.forEach(function(voice) {
+                            const selected = voice.id === currentVoiceId ? ' selected' : '';
+                            options += `<option value="${voice.id}"${selected}>${voice.name} (${voice.language})</option>`;
+                        });
+                        $voiceSelect.html(options);
+                        console.log('Voices loaded, preselected voice:', currentVoiceId);
+                    } else {
+                        $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS SesoLibre"); ?></option>');
+                    }
+                },
+                error: function() {
+                    $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS SesoLibre"); ?></option>');
+                }
+            });
+        }
+    }
+    
+    // Initialize voices on page load
+    initializeVoices();
     
     // Load voices when provider changes
     $('#tts_voice_provider').on('change', function() {

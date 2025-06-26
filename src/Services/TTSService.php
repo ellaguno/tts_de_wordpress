@@ -959,22 +959,25 @@ class TTSService {
 		try {
 			$this->logger->info( 'Processing intro/outro audio for post', [ 'post_id' => $post_id ] );
 			
-			// Get intro/outro settings
+			// Get intro/outro/background settings
 			$intro_audio_id = '';
 			$outro_audio_id = '';
+			$background_audio_id = '';
 			
-			// Get post-specific intro/outro
+			// Get post-specific audio assets
 			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
 				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
 				$intro_audio_id = $tts_data['audio_assets']['intro_audio'] ?? '';
 				$outro_audio_id = $tts_data['audio_assets']['outro_audio'] ?? '';
+				$background_audio_id = $tts_data['audio_assets']['background_audio'] ?? '';
 			}
 			
 			// If no post-specific audio, check for defaults
-			if ( ! $intro_audio_id || ! $outro_audio_id ) {
+			if ( ! $intro_audio_id || ! $outro_audio_id || ! $background_audio_id ) {
 				$config = get_option( 'wp_tts_config', [] );
 				$default_intro = $config['audio_assets']['default_intro'] ?? '';
 				$default_outro = $config['audio_assets']['default_outro'] ?? '';
+				$default_background = $config['audio_assets']['default_background'] ?? '';
 				
 				if ( ! $intro_audio_id ) {
 					$intro_audio_id = $default_intro;
@@ -982,23 +985,28 @@ class TTSService {
 				if ( ! $outro_audio_id ) {
 					$outro_audio_id = $default_outro;
 				}
+				if ( ! $background_audio_id ) {
+					$background_audio_id = $default_background;
+				}
 			}
 			
-			// If no intro or outro, return original result
-			if ( ! $intro_audio_id && ! $outro_audio_id ) {
-				$this->logger->info( 'No intro/outro configured, returning original audio', [ 'post_id' => $post_id ] );
+			// If no intro, outro, or background, return original result
+			if ( ! $intro_audio_id && ! $outro_audio_id && ! $background_audio_id ) {
+				$this->logger->info( 'No audio assets configured, returning original audio', [ 'post_id' => $post_id ] );
 				return $result;
 			}
 			
-			$this->logger->info( 'Found intro/outro configuration', [
+			$this->logger->info( 'Found audio assets configuration', [
 				'post_id' => $post_id,
 				'intro_id' => $intro_audio_id,
-				'outro_id' => $outro_audio_id
+				'outro_id' => $outro_audio_id,
+				'background_id' => $background_audio_id
 			] );
 			
 			// Get file paths
 			$intro_path = $intro_audio_id ? $this->getAttachmentFilePath( $intro_audio_id ) : '';
 			$outro_path = $outro_audio_id ? $this->getAttachmentFilePath( $outro_audio_id ) : '';
+			$background_path = $background_audio_id ? $this->getAttachmentFilePath( $background_audio_id ) : '';
 			$main_audio_path = $this->getAudioFilePathFromUrl( $result['audio_url'] );
 			
 			if ( ! $main_audio_path || ! file_exists( $main_audio_path ) ) {
@@ -1029,30 +1037,56 @@ class TTSService {
 				$outro_path = '';
 			}
 			
-			// If no valid intro/outro files, return original
-			if ( ! $intro_path && ! $outro_path ) {
-				$this->logger->info( 'No valid intro/outro files found, returning original audio', [ 'post_id' => $post_id ] );
-				return $result;
-			}
-			
-			// Concatenate audio files
-			$concatenated_url = $this->concatenateAudioFiles( $intro_path, $main_audio_path, $outro_path, $post_id );
-			
-			if ( $concatenated_url ) {
-				$this->logger->info( 'Successfully concatenated audio with intro/outro', [
+			if ( $background_path && ! file_exists( $background_path ) ) {
+				$this->logger->warning( 'Background audio file not found, skipping', [
 					'post_id' => $post_id,
-					'original_url' => $result['audio_url'],
-					'concatenated_url' => $concatenated_url
+					'background_id' => $background_audio_id,
+					'background_path' => $background_path
 				] );
-				
-				// Update result with new URL
-				$result['audio_url'] = $concatenated_url;
-				$result['has_intro_outro'] = true;
-				$result['intro_file'] = $intro_path ? basename( $intro_path ) : '';
-				$result['outro_file'] = $outro_path ? basename( $outro_path ) : '';
-			} else {
-				$this->logger->error( 'Failed to concatenate audio files', [ 'post_id' => $post_id ] );
+				$background_path = '';
 			}
+			
+			// NEW APPROACH: Save intro/outro info to metadata for dynamic player mixing
+			// Instead of creating mixed files, we'll store the audio asset references
+			// so the SesoLibre player can dynamically mix them
+			
+			$this->logger->info( 'Saving audio assets metadata for dynamic mixing', [
+				'post_id' => $post_id,
+				'intro_id' => $intro_audio_id,
+				'outro_id' => $outro_audio_id,
+				'background_id' => $background_audio_id,
+				'intro_valid' => $intro_path ? file_exists( $intro_path ) : false,
+				'outro_valid' => $outro_path ? file_exists( $outro_path ) : false,
+				'background_valid' => $background_path ? file_exists( $background_path ) : false
+			] );
+			
+			// Update TTS metadata with valid audio asset references
+			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				$current_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
+				
+				// Only save IDs for files that actually exist
+				$current_data['audio_assets']['intro_audio'] = ( $intro_path && file_exists( $intro_path ) ) ? $intro_audio_id : '';
+				$current_data['audio_assets']['outro_audio'] = ( $outro_path && file_exists( $outro_path ) ) ? $outro_audio_id : '';
+				$current_data['audio_assets']['background_audio'] = ( $background_path && file_exists( $background_path ) ) ? $background_audio_id : '';
+				
+				// Save the clean main audio URL (not mixed)
+				$current_data['audio']['url'] = $result['audio_url'];
+				
+				\WP_TTS\Utils\TTSMetaManager::saveTTSData( $post_id, $current_data );
+				
+				$this->logger->info( 'Updated metadata with audio asset references', [
+					'post_id' => $post_id,
+					'intro_saved' => $current_data['audio_assets']['intro_audio'],
+					'outro_saved' => $current_data['audio_assets']['outro_audio'],
+					'background_saved' => $current_data['audio_assets']['background_audio']
+				] );
+			}
+			
+			// Return the original clean audio URL - no mixing at file level
+			$result['uses_dynamic_mixing'] = true;
+			$result['intro_id'] = ( $intro_path && file_exists( $intro_path ) ) ? $intro_audio_id : '';
+			$result['outro_id'] = ( $outro_path && file_exists( $outro_path ) ) ? $outro_audio_id : '';
+			$result['background_id'] = ( $background_path && file_exists( $background_path ) ) ? $background_audio_id : '';
 			
 			return $result;
 			

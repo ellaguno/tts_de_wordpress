@@ -280,6 +280,25 @@ class Plugin {
 			$status      = get_post_meta( $post->ID, '_tts_generation_status', true );
 		}
 
+		// Apply defaults if no specific provider/voice is set
+		$config = new ConfigurationManager();
+		$defaults = $config->getDefaults();
+		
+		// If no provider is set, use default provider
+		if ( empty( $provider ) && ! empty( $defaults['default_provider'] ) ) {
+			$provider = $defaults['default_provider'];
+			error_log("[Plugin] Using default provider: {$provider}");
+		}
+		
+		// If no voice is set and we have a provider, use the provider's default voice
+		if ( empty( $voice_id ) && ! empty( $provider ) ) {
+			$provider_config = $config->getProviderConfig( $provider );
+			if ( ! empty( $provider_config['default_voice'] ) ) {
+				$voice_id = $provider_config['default_voice'];
+				error_log("[Plugin] Using default voice for {$provider}: {$voice_id}");
+			}
+		}
+
 		// Include meta box template
 		include WP_TTS_PLUGIN_DIR . 'templates/admin/meta-box.php';
 	}
