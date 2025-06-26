@@ -44,7 +44,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Enable/Disable TTS -->
     <div class="wp-tts-field">
         <div class="wp-tts-field-header">
-            <label for="tts_enabled" class="wp-tts-field-label"><?php _e('Enable TTS', 'TTS SesoLibre'); ?></label>
+            <label for="tts_enabled" class="wp-tts-field-label"><?php _e('Enable TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
             <label class="wp-tts-toggle">
                 <input type="checkbox" 
                        id="tts_enabled" 
@@ -55,46 +55,46 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             </label>
         </div>
         <p class="wp-tts-field-description">
-            <?php _e('Enable text-to-speech conversion for this post', 'TTS SesoLibre'); ?>
+            <?php _e('Enable text-to-speech conversion for this post', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
         </p>
     </div>
 
     <!-- TTS Provider Selection -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'TTS SesoLibre'); ?></label>
+            <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
         </div>
         <div class="wp-tts-field-content">
             <?php if (empty($enabled_providers)): ?>
                 <div class="notice notice-warning inline" style="margin: 0; padding: 8px 12px;">
                     <p style="margin: 0;">
-                        <?php _e('No TTS providers are currently enabled. Please go to', 'TTS SesoLibre'); ?>
+                        <?php _e('No TTS providers are currently enabled. Please go to', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                         <a href="<?php echo admin_url('options-general.php?page=wp-tts-settings'); ?>" target="_blank">
-                            <?php _e('TTS Settings', 'TTS SesoLibre'); ?>
+                            <?php _e('TTS Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                         </a>
-                        <?php _e('to enable at least one provider.', 'TTS SesoLibre'); ?>
+                        <?php _e('to enable at least one provider.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                     </p>
                 </div>
                 <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select" disabled>
-                    <option value=""><?php _e('No providers enabled', 'TTS SesoLibre'); ?></option>
+                    <option value=""><?php _e('No providers enabled', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
                 </select>
             <?php else: ?>
                 <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select">
-                    <option value=""><?php _e('Use default provider', 'TTS SesoLibre'); ?></option>
+                    <option value=""><?php _e('Use default provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
                     <?php foreach ($enabled_providers as $provider_name): ?>
                         <?php $provider_config = $config->getProviderConfig($provider_name); ?>
                         <option value="<?php echo esc_attr($provider_name); ?>" 
                                 <?php selected($provider, $provider_name); ?>>
                             <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider_name))); ?>
                             <?php if ($provider_name === $defaults['default_provider']): ?>
-                                (<?php _e('Default', 'TTS SesoLibre'); ?>)
+                                (<?php _e('Default', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>)
                             <?php endif; ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             <?php endif; ?>
             <p class="wp-tts-field-description">
-                <?php _e('Select the TTS provider for this post', 'TTS SesoLibre'); ?>
+                <?php _e('Select the TTS provider for this post', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
             </p>
         </div>
     </div>
@@ -102,15 +102,15 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Voice Selection -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label for="tts_voice_id" class="wp-tts-field-label"><?php _e('Voice', 'TTS SesoLibre'); ?></label>
+            <label for="tts_voice_id" class="wp-tts-field-label"><?php _e('Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
         </div>
         <div class="wp-tts-field-content">
             <select id="tts_voice_id" name="tts_voice_id" class="wp-tts-select">
-                <option value=""><?php _e('Use default voice', 'TTS SesoLibre'); ?></option>
+                <option value=""><?php _e('Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
                 <!-- Voices will be loaded via AJAX based on provider selection -->
             </select>
             <p class="wp-tts-field-description">
-                <?php _e('Select the voice for text-to-speech conversion', 'TTS SesoLibre'); ?>
+                <?php _e('Select the voice for text-to-speech conversion', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
             </p>
         </div>
     </div>
@@ -120,8 +120,8 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
         <div class="wp-tts-field-header" style="cursor: pointer;" onclick="toggleAudioAssets()">
             <label class="wp-tts-field-label">
                 <span id="audio-assets-toggle" style="margin-right: 8px;">▶</span>
-                <?php _e('Audio Assets', 'TTS SesoLibre'); ?>
-                <small style="color: #666; font-weight: normal;"><?php _e('(Click to expand)', 'TTS SesoLibre'); ?></small>
+                <?php _e('Audio Assets', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <small style="color: #666; font-weight: normal;"><?php _e('(Click to expand)', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></small>
             </label>
         </div>
         <div class="wp-tts-field-content" id="audio-assets-content" style="display: none;">
@@ -134,10 +134,10 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             }
             
             $asset_types = [
-                'intro_audio' => __('Intro Audio', 'TTS SesoLibre'),
-                'background_audio' => __('Background Music', 'TTS SesoLibre'),
-                'outro_audio' => __('Outro Audio', 'TTS SesoLibre'),
-                'custom_audio' => __('Custom Audio (replaces TTS)', 'TTS SesoLibre')
+                'intro_audio' => __('Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
+                'background_audio' => __('Background Music', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
+                'outro_audio' => __('Outro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
+                'custom_audio' => __('Custom Audio (replaces TTS)', 'TTS-SesoLibre-v1.6.7-shortcode-docs')
             ];
             
             foreach ($asset_types as $asset_key => $asset_label): 
@@ -156,21 +156,21 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                         <?php if ($asset_url): ?>
                             <audio controls style="width: 100%; margin-bottom: 10px;">
                                 <source src="<?php echo esc_url($asset_url); ?>" type="audio/mpeg">
-                                <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
+                                <?php _e('Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </audio>
                         <?php endif; ?>
                         <p class="tts-media-title"><?php echo esc_html($asset_title); ?></p>
                     </div>
                     
                     <div class="tts-media-buttons">
-                        <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'TTS SesoLibre'); ?></button>
-                        <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS SesoLibre'); ?></button>
+                        <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
+                        <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
                     </div>
                 </div>
                 
                 <?php if ($asset_key === 'background_audio'): ?>
                 <div style="margin-top: 10px;">
-                    <label><?php _e('Default Volume:', 'TTS SesoLibre'); ?></label>
+                    <label><?php _e('Default Volume:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
                     <input type="range" name="tts_background_volume" 
                            value="<?php echo esc_attr($audio_assets['background_volume'] ?? 0.3); ?>" 
                            min="0" max="1" step="0.1" style="width: 150px; margin-left: 10px;">
@@ -182,12 +182,12 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             <?php endforeach; ?>
             
             <p class="wp-tts-field-description">
-                <?php _e('Configure audio assets for enhanced playback experience:', 'TTS SesoLibre'); ?>
-                <br>• <strong><?php _e('Intro Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Plays before the main TTS audio', 'TTS SesoLibre'); ?>
-                <br>• <strong><?php _e('Background Music:', 'TTS SesoLibre'); ?></strong> <?php _e('Loops during main TTS audio playback', 'TTS SesoLibre'); ?>
-                <br>• <strong><?php _e('Outro Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Plays after the main TTS audio', 'TTS SesoLibre'); ?>
-                <br>• <strong><?php _e('Custom Audio:', 'TTS SesoLibre'); ?></strong> <?php _e('Replaces auto-generated TTS entirely', 'TTS SesoLibre'); ?>
-                <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'TTS SesoLibre'); ?></em>
+                <?php _e('Configure audio assets for enhanced playback experience:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <br>• <strong><?php _e('Intro Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Plays before the main TTS audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <br>• <strong><?php _e('Background Music:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Loops during main TTS audio playback', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <br>• <strong><?php _e('Outro Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Plays after the main TTS audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <br>• <strong><?php _e('Custom Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Replaces auto-generated TTS entirely', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></em>
             </p>
         </div>
     </div>
@@ -195,25 +195,25 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Generation Status and Controls -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label class="wp-tts-field-label"><?php _e('Audio Status', 'TTS SesoLibre'); ?></label>
+            <label class="wp-tts-field-label"><?php _e('Audio Status', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
         </div>
         <div class="wp-tts-field-content">
                     <div class="wp-tts-status-container">
                         <?php if ($audio_url): ?>
                             <div class="wp-tts-status wp-tts-status-success">
                                 <span class="dashicons dashicons-yes-alt"></span>
-                                <?php _e('Audio generated successfully', 'TTS de Wordpress'); ?>
+                                <?php _e('Audio generated successfully', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                                 <a href="<?php echo esc_url($audio_url); ?>" target="_blank" class="button button-small">
-                                    <?php _e('Listen', 'TTS de Wordpress'); ?>
+                                    <?php _e('Listen', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                                 </a>
                             </div>
                             
                             <!-- Audio Information -->
                             <div class="wp-tts-audio-info" style="background: #f8f9fa; border: 1px solid #e2e4e7; border-radius: 4px; padding: 12px; margin-top: 10px; font-size: 13px;">
-                                <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1d2327;"><?php _e('Audio Details', 'TTS de Wordpress'); ?></h4>
+                                <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1d2327;"><?php _e('Audio Details', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></h4>
                                 <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center;">
                                     <?php if ($provider): ?>
-                                    <strong style="color: #646970;"><?php _e('Provider:', 'TTS de Wordpress'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Provider:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
                                     <span style="color: #1d2327;">
                                         <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider))); ?>
                                         <span style="background: #007cba; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 500; margin-left: 6px;">
@@ -223,7 +223,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     <?php endif; ?>
                                     
                                     <?php if ($voice_id): ?>
-                                    <strong style="color: #646970;"><?php _e('Voice:', 'TTS de Wordpress'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Voice:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
                                     <span style="color: #1d2327;"><?php echo esc_html($voice_id); ?></span>
                                     <?php endif; ?>
                                     
@@ -241,14 +241,14 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     }
                                     if ($generated_at): 
                                     ?>
-                                    <strong style="color: #646970;"><?php _e('Generated:', 'TTS de Wordpress'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Generated:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
                                     <span style="color: #1d2327;">
                                         <?php 
                                         $timestamp = strtotime($generated_at);
                                         echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp)); 
                                         ?>
                                         <span style="color: #646970; font-size: 11px;">
-                                            (<?php echo esc_html(human_time_diff($timestamp, current_time('timestamp'))); ?> <?php _e('ago', 'TTS de Wordpress'); ?>)
+                                            (<?php echo esc_html(human_time_diff($timestamp, current_time('timestamp'))); ?> <?php _e('ago', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>)
                                         </span>
                                     </span>
                                     <?php endif; ?>
@@ -264,7 +264,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     }
                                     if ($file_size): 
                                     ?>
-                                    <strong style="color: #646970;"><?php _e('File Size:', 'TTS de Wordpress'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('File Size:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
                                     <span style="color: #1d2327;"><?php echo esc_html($file_size); ?></span>
                                     <?php endif; ?>
                                 </div>
@@ -272,22 +272,22 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                             
                             <audio controls style="width: 100%; margin-top: 10px;">
                                 <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-                                <?php _e('Your browser does not support the audio element.', 'TTS SesoLibre'); ?>
+                                <?php _e('Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </audio>
                         <?php elseif ($status === 'processing'): ?>
                             <div class="wp-tts-status wp-tts-status-processing">
                                 <span class="dashicons dashicons-update wp-tts-spin"></span>
-                                <?php _e('Generating audio...', 'TTS de Wordpress'); ?>
+                                <?php _e('Generating audio...', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </div>
                         <?php elseif ($status === 'failed'): ?>
                             <div class="wp-tts-status wp-tts-status-error">
                                 <span class="dashicons dashicons-warning"></span>
-                                <?php _e('Audio generation failed', 'TTS de Wordpress'); ?>
+                                <?php _e('Audio generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </div>
                         <?php else: ?>
                             <div class="wp-tts-status wp-tts-status-pending">
                                 <span class="dashicons dashicons-clock"></span>
-                                <?php _e('Audio not generated yet', 'TTS de Wordpress'); ?>
+                                <?php _e('Audio not generated yet', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -296,17 +296,17 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                         <button type="button" id="tts_generate_now" class="button button-primary" 
                                 <?php echo $status === 'processing' ? 'disabled' : ''; ?>>
                             <span class="dashicons dashicons-controls-play"></span>
-                            <?php _e('Generate Audio Now', 'TTS de Wordpress'); ?>
+                            <?php _e('Generate Audio Now', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                         </button>
                         
                         <?php if ($audio_url): ?>
                             <button type="button" id="tts_regenerate" class="button button-secondary">
                                 <span class="dashicons dashicons-update"></span>
-                                <?php _e('Regenerate', 'TTS de Wordpress'); ?>
+                                <?php _e('Regenerate', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </button>
                             <button type="button" id="tts_delete_audio" class="button button-secondary" style="color: #d63638;">
                                 <span class="dashicons dashicons-trash"></span>
-                                <?php _e('Delete Audio', 'TTS de Wordpress'); ?>
+                                <?php _e('Delete Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -315,7 +315,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                         <div class="wp-tts-progress-bar">
                             <div class="wp-tts-progress-fill" style="width: 0%;"></div>
                         </div>
-                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'TTS SesoLibre'); ?></p>
+                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></p>
                     </div>
         </div>
     </div>

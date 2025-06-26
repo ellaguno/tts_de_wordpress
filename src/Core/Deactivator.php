@@ -214,9 +214,9 @@ class Deactivator {
 		$admin_email = get_option( 'admin_email' );
 
 		if ( $admin_email ) {
-			$subject = __( 'WordPress TTS Plugin Deactivated', 'TTS de Wordpress' );
+			$subject = __( 'WordPress TTS Plugin Deactivated', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			$message = sprintf(
-				__( 'The WordPress TTS Plugin has been deactivated on %1$s at %2$s.', 'TTS de Wordpress' ),
+				__( 'The WordPress TTS Plugin has been deactivated on %1$s at %2$s.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				get_bloginfo( 'name' ),
 				current_time( 'mysql' )
 			);

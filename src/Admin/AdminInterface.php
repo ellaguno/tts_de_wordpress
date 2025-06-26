@@ -71,16 +71,16 @@ class AdminInterface {
 	 */
 	public function addAdminMenu(): void {
 		add_options_page(
-			__( 'TTS Settings', 'TTS de Wordpress' ),
-			__( 'TTS Settings', 'TTS de Wordpress' ),
+			__( 'TTS Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'TTS Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			'manage_options',
 			'wp-tts-settings',
 			[ $this, 'renderSettingsPage' ]
 		);
 		
 		add_management_page(
-			__( 'TTS Tools', 'TTS de Wordpress' ),
-			__( 'TTS Tools', 'TTS de Wordpress' ),
+			__( 'TTS Tools', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'TTS Tools', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			'manage_options',
 			'wp-tts-tools',
 			[ $this, 'renderToolsPage' ]
@@ -98,7 +98,7 @@ class AdminInterface {
 		// TTS Providers section
 		add_settings_section(
 			'wp_tts_providers',
-			__( 'TTS Providers', 'TTS de Wordpress' ),
+			__( 'TTS Providers', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderProvidersSection' ],
 			'wp-tts-settings'
 		);
@@ -106,7 +106,7 @@ class AdminInterface {
 		// Provider fields
 		add_settings_field(
 			'openai_api_key',
-			__( 'OpenAI API Key', 'TTS de Wordpress' ),
+			__( 'OpenAI API Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderOpenAIKeyField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -114,7 +114,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'elevenlabs_api_key',
-			__( 'ElevenLabs API Key', 'TTS de Wordpress' ),
+			__( 'ElevenLabs API Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderElevenLabsKeyField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -122,7 +122,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'google_credentials',
-			__( 'Google Cloud Credentials', 'TTS de Wordpress' ),
+			__( 'Google Cloud Credentials', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderGoogleCredentialsField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -131,7 +131,7 @@ class AdminInterface {
 		// Google default voice field
 		add_settings_field(
 			'google_default_voice',
-			__( 'Default Google Voice', 'TTS de Wordpress' ),
+			__( 'Default Google Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderGoogleDefaultVoiceField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -140,7 +140,7 @@ class AdminInterface {
 		// OpenAI default voice field
 		add_settings_field(
 			'openai_default_voice',
-			__( 'Default OpenAI Voice', 'TTS de Wordpress' ),
+			__( 'Default OpenAI Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderOpenAIDefaultVoiceField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -149,7 +149,7 @@ class AdminInterface {
 		// ElevenLabs default voice field
 		add_settings_field(
 			'elevenlabs_default_voice',
-			__( 'Default ElevenLabs Voice', 'TTS de Wordpress' ),
+			__( 'Default ElevenLabs Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderElevenLabsDefaultVoiceField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -158,7 +158,7 @@ class AdminInterface {
 		// Amazon Polly fields
 		add_settings_field(
 			'amazon_polly_access_key',
-			__( 'Amazon Polly Access Key', 'TTS de Wordpress' ),
+			__( 'Amazon Polly Access Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAmazonPollyAccessKeyField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -166,7 +166,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'amazon_polly_secret_key',
-			__( 'Amazon Polly Secret Key', 'TTS de Wordpress' ),
+			__( 'Amazon Polly Secret Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAmazonPollySecretKeyField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -174,7 +174,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'amazon_polly_region',
-			__( 'Amazon Polly Region', 'TTS de Wordpress' ),
+			__( 'Amazon Polly Region', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAmazonPollyRegionField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -182,7 +182,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'amazon_polly_voice',
-			__( 'Default Amazon Polly Voice', 'TTS de Wordpress' ),
+			__( 'Default Amazon Polly Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAmazonPollyVoiceField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -190,7 +190,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'default_provider',
-			__( 'Default Provider', 'TTS de Wordpress' ),
+			__( 'Default Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderDefaultProviderField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -199,7 +199,7 @@ class AdminInterface {
 		// Storage section
 		add_settings_section(
 			'wp_tts_storage',
-			__( 'Storage Settings', 'TTS de Wordpress' ),
+			__( 'Storage Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderStorageSection' ],
 			'wp-tts-settings'
 		);
@@ -207,7 +207,7 @@ class AdminInterface {
 		// Storage fields
 		add_settings_field(
 			'storage_provider',
-			__( 'Storage Provider', 'TTS de Wordpress' ),
+			__( 'Storage Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderStorageProviderField' ],
 			'wp-tts-settings',
 			'wp_tts_storage'
@@ -215,7 +215,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'cache_duration',
-			__( 'Cache Duration (hours)', 'TTS de Wordpress' ),
+			__( 'Cache Duration (hours)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderCacheDurationField' ],
 			'wp-tts-settings',
 			'wp_tts_storage'
@@ -223,7 +223,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'max_cache_size',
-			__( 'Max Cache Size (MB)', 'TTS de Wordpress' ),
+			__( 'Max Cache Size (MB)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderMaxCacheSizeField' ],
 			'wp-tts-settings',
 			'wp_tts_storage'
@@ -232,7 +232,7 @@ class AdminInterface {
 		// Buzzsprout storage fields
 		add_settings_field(
 			'buzzsprout_api_token',
-			__( 'Buzzsprout API Token', 'TTS de Wordpress' ),
+			__( 'Buzzsprout API Token', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderBuzzsproutApiTokenField' ],
 			'wp-tts-settings',
 			'wp_tts_storage'
@@ -240,7 +240,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'buzzsprout_podcast_id',
-			__( 'Buzzsprout Podcast ID', 'TTS de Wordpress' ),
+			__( 'Buzzsprout Podcast ID', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderBuzzsproutPodcastIdField' ],
 			'wp-tts-settings',
 			'wp_tts_storage'
@@ -249,7 +249,7 @@ class AdminInterface {
 		// Azure TTS fields
 		add_settings_field(
 			'azure_tts_subscription_key',
-			__( 'Azure TTS Subscription Key', 'TTS de Wordpress' ),
+			__( 'Azure TTS Subscription Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAzureTTSSubscriptionKeyField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -257,7 +257,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'azure_tts_region',
-			__( 'Azure TTS Region', 'TTS de Wordpress' ),
+			__( 'Azure TTS Region', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAzureTTSRegionField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -265,7 +265,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'azure_tts_default_voice',
-			__( 'Default Azure TTS Voice', 'TTS de Wordpress' ),
+			__( 'Default Azure TTS Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAzureTTSVoiceField' ],
 			'wp-tts-settings',
 			'wp_tts_providers'
@@ -274,14 +274,14 @@ class AdminInterface {
 		// Audio Assets section
 		add_settings_section(
 			'wp_tts_audio_assets',
-			__( 'Audio Assets', 'TTS de Wordpress' ),
+			__( 'Audio Assets', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderAudioAssetsSection' ],
 			'wp-tts-settings'
 		);
 		
 		add_settings_field(
 			'default_intro_audio',
-			__( 'Default Intro Audio', 'TTS de Wordpress' ),
+			__( 'Default Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderDefaultIntroField' ],
 			'wp-tts-settings',
 			'wp_tts_audio_assets'
@@ -289,7 +289,7 @@ class AdminInterface {
 		
 		add_settings_field(
 			'default_outro_audio',
-			__( 'Default Outro Audio', 'TTS de Wordpress' ),
+			__( 'Default Outro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			[ $this, 'renderDefaultOutroField' ],
 			'wp-tts-settings',
 			'wp_tts_audio_assets'
@@ -343,8 +343,8 @@ class AdminInterface {
 		wp_localize_script( 'wp-tts-admin', 'wpTtsAdmin', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'wp_tts_admin' ),
-			'mediaTitle' => __( 'Select Audio File', 'TTS SesoLibre' ),
-			'mediaButton' => __( 'Use this audio', 'TTS SesoLibre' ),
+			'mediaTitle' => __( 'Select Audio File', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'mediaButton' => __( 'Use this audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 		] );
 	}
 	
@@ -353,7 +353,7 @@ class AdminInterface {
 	 */
 	public function renderSettingsPage(): void {
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS SesoLibre' ) );
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) );
 		}
 		
 		$active_tab = $_GET['tab'] ?? 'defaults';
@@ -367,7 +367,7 @@ class AdminInterface {
 		];
 		
 		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( 'TTS SesoLibre Settings', 'TTS SesoLibre' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'TTS SesoLibre Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h1>';
 		
 		// Render tabs navigation
 		$this->renderTabsNavigation( $active_tab );
@@ -412,11 +412,11 @@ class AdminInterface {
 	 */
 	private function renderTabsNavigation( string $active_tab ): void {
 		$tabs = [
-			'defaults' => __( 'Defaults', 'TTS SesoLibre' ),
-			'providers' => __( 'TTS Providers', 'TTS SesoLibre' ),
-			'storage' => __( 'Storage', 'TTS SesoLibre' ),
-			'audio_assets' => __( 'Audio Assets', 'TTS SesoLibre' ),
-			'player' => __( 'Player', 'TTS SesoLibre' )
+			'defaults' => __( 'Defaults', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'providers' => __( 'TTS Providers', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'storage' => __( 'Storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'audio_assets' => __( 'Audio Assets', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'player' => __( 'Player', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 		];
 
 		echo '<div class="nav-tab-wrapper">';
@@ -434,34 +434,34 @@ class AdminInterface {
 	 */
 	private function renderDefaultsTab( array $config ): void {
 		echo '<div class="tts-tab-content">';
-		echo '<h2>' . esc_html__( 'Default Settings', 'TTS SesoLibre' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Configure the default TTS provider and general settings.', 'TTS SesoLibre' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Default Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure the default TTS provider and general settings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		echo '<table class="form-table">';
 		
 		// Default Provider
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default TTS Provider', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default TTS Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderDefaultProviderField();
-		echo '<p class="description">' . esc_html__( 'Select the default TTS provider to use when no specific provider is chosen for a post.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default TTS provider to use when no specific provider is chosen for a post.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		// Cache Settings
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Cache Duration', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Cache Duration', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderCacheDurationField();
-		echo '<p class="description">' . esc_html__( 'How long to keep generated audio files cached (in hours).', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'How long to keep generated audio files cached (in hours).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Max Cache Size', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Max Cache Size', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderMaxCacheSizeField();
-		echo '<p class="description">' . esc_html__( 'Maximum cache size in megabytes.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Maximum cache size in megabytes.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -474,17 +474,17 @@ class AdminInterface {
 	 */
 	private function renderProvidersTab( array $config ): void {
 		echo '<div class="tts-tab-content">';
-		echo '<h2>' . esc_html__( 'TTS Providers Configuration', 'TTS SesoLibre' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Configure your TTS providers with API keys and default voices.', 'TTS SesoLibre' ) . '</p>';
+		echo '<h2>' . esc_html__( 'TTS Providers Configuration', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure your TTS providers with API keys and default voices.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		// Provider cards container
 		echo '<div class="tts-providers-grid">';
 		
-		$this->renderProviderCard( 'google', __( 'Google Cloud TTS', 'TTS SesoLibre' ), $config );
-		$this->renderProviderCard( 'openai', __( 'OpenAI TTS', 'TTS SesoLibre' ), $config );
-		$this->renderProviderCard( 'elevenlabs', __( 'ElevenLabs', 'TTS SesoLibre' ), $config );
-		$this->renderProviderCard( 'azure_tts', __( 'Microsoft Azure TTS', 'TTS SesoLibre' ), $config );
-		$this->renderProviderCard( 'amazon_polly', __( 'Amazon Polly', 'TTS SesoLibre' ), $config );
+		$this->renderProviderCard( 'google', __( 'Google Cloud TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ), $config );
+		$this->renderProviderCard( 'openai', __( 'OpenAI TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ), $config );
+		$this->renderProviderCard( 'elevenlabs', __( 'ElevenLabs', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ), $config );
+		$this->renderProviderCard( 'azure_tts', __( 'Microsoft Azure TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ), $config );
+		$this->renderProviderCard( 'amazon_polly', __( 'Amazon Polly', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ), $config );
 		
 		echo '</div>';
 		echo '</div>';
@@ -495,18 +495,18 @@ class AdminInterface {
 	 */
 	private function renderStorageTab( array $config ): void {
 		echo '<div class="tts-tab-content">';
-		echo '<h2>' . esc_html__( 'Storage Configuration', 'TTS SesoLibre' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Configure where and how audio files are stored.', 'TTS SesoLibre' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Storage Configuration', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure where and how audio files are stored.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		echo '<div class="tts-storage-section">';
-		echo '<h3>' . esc_html__( 'Storage Provider', 'TTS SesoLibre' ) . '</h3>';
+		echo '<h3>' . esc_html__( 'Storage Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
 		echo '<table class="form-table">';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Storage Provider', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Storage Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderStorageProviderField();
-		echo '<p class="description">' . esc_html__( 'Choose where to store generated audio files.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Choose where to store generated audio files.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -515,22 +515,22 @@ class AdminInterface {
 		
 		// Buzzsprout configuration
 		echo '<div class="tts-storage-provider-config" id="buzzsprout-config">';
-		echo '<h3>' . esc_html__( 'Buzzsprout Configuration', 'TTS SesoLibre' ) . '</h3>';
+		echo '<h3>' . esc_html__( 'Buzzsprout Configuration', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
 		echo '<table class="form-table">';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'API Token', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'API Token', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderBuzzsproutApiTokenField();
-		echo '<p class="description">' . esc_html__( 'Your Buzzsprout API token for uploading audio files.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Your Buzzsprout API token for uploading audio files.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Podcast ID', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Podcast ID', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderBuzzsproutPodcastIdField();
-		echo '<p class="description">' . esc_html__( 'Your Buzzsprout podcast ID.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Your Buzzsprout podcast ID.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -819,13 +819,13 @@ class AdminInterface {
 	private function renderGoogleTTSFields(): void {
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Credentials Path', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Credentials Path', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderGoogleCredentialsField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderGoogleDefaultVoiceField();
 		echo '</td>';
@@ -839,13 +839,13 @@ class AdminInterface {
 	private function renderOpenAITTSFields(): void {
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderOpenAIKeyField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderOpenAIDefaultVoiceField();
 		echo '</td>';
@@ -859,13 +859,13 @@ class AdminInterface {
 	private function renderElevenLabsFields(): void {
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'API Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderElevenLabsKeyField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderElevenLabsDefaultVoiceField();
 		echo '</td>';
@@ -879,19 +879,19 @@ class AdminInterface {
 	private function renderAzureTTSFields(): void {
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Subscription Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Subscription Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAzureTTSSubscriptionKeyField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Region', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Region', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAzureTTSRegionField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAzureTTSVoiceField();
 		echo '</td>';
@@ -905,25 +905,25 @@ class AdminInterface {
 	private function renderAmazonPollyFields(): void {
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Access Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Access Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAmazonPollyAccessKeyField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Secret Key', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Secret Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAmazonPollySecretKeyField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Region', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Region', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAmazonPollyRegionField();
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAmazonPollyVoiceField();
 		echo '</td>';
@@ -936,7 +936,7 @@ class AdminInterface {
 	 */
 	public function renderToolsPage(): void {
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS de Wordpress' ) );
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) );
 		}
 		
 		$stats = $this->tts_service->getStats();
@@ -957,18 +957,18 @@ class AdminInterface {
 		}
 		
 		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( 'TTS Tools', 'TTS de Wordpress' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'TTS Tools', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h1>';
 		
 		// Voice Preview Tool
 		echo '<div class="card">';
-		echo '<h2>' . esc_html__( 'Voice Preview', 'TTS de Wordpress' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Test different voices and providers before using them in your posts.', 'TTS de Wordpress' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Voice Preview', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Test different voices and providers before using them in your posts.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row"><label for="preview_provider">' . esc_html__( 'Provider', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="preview_provider">' . esc_html__( 'Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
 		echo '<select id="preview_provider" class="regular-text">';
-		echo '<option value="">' . esc_html__( 'Select a provider', 'TTS de Wordpress' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Select a provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		foreach ($enabled_providers as $provider) {
 			echo '<option value="' . esc_attr($provider) . '">' . esc_html(ucfirst($provider)) . '</option>';
 		}
@@ -976,29 +976,29 @@ class AdminInterface {
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row"><label for="preview_voice">' . esc_html__( 'Voice', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="preview_voice">' . esc_html__( 'Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
 		echo '<select id="preview_voice" class="regular-text" disabled>';
-		echo '<option value="">' . esc_html__( 'Select a provider first', 'TTS de Wordpress' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Select a provider first', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '</select>';
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row"><label for="preview_text">' . esc_html__( 'Sample Text', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="preview_text">' . esc_html__( 'Sample Text', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
-		echo '<textarea id="preview_text" rows="3" class="large-text" placeholder="' . esc_attr__( 'Enter text to preview...', 'TTS de Wordpress' ) . '">' . esc_textarea('Hola, esta es una muestra de voz para probar el sistema de texto a voz.') . '</textarea>';
+		echo '<textarea id="preview_text" rows="3" class="large-text" placeholder="' . esc_attr__( 'Enter text to preview...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '">' . esc_textarea('Hola, esta es una muestra de voz para probar el sistema de texto a voz.') . '</textarea>';
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
 		echo '<th scope="row"></th>';
 		echo '<td>';
 		echo '<button type="button" class="button button-primary" id="generate_preview" disabled>';
-		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Preview', 'TTS de Wordpress' );
+		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Preview', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</button>';
 		echo '<div id="preview_result" style="margin-top: 15px; display: none;">';
 		echo '<audio controls style="width: 100%;">';
 		echo '<source id="preview_audio_source" src="" type="audio/mpeg">';
-		echo esc_html__( 'Your browser does not support the audio element.', 'TTS de Wordpress' );
+		echo esc_html__( 'Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</audio>';
 		echo '</div>';
 		echo '</td>';
@@ -1008,14 +1008,14 @@ class AdminInterface {
 		
 		// Custom Text Generator
 		echo '<div class="card">';
-		echo '<h2>' . esc_html__( 'Custom Text Generator', 'TTS de Wordpress' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Generate audio from custom text with detailed configuration options.', 'TTS de Wordpress' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Custom Text Generator', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Generate audio from custom text with detailed configuration options.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '<table class="form-table">';
 		echo '<tr>';
-		echo '<th scope="row"><label for="custom_provider">' . esc_html__( 'Provider', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="custom_provider">' . esc_html__( 'Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
 		echo '<select id="custom_provider" class="regular-text">';
-		echo '<option value="">' . esc_html__( 'Use default provider', 'TTS de Wordpress' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Use default provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		foreach ($enabled_providers as $provider) {
 			echo '<option value="' . esc_attr($provider) . '">' . esc_html(ucfirst($provider)) . '</option>';
 		}
@@ -1023,21 +1023,21 @@ class AdminInterface {
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row"><label for="custom_voice">' . esc_html__( 'Voice', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="custom_voice">' . esc_html__( 'Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
 		echo '<select id="custom_voice" class="regular-text">';
-		echo '<option value="">' . esc_html__( 'Use default voice', 'TTS de Wordpress' ) . '</option>';
+		echo '<option value="">' . esc_html__( 'Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '</select>';
 		echo '</td>';
 		echo '</tr>';
 		echo '<tr>';
-		echo '<th scope="row"><label for="custom_text">' . esc_html__( 'Custom Text', 'TTS de Wordpress' ) . '</label></th>';
+		echo '<th scope="row"><label for="custom_text">' . esc_html__( 'Custom Text', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label></th>';
 		echo '<td>';
-		echo '<textarea id="custom_text" rows="8" class="large-text" placeholder="' . esc_attr__( 'Enter your custom text here...', 'TTS de Wordpress' ) . '"></textarea>';
+		echo '<textarea id="custom_text" rows="8" class="large-text" placeholder="' . esc_attr__( 'Enter your custom text here...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '"></textarea>';
 		echo '<div class="wp-tts-text-stats" style="margin-top: 5px; font-size: 12px; color: #666;">';
-		echo '<span id="custom_character_count">0</span> ' . esc_html__( 'characters', 'TTS de Wordpress' );
+		echo '<span id="custom_character_count">0</span> ' . esc_html__( 'characters', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '<span style="margin: 0 10px;">|</span>';
-		echo '<span id="custom_estimated_cost">$0.00</span> ' . esc_html__( 'estimated cost', 'TTS de Wordpress' );
+		echo '<span id="custom_estimated_cost">$0.00</span> ' . esc_html__( 'estimated cost', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</div>';
 		echo '</td>';
 		echo '</tr>';
@@ -1045,21 +1045,21 @@ class AdminInterface {
 		echo '<th scope="row"></th>';
 		echo '<td>';
 		echo '<button type="button" class="button button-primary" id="generate_custom">';
-		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Audio', 'TTS de Wordpress' );
+		echo '<span class="dashicons dashicons-controls-play"></span> ' . esc_html__( 'Generate Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</button>';
 		echo '<div id="custom_generation_progress" style="display: none; margin-top: 15px;">';
 		echo '<div style="width: 100%; height: 20px; background-color: #f0f0f0; border-radius: 10px; overflow: hidden;">';
 		echo '<div id="custom_progress_fill" style="height: 100%; background-color: #0073aa; width: 0%; transition: width 0.3s ease;"></div>';
 		echo '</div>';
-		echo '<p style="margin: 5px 0 0 0; font-size: 12px; color: #666;" id="custom_progress_text">' . esc_html__( 'Preparing...', 'TTS de Wordpress' ) . '</p>';
+		echo '<p style="margin: 5px 0 0 0; font-size: 12px; color: #666;" id="custom_progress_text">' . esc_html__( 'Preparing...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '<div id="custom_result" style="margin-top: 15px; display: none;">';
 		echo '<audio controls style="width: 100%;">';
 		echo '<source id="custom_audio_source" src="" type="audio/mpeg">';
-		echo esc_html__( 'Your browser does not support the audio element.', 'TTS de Wordpress' );
+		echo esc_html__( 'Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</audio>';
 		echo '<p style="margin-top: 10px;">';
-		echo '<a id="custom_download_link" href="#" download class="button button-secondary">' . esc_html__( 'Download Audio', 'TTS de Wordpress' ) . '</a>';
+		echo '<a id="custom_download_link" href="#" download class="button button-secondary">' . esc_html__( 'Download Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</a>';
 		echo '</p>';
 		echo '</div>';
 		echo '</td>';
@@ -1069,7 +1069,7 @@ class AdminInterface {
 		
 		// Service Statistics
 		echo '<div class="card">';
-		echo '<h2>' . esc_html__( 'Service Statistics', 'TTS de Wordpress' ) . '</h2>';
+		echo '<h2>' . esc_html__( 'Service Statistics', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
 		echo '<pre>' . esc_html( wp_json_encode( $stats, JSON_PRETTY_PRINT ) ) . '</pre>';
 		echo '</div>';
 		
@@ -1085,11 +1085,11 @@ class AdminInterface {
 		echo 'const provider = $(this).val();';
 		echo 'const $voiceSelect = $(\'#preview_voice\');';
 		echo 'if (!provider) {';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Select a provider first', 'TTS de Wordpress' ) . '</option>\').prop(\'disabled\', true);';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Select a provider first', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\').prop(\'disabled\', true);';
 		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
 		echo 'return;';
 		echo '}';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '$.ajax({';
 		echo 'url: ajaxurl,';
 		echo 'type: \'POST\',' ;
@@ -1101,7 +1101,7 @@ class AdminInterface {
 		echo 'console.log("[TTS Preview] AJAX Response received:", response);';
 		echo 'if (response.success && response.data && response.data.voices) {';
 		echo 'console.log("[TTS Preview] Success! Found " + response.data.voices.length + " voices");';
-		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\';';
 		echo 'if (response.data.voices.length > 0) {';
 		echo 'response.data.voices.forEach(function(voice) {';
 		echo 'console.log("[TTS Preview] Adding voice:", voice);';
@@ -1109,7 +1109,7 @@ class AdminInterface {
 		echo '});';
 		echo '} else {';
 		echo 'console.log("[TTS Preview] No voices found in response");';
-		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\';';
 		echo '}';
 		echo '$voiceSelect.html(options).prop(\'disabled\', false);';
 		echo '$(\'#generate_preview\').prop(\'disabled\', false);';
@@ -1118,14 +1118,14 @@ class AdminInterface {
 		echo 'if (response.data && response.data.message) {';
 		echo 'console.error("[TTS Preview] Error message:", response.data.message);';
 		echo '}';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
 		echo '}';
 		echo '},';
 		echo 'error: function(xhr, status, error) {';
 		echo 'console.error("[TTS Preview] AJAX Call Failed:", {xhr: xhr, status: status, error: error});';
 		echo 'console.error("[TTS Preview] Response text:", xhr.responseText);';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '$(\'#generate_preview\').prop(\'disabled\', true);';
 		echo '}';
 		echo '});';
@@ -1137,12 +1137,12 @@ class AdminInterface {
 		echo 'const voice = $(\'#preview_voice\').val();';
 		echo 'const text = $(\'#preview_text\').val();';
 		echo 'if (!text.trim()) {';
-		echo 'alert(\''. esc_js__( 'Please enter some text to preview', 'TTS de Wordpress' ) .'\');';
+		echo 'alert(\''. esc_js__( 'Please enter some text to preview', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\');';
 		echo 'return;';
 		echo '}';
 		echo 'const $button = $(this);';
 		echo 'const originalText = $button.html();';
-		echo '$button.prop(\'disabled\', true).html(\'<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> '. esc_js__( 'Generating...', 'TTS de Wordpress' ) .'\');';
+		echo '$button.prop(\'disabled\', true).html(\'<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> '. esc_js__( 'Generating...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\');';
 		echo '$.ajax({';
 		echo 'url: ajaxurl,';
 		echo 'type: \'POST\',' ;
@@ -1153,10 +1153,10 @@ class AdminInterface {
 		echo '$(\'#preview_result\').show();';
 		echo '$(\'#preview_result audio\')[0].load();';
 		echo '} else {';
-		echo 'alert(response.data.message || \''. esc_js__( 'Preview failed', 'TTS de Wordpress' ) .'\');';
+		echo 'alert(response.data.message || \''. esc_js__( 'Preview failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\');';
 		echo '}';
 		echo '},';
-		echo 'error: function() { alert(\''. esc_js__( 'Preview failed', 'TTS de Wordpress' ) .'\'); },';
+		echo 'error: function() { alert(\''. esc_js__( 'Preview failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\'); },';
 		echo 'complete: function() { $button.prop(\'disabled\', false).html(originalText); }';
 		echo '});';
 		echo '});';
@@ -1166,10 +1166,10 @@ class AdminInterface {
 		echo 'const provider = $(this).val();';
 		echo 'const $voiceSelect = $(\'#custom_voice\');';
 		echo 'if (!provider) {';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo 'return;';
 		echo '}';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Loading voices...', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '$.ajax({';
 		echo 'url: ajaxurl,';
 		echo 'type: \'POST\',' ;
@@ -1181,7 +1181,7 @@ class AdminInterface {
 		echo 'console.log("[TTS Custom] AJAX Response received:", response);';
 		echo 'if (response.success && response.data && response.data.voices) {';
 		echo 'console.log("[TTS Custom] Success! Found " + response.data.voices.length + " voices");';
-		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'let options = \'<option value="">' . esc_js__( 'Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\';';
 		echo 'if (response.data.voices.length > 0) {';
 		echo 'response.data.voices.forEach(function(voice) {';
 		echo 'console.log("[TTS Custom] Adding voice:", voice);';
@@ -1189,7 +1189,7 @@ class AdminInterface {
 		echo '});';
 		echo '} else {';
 		echo 'console.log("[TTS Custom] No voices found in response");';
-		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS de Wordpress' ) . '</option>\';';
+		echo 'options += \'<option value="">' . esc_js__( 'No voices available', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\';';
 		echo '}';
 		echo '$voiceSelect.html(options).prop(\'disabled\', false);';
 		echo '} else {';
@@ -1197,13 +1197,13 @@ class AdminInterface {
 		echo 'if (response.data && response.data.message) {';
 		echo 'console.error("[TTS Custom] Error message:", response.data.message);';
 		echo '}';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Error loading voices', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '}';
 		echo '},';
 		echo 'error: function(xhr, status, error) {';
 		echo 'console.error("[TTS Custom] AJAX Call Failed:", {xhr: xhr, status: status, error: error});';
 		echo 'console.error("[TTS Custom] Response text:", xhr.responseText);';
-		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS de Wordpress' ) . '</option>\');';
+		echo '$voiceSelect.html(\'<option value="">' . esc_js__( 'Connection error', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>\');';
 		echo '}';
 		echo '});';
 		echo '});';
@@ -1223,7 +1223,7 @@ class AdminInterface {
 		echo 'const voice = $(\'#custom_voice\').val();';
 		echo 'const text = $(\'#custom_text\').val();';
 		echo 'if (!text.trim()) {';
-		echo 'alert(\''. esc_js__( 'Please enter some text to generate', 'TTS de Wordpress' ) .'\');';
+		echo 'alert(\''. esc_js__( 'Please enter some text to generate', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\');';
 		echo 'return;';
 		echo '}';
 		echo 'const $button = $(this);';
@@ -1258,7 +1258,7 @@ class AdminInterface {
 		echo '}, 1000);';
 		echo '} else {';
 		echo 'console.error("[TTS Custom Generate] Generation failed:", response);';
-		echo 'const errorMsg = response.data ? response.data.message : \''. esc_js__( 'Generation failed', 'TTS de Wordpress' ) .'\';';
+		echo 'const errorMsg = response.data ? response.data.message : \''. esc_js__( 'Generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\';';
 		echo 'alert(errorMsg);';
 		echo '$(\'#custom_generation_progress\').hide();';
 		echo '}';
@@ -1267,7 +1267,7 @@ class AdminInterface {
 		echo 'console.error("[TTS Custom Generate] AJAX Error:", {xhr: xhr, status: status, error: error});';
 		echo 'console.error("[TTS Custom Generate] Response text:", xhr.responseText);';
 		echo 'clearInterval(progressInterval);';
-		echo 'alert(\''. esc_js__( 'Generation failed', 'TTS de Wordpress' ) .'\');';
+		echo 'alert(\''. esc_js__( 'Generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) .'\');';
 		echo '$(\'#custom_generation_progress\').hide();';
 		echo '},';
 		echo 'complete: function() { $button.prop(\'disabled\', false).html(originalText); }';
@@ -1288,14 +1288,14 @@ class AdminInterface {
 	 * Render providers section
 	 */
 	public function renderProvidersSection(): void {
-		echo '<p>' . esc_html__( 'Configure your TTS providers below.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure your TTS providers below.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
 	 * Render storage section
 	 */
 	public function renderStorageSection(): void {
-		echo '<p>' . esc_html__( 'Configure audio storage settings.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure audio storage settings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1309,11 +1309,11 @@ class AdminInterface {
 		echo '<div class="tts-provider-field">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[providers][openai][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="openai" />';
-		echo ' ' . esc_html__( 'Enable OpenAI TTS', 'TTS de Wordpress' );
+		echo ' ' . esc_html__( 'Enable OpenAI TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
 		echo '<input type="password" name="wp_tts_config[providers][openai][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Enter your OpenAI API key for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your OpenAI API key for TTS services.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -1329,11 +1329,11 @@ class AdminInterface {
 		echo '<div class="tts-provider-field">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[providers][elevenlabs][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="elevenlabs" />';
-		echo ' ' . esc_html__( 'Enable ElevenLabs TTS', 'TTS de Wordpress' );
+		echo ' ' . esc_html__( 'Enable ElevenLabs TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
 		echo '<input type="password" name="wp_tts_config[providers][elevenlabs][api_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Enter your ElevenLabs API key for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your ElevenLabs API key for TTS services.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -1349,11 +1349,11 @@ class AdminInterface {
 		echo '<div class="tts-provider-field">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[providers][google][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="google" />';
-		echo ' ' . esc_html__( 'Enable Google Cloud TTS', 'TTS de Wordpress' );
+		echo ' ' . esc_html__( 'Enable Google Cloud TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
 		echo '<input type="text" name="wp_tts_config[providers][google][credentials_path]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Path to Google Cloud service account JSON file.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Path to Google Cloud service account JSON file.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -1368,12 +1368,12 @@ class AdminInterface {
 		echo '<div class="tts-provider-field">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[providers][amazon_polly][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="amazon_polly" />';
-		echo ' ' . esc_html__( 'Enable Amazon Polly TTS', 'TTS de Wordpress' );
+		echo ' ' . esc_html__( 'Enable Amazon Polly TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
-		echo '<label>' . esc_html__( 'AWS Access Key ID:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<label>' . esc_html__( 'AWS Access Key ID:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label><br>';
 		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][access_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Enter your AWS Access Key ID for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your AWS Access Key ID for Amazon Polly.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -1387,9 +1387,9 @@ class AdminInterface {
 		$enabled = $config['providers']['amazon_polly']['enabled'] ?? false;
 		
 		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
-		echo '<label>' . esc_html__( 'AWS Secret Access Key:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<label>' . esc_html__( 'AWS Secret Access Key:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label><br>';
 		echo '<input type="password" name="wp_tts_config[providers][amazon_polly][secret_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Enter your AWS Secret Access Key for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your AWS Secret Access Key for Amazon Polly.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 	}
 	
@@ -1409,13 +1409,13 @@ class AdminInterface {
 		];
 		
 		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
-		echo '<label>' . esc_html__( 'AWS Region:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<label>' . esc_html__( 'AWS Region:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label><br>';
 		echo '<select name="wp_tts_config[providers][amazon_polly][region]" ' . ( $enabled ? '' : 'disabled' ) . '>';
 		foreach ( $regions as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the AWS region for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the AWS region for Amazon Polly.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 	}
 	
@@ -1445,7 +1445,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default voice for Amazon Polly.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default voice for Amazon Polly.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1467,7 +1467,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default TTS provider to use.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default TTS provider to use.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1488,7 +1488,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select where to store generated audio files.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select where to store generated audio files.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 /**
 	 * Render Buzzsprout API Token field
@@ -1497,7 +1497,7 @@ class AdminInterface {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['storage']['buzzsprout']['api_token'] ?? '';
 		echo '<input type="password" name="wp_tts_config[storage][buzzsprout][api_token]" value="' . esc_attr( $value ) . '" class="regular-text" />';
-		echo '<p class="description">' . esc_html__( 'Enter your Buzzsprout API token for audio storage.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your Buzzsprout API token for audio storage.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1507,7 +1507,7 @@ class AdminInterface {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['storage']['buzzsprout']['podcast_id'] ?? '';
 		echo '<input type="text" name="wp_tts_config[storage][buzzsprout][podcast_id]" value="' . esc_attr( $value ) . '" class="regular-text" />';
-		echo '<p class="description">' . esc_html__( 'Enter your Buzzsprout Podcast ID where audio files will be stored.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your Buzzsprout Podcast ID where audio files will be stored.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1521,12 +1521,12 @@ class AdminInterface {
 		echo '<div class="tts-provider-field">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[providers][azure_tts][enabled]" value="1" ' . checked( $enabled, true, false ) . ' class="tts-provider-toggle" data-provider="azure_tts" />';
-		echo ' ' . esc_html__( 'Enable Azure TTS', 'TTS de Wordpress' );
+		echo ' ' . esc_html__( 'Enable Azure TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '<div class="tts-provider-config" style="margin-top: 10px; ' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
-		echo '<label>' . esc_html__( 'Subscription Key:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<label>' . esc_html__( 'Subscription Key:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label><br>';
 		echo '<input type="password" name="wp_tts_config[providers][azure_tts][subscription_key]" value="' . esc_attr( $value ) . '" class="regular-text" ' . ( $enabled ? '' : 'disabled' ) . ' />';
-		echo '<p class="description">' . esc_html__( 'Enter your Azure Cognitive Services subscription key for TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Enter your Azure Cognitive Services subscription key for TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -1570,13 +1570,13 @@ class AdminInterface {
 		];
 		
 		echo '<div class="tts-provider-config" style="' . ( $enabled ? '' : 'opacity: 0.5;' ) . '">';
-		echo '<label>' . esc_html__( 'Azure Region:', 'TTS de Wordpress' ) . '</label><br>';
+		echo '<label>' . esc_html__( 'Azure Region:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label><br>';
 		echo '<select name="wp_tts_config[providers][azure_tts][region]" ' . ( $enabled ? '' : 'disabled' ) . '>';
 		foreach ( $regions as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the Azure region for TTS services.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the Azure region for TTS services.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 	}
 	
@@ -1611,7 +1611,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default voice for Azure TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default voice for Azure TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1638,7 +1638,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default voice for Google Cloud TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default voice for Google Cloud TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1661,7 +1661,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default voice for OpenAI TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default voice for OpenAI TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1686,7 +1686,7 @@ class AdminInterface {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Select the default voice for ElevenLabs TTS.', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default voice for ElevenLabs TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1696,7 +1696,7 @@ class AdminInterface {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['cache']['duration'] ?? 24;
 		echo '<input type="number" name="wp_tts_config[cache][duration]" value="' . esc_attr( $value ) . '" min="1" max="8760" class="small-text" />';
-		echo '<p class="description">' . esc_html__( 'How long to cache audio files (1-8760 hours).', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'How long to cache audio files (1-8760 hours).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1706,7 +1706,7 @@ class AdminInterface {
 		$config = get_option( 'wp_tts_config', [] );
 		$value = $config['cache']['max_size'] ?? 100;
 		echo '<input type="number" name="wp_tts_config[cache][max_size]" value="' . esc_attr( $value ) . '" min="10" max="10000" class="small-text" />';
-		echo '<p class="description">' . esc_html__( 'Maximum cache size in megabytes (10-10000 MB).', 'TTS de Wordpress' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Maximum cache size in megabytes (10-10000 MB).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 	
 	/**
@@ -1717,7 +1717,7 @@ class AdminInterface {
 		// Check nonce (wpTtsAdmin.nonce is 'wp_tts_admin')
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed (nonce).', 'TTS de Wordpress' ),
+				'message' => __( 'Security check failed (nonce).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'debug_info' => [
 					'nonce_received' => isset($_POST['nonce']) ? 'yes' : 'no',
 					'expected_action' => 'wp_tts_admin'
@@ -1729,7 +1729,7 @@ class AdminInterface {
 		// Check permissions
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1738,7 +1738,7 @@ class AdminInterface {
 		
 		if ( empty( $text_to_generate ) ) {
 			wp_send_json_error( [
-				'message' => __( 'No text provided for TTS generation.', 'TTS de Wordpress' ),
+				'message' => __( 'No text provided for TTS generation.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error_details' => 'Text input was empty.'
 			] );
 			return;
@@ -1757,17 +1757,17 @@ class AdminInterface {
 			if ( $result && isset($result['success']) && $result['success'] && ! empty( $result['audio_url'] ) ) {
 				$this->config->getLogger()->info('[AdminInterface::handleTestProvider] Test audio generated successfully.', ['audio_url' => $result['audio_url'], 'provider' => $result['provider'] ?? 'N/A']);
 				wp_send_json_success( [
-					'message'   => __( 'Test audio generated successfully.', 'TTS de Wordpress' ),
+					'message'   => __( 'Test audio generated successfully.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					'audio_url' => $result['audio_url'],
 					'provider'  => $result['provider'] ?? 'N/A',
 				] );
 			} else {
-				$error_message = isset($result['message']) && !empty($result['message']) ? $result['message'] : __( 'Failed to generate test audio. TTSService did not return success or audio URL.', 'TTS de Wordpress' );
+				$error_message = isset($result['message']) && !empty($result['message']) ? $result['message'] : __( 'Failed to generate test audio. TTSService did not return success or audio URL.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				$this->config->getLogger()->error('[AdminInterface::handleTestProvider] TTS generation failed or returned invalid result.', ['result_from_service' => $result]);
 				
 				$error_details = '';
 				if ( isset($result['error_code']) && $result['error_code'] === 'NO_PROVIDERS_CONFIGURED' ) {
-					$error_details = __( 'No TTS providers are configured. Please go to Settings > TTS Settings to configure at least one provider (OpenAI, Google Cloud, ElevenLabs, Amazon Polly, or Azure TTS).', 'TTS de Wordpress' );
+					$error_details = __( 'No TTS providers are configured. Please go to Settings > TTS Settings to configure at least one provider (OpenAI, Google Cloud, ElevenLabs, Amazon Polly, or Azure TTS).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				} else {
 					$error_details = 'Provider attempted: ' . ($result['provider'] ?? 'Unknown') . '. Check plugin logs for more details from TTSService.';
 				}
@@ -1782,7 +1782,7 @@ class AdminInterface {
 		} catch ( \Exception $e ) {
 			$this->config->getLogger()->error( '[AdminInterface::handleTestProvider] Exception during test audio generation.', [ 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString() ] );
 			wp_send_json_error( [
-				'message' => __( 'An exception occurred during test audio generation.', 'TTS de Wordpress' ),
+				'message' => __( 'An exception occurred during test audio generation.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error_details' => $e->getMessage(),
 			] );
 		}
@@ -1794,7 +1794,7 @@ class AdminInterface {
 	public function handleGetVoices(): void {
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+				'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1802,7 +1802,7 @@ class AdminInterface {
 		// Check permissions
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1867,7 +1867,7 @@ class AdminInterface {
 	public function handlePreviewVoice(): void {
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+				'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1875,7 +1875,7 @@ class AdminInterface {
 		// Check permissions
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1885,7 +1885,7 @@ class AdminInterface {
 		$text = isset($_POST['text']) ? $this->security->sanitizeTextForTTS( sanitize_textarea_field(wp_unslash($_POST['text'])) ) : '';
 
 		if ( empty( $text ) ) {
-			$text = __( 'This is a voice preview sample.', 'TTS de Wordpress' );
+			$text = __( 'This is a voice preview sample.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		}
 
 		try {
@@ -1896,16 +1896,16 @@ class AdminInterface {
 					'audio_url' => $result->url,
 					'provider' => $provider,
 					'duration' => $result->duration ?? 0,
-					'message' => __( 'Preview generated successfully', 'TTS de Wordpress' ),
+					'message' => __( 'Preview generated successfully', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				] );
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'Preview generation failed - No audio URL returned', 'TTS de Wordpress' ),
+					'message' => __( 'Preview generation failed - No audio URL returned', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Preview generation failed', 'TTS de Wordpress' ),
+				'message' => __( 'Preview generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage(),
 			] );
 		}
@@ -1917,7 +1917,7 @@ class AdminInterface {
 	public function handleGenerateCustom(): void {
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_admin' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed.', 'TTS de Wordpress' )
+				'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1925,7 +1925,7 @@ class AdminInterface {
 		// Check permissions
 		if ( ! $this->security->canUser( 'manage_options' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS de Wordpress' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -1936,7 +1936,7 @@ class AdminInterface {
 
 		if ( empty( $text ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Text is required', 'TTS de Wordpress' ),
+				'message' => __( 'Text is required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			] );
 			return;
 		}
@@ -1954,16 +1954,16 @@ class AdminInterface {
 				wp_send_json_success( [
 					'audio_url' => $result['audio_url'],
 					'provider' => $result['provider'] ?? $provider,
-					'message' => __( 'Audio generated successfully', 'TTS de Wordpress' ),
+					'message' => __( 'Audio generated successfully', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				] );
 			} else {
 				wp_send_json_error( [
-					'message' => $result['message'] ?? __( 'Generation failed', 'TTS de Wordpress' ),
+					'message' => $result['message'] ?? __( 'Generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Generation failed', 'TTS de Wordpress' ),
+				'message' => __( 'Generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage(),
 			] );
 		}
@@ -1974,34 +1974,34 @@ class AdminInterface {
 	 */
 	private function renderAudioAssetsTab( array $config ): void {
 		echo '<div class="tts-tab-content">';
-		echo '<h2>' . esc_html__( 'Audio Assets Configuration', 'TTS SesoLibre' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Configure default intro and outro audio files for TTS recordings. These will be added before and after the main content.', 'TTS SesoLibre' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Audio Assets Configuration', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configure default intro and outro audio files for TTS recordings. These will be added before and after the main content.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		echo '<div class="tts-audio-assets-section">';
-		echo '<h3>' . esc_html__( 'Default Audio Assets', 'TTS SesoLibre' ) . '</h3>';
+		echo '<h3>' . esc_html__( 'Default Audio Assets', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
 		echo '<table class="form-table">';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Intro Audio', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderDefaultIntroField();
-		echo '<p class="description">' . esc_html__( 'Select the default intro audio file that will be added at the beginning of TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default intro audio file that will be added at the beginning of TTS recordings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Background Music', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Background Music', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderDefaultBackgroundField();
-		echo '<p class="description">' . esc_html__( 'Select the default background music that will play during TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default background music that will play during TTS recordings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Default Outro Audio', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Default Outro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderDefaultOutroField();
-		echo '<p class="description">' . esc_html__( 'Select the default outro audio file that will be added at the end of TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Select the default outro audio file that will be added at the end of TTS recordings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -2014,7 +2014,7 @@ class AdminInterface {
 	 * Render audio assets section description
 	 */
 	public function renderAudioAssetsSection(): void {
-		echo '<p>' . esc_html__( 'Configure intro and outro audio files for your TTS recordings.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure intro and outro audio files for your TTS recordings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
 
 	/**
@@ -2038,15 +2038,15 @@ class AdminInterface {
 		if ( $intro_url ) {
 			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
 			echo '<source src="' . esc_url( $intro_url ) . '" type="audio/mpeg">';
-			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			echo '</audio>';
 		}
 		echo '<p class="tts-media-title">' . esc_html( $intro_title ) . '</p>';
 		echo '</div>';
 		
 		echo '<div class="tts-media-buttons">';
-		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Intro Audio', 'TTS SesoLibre' ) . '</button>';
-		echo '<button type="button" class="button tts-remove-media" style="' . ( $intro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $intro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -2073,20 +2073,20 @@ class AdminInterface {
 		if ( $background_url ) {
 			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
 			echo '<source src="' . esc_url( $background_url ) . '" type="audio/mpeg">';
-			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			echo '</audio>';
 		}
 		echo '<p class="tts-media-title">' . esc_html( $background_title ) . '</p>';
 		echo '</div>';
 		
 		echo '<div class="tts-media-buttons">';
-		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Background Music', 'TTS SesoLibre' ) . '</button>';
-		echo '<button type="button" class="button tts-remove-media" style="' . ( $background_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Background Music', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $background_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
 		echo '</div>';
 		
 		// Background Volume Control
 		echo '<div style="margin-top: 15px;">';
-		echo '<label>' . esc_html__( 'Default Volume:', 'TTS SesoLibre' ) . '</label>';
+		echo '<label>' . esc_html__( 'Default Volume:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</label>';
 		echo '<input type="range" name="wp_tts_config[audio_assets][background_volume]" ';
 		echo 'value="' . esc_attr( $background_volume ) . '" ';
 		echo 'min="0" max="1" step="0.1" style="width: 150px; margin-left: 10px;">';
@@ -2116,15 +2116,15 @@ class AdminInterface {
 		if ( $outro_url ) {
 			echo '<audio controls style="width: 100%; margin-bottom: 10px;">';
 			echo '<source src="' . esc_url( $outro_url ) . '" type="audio/mpeg">';
-			echo esc_html__( 'Your browser does not support the audio element.', 'TTS SesoLibre' );
+			echo esc_html__( 'Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			echo '</audio>';
 		}
 		echo '<p class="tts-media-title">' . esc_html( $outro_title ) . '</p>';
 		echo '</div>';
 		
 		echo '<div class="tts-media-buttons">';
-		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Outro Audio', 'TTS SesoLibre' ) . '</button>';
-		echo '<button type="button" class="button tts-remove-media" style="' . ( $outro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS SesoLibre' ) . '</button>';
+		echo '<button type="button" class="button tts-select-media">' . esc_html__( 'Select Outro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
+		echo '<button type="button" class="button tts-remove-media" style="' . ( $outro_id ? '' : 'display: none;' ) . '">' . esc_html__( 'Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</button>';
 		echo '</div>';
 		echo '</div>';
 	}
@@ -2135,7 +2135,7 @@ class AdminInterface {
 	public function handleAutoSaveAudioAsset(): void {
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_auto_save' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+				'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -2146,7 +2146,7 @@ class AdminInterface {
 		
 		if ( ! $post_id || ! in_array($asset_type, ['intro_audio', 'outro_audio', 'background_audio', 'custom_audio']) ) {
 			wp_send_json_error( [
-				'message' => __( 'Invalid parameters.', 'TTS SesoLibre' )
+				'message' => __( 'Invalid parameters.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			] );
 			return;
 		}
@@ -2154,7 +2154,7 @@ class AdminInterface {
 		// Check permissions
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -2177,7 +2177,7 @@ class AdminInterface {
 				
 				wp_send_json_success( [
 					'message' => sprintf(
-						__( '%s audio updated successfully.', 'TTS SesoLibre' ),
+						__( '%s audio updated successfully.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 						ucfirst($asset_type)
 					),
 					'asset_type' => $asset_type,
@@ -2185,12 +2185,12 @@ class AdminInterface {
 				] );
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'TTS Meta Manager not available.', 'TTS SesoLibre' )
+					'message' => __( 'TTS Meta Manager not available.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Failed to save audio asset.', 'TTS SesoLibre' ),
+				'message' => __( 'Failed to save audio asset.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage()
 			] );
 		}
@@ -2341,7 +2341,7 @@ class AdminInterface {
 		// Security check with nonce verification
 		if ( ! isset($_POST['nonce']) || ! $this->security->verifyNonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_tts_auto_save' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+				'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -2352,7 +2352,7 @@ class AdminInterface {
 		
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'Invalid post ID.', 'TTS SesoLibre' )
+				'message' => __( 'Invalid post ID.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			] );
 			return;
 		}
@@ -2360,7 +2360,7 @@ class AdminInterface {
 		// Permission check
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+				'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			], 403 );
 			return;
 		}
@@ -2386,17 +2386,17 @@ class AdminInterface {
 				\WP_TTS\Utils\TTSMetaManager::saveTTSData($post_id, $tts_data);
 				
 				wp_send_json_success( [
-					'message' => __( 'Background volume updated successfully.', 'TTS SesoLibre' ),
+					'message' => __( 'Background volume updated successfully.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					'volume' => $volume
 				] );
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'TTS Meta Manager not available.', 'TTS SesoLibre' )
+					'message' => __( 'TTS Meta Manager not available.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Failed to save background volume.', 'TTS SesoLibre' ),
+				'message' => __( 'Failed to save background volume.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage()
 			] );
 		}
@@ -2407,55 +2407,55 @@ class AdminInterface {
 	 */
 	private function renderPlayerTab( array $config ): void {
 		echo '<div class="tts-tab-content">';
-		echo '<h2>' . esc_html__( 'Player Settings', 'TTS SesoLibre' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Choose between different player styles and configure player behavior.', 'TTS SesoLibre' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Player Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Choose between different player styles and configure player behavior.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		echo '<table class="form-table">';
 		
 		// Player Style Selection
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Player Style', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Player Style', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderPlayerStyleField( $config );
-		echo '<p class="description">' . esc_html__( 'Choose the player style for displaying TTS audio on your website.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Choose the player style for displaying TTS audio on your website.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		// Auto-insertion Settings
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Auto-insert Player', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Auto-insert Player', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderAutoInsertField( $config );
-		echo '<p class="description">' . esc_html__( 'Automatically insert the TTS player in posts and pages.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Automatically insert the TTS player in posts and pages.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		// Player Position
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Player Position', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Player Position', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderPlayerPositionField( $config );
-		echo '<p class="description">' . esc_html__( 'Where to display the player when auto-inserting.', 'TTS SesoLibre' ) . '<br>' . 
-		     esc_html__( 'Manual option allows you to use the shortcode:', 'TTS SesoLibre' ) . ' <code>[wp_tts_player]</code><br>' .
-		     esc_html__( 'Optional parameters:', 'TTS SesoLibre' ) . ' <code>[wp_tts_player post_id="123" style="sesolibre"]</code>' . '</p>';
+		echo '<p class="description">' . esc_html__( 'Where to display the player when auto-inserting.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '<br>' . 
+		     esc_html__( 'Manual option allows you to use the shortcode:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . ' <code>[wp_tts_player]</code><br>' .
+		     esc_html__( 'Optional parameters:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . ' <code>[wp_tts_player post_id="123" style="sesolibre"]</code>' . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		// Volume Controls Section
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Volume Controls', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Volume Controls', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderVolumeControlsField( $config );
-		echo '<p class="description">' . esc_html__( 'Configure which volume controls to show in the SesoLibre player.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Configure which volume controls to show in the SesoLibre player.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
 		// Player Information Section
 		echo '<tr>';
-		echo '<th scope="row">' . esc_html__( 'Player Information', 'TTS SesoLibre' ) . '</th>';
+		echo '<th scope="row">' . esc_html__( 'Player Information', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
 		echo '<td>';
 		$this->renderPlayerInfoField( $config );
-		echo '<p class="description">' . esc_html__( 'Configure which information to show below the progress bar in the SesoLibre player.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Configure which information to show below the progress bar in the SesoLibre player.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -2470,8 +2470,8 @@ class AdminInterface {
 		$player_style = $config['player']['style'] ?? 'classic';
 		
 		echo '<select name="wp_tts_config[player][style]" id="player_style" class="tts-player-setting" data-setting="style">';
-		echo '<option value="classic"' . selected( $player_style, 'classic', false ) . '>' . esc_html__( 'Classic Player', 'TTS SesoLibre' ) . '</option>';
-		echo '<option value="sesolibre"' . selected( $player_style, 'sesolibre', false ) . '>' . esc_html__( 'SesoLibre Player (with Audio Mixing)', 'TTS SesoLibre' ) . '</option>';
+		echo '<option value="classic"' . selected( $player_style, 'classic', false ) . '>' . esc_html__( 'Classic Player', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
+		echo '<option value="sesolibre"' . selected( $player_style, 'sesolibre', false ) . '>' . esc_html__( 'SesoLibre Player (with Audio Mixing)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '</select>';
 	}
 
@@ -2483,7 +2483,7 @@ class AdminInterface {
 		
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][auto_insert]" value="1" class="tts-player-setting" data-setting="auto_insert" ' . checked( $auto_insert, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Automatically insert TTS player in posts', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Automatically insert TTS player in posts', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 	}
 
@@ -2494,9 +2494,9 @@ class AdminInterface {
 		$position = $config['player']['position'] ?? 'before_content';
 		
 		echo '<select name="wp_tts_config[player][position]" id="player_position">';
-		echo '<option value="before_content"' . selected( $position, 'before_content', false ) . '>' . esc_html__( 'Before Content', 'TTS SesoLibre' ) . '</option>';
-		echo '<option value="after_content"' . selected( $position, 'after_content', false ) . '>' . esc_html__( 'After Content', 'TTS SesoLibre' ) . '</option>';
-		echo '<option value="manual"' . selected( $position, 'manual', false ) . '>' . esc_html__( 'Manual (Shortcode)', 'TTS SesoLibre' ) . '</option>';
+		echo '<option value="before_content"' . selected( $position, 'before_content', false ) . '>' . esc_html__( 'Before Content', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
+		echo '<option value="after_content"' . selected( $position, 'after_content', false ) . '>' . esc_html__( 'After Content', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
+		echo '<option value="manual"' . selected( $position, 'manual', false ) . '>' . esc_html__( 'Manual (Shortcode)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '</select>';
 	}
 
@@ -2510,14 +2510,14 @@ class AdminInterface {
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_volume]" value="1" class="tts-player-setting" data-setting="show_voice_volume" ' . checked( $show_voice_volume, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show Voice Volume Control', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show Voice Volume Control', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 		
 		echo '<div>';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_background_volume]" value="1" class="tts-player-setting" data-setting="show_background_volume" ' . checked( $show_background_volume, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show Background Music Volume Control', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show Background Music Volume Control', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 	}
@@ -2538,14 +2538,14 @@ class AdminInterface {
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_tts_service]" value="1" class="tts-player-setting" data-setting="show_tts_service" ' . checked( $show_tts_service, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show TTS Service', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show TTS Service', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 		
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_name]" value="1" class="tts-player-setting" data-setting="show_voice_name" ' . checked( $show_voice_name, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show Voice Name', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show Voice Name', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 		echo '</div>';
@@ -2555,14 +2555,14 @@ class AdminInterface {
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_download_link]" value="1" class="tts-player-setting" data-setting="show_download_link" ' . checked( $show_download_link, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show Download Link', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show Download Link', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 		
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
 		echo '<input type="checkbox" name="wp_tts_config[player][show_article_title]" value="1" class="tts-player-setting" data-setting="show_article_title" ' . checked( $show_article_title, true, false ) . ' />';
-		echo ' ' . esc_html__( 'Show Article Title', 'TTS SesoLibre' );
+		echo ' ' . esc_html__( 'Show Article Title', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
 		echo '</div>';
@@ -2571,21 +2571,21 @@ class AdminInterface {
 		
 		// Shortcode documentation section
 		echo '<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px;">';
-		echo '<h3 style="margin-top: 0;">' . esc_html__( 'Shortcode Documentation', 'TTS SesoLibre' ) . '</h3>';
-		echo '<p>' . esc_html__( 'When using Manual position, you can place the TTS player anywhere in your content using the shortcode:', 'TTS SesoLibre' ) . '</p>';
+		echo '<h3 style="margin-top: 0;">' . esc_html__( 'Shortcode Documentation', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
+		echo '<p>' . esc_html__( 'When using Manual position, you can place the TTS player anywhere in your content using the shortcode:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		
 		echo '<table class="widefat" style="margin: 15px 0;">';
-		echo '<thead><tr><th>' . esc_html__( 'Shortcode', 'TTS SesoLibre' ) . '</th><th>' . esc_html__( 'Description', 'TTS SesoLibre' ) . '</th></tr></thead>';
+		echo '<thead><tr><th>' . esc_html__( 'Shortcode', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th><th>' . esc_html__( 'Description', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th></tr></thead>';
 		echo '<tbody>';
-		echo '<tr><td><code>[wp_tts_player]</code></td><td>' . esc_html__( 'Basic player for current post', 'TTS SesoLibre' ) . '</td></tr>';
-		echo '<tr><td><code>[wp_tts_player style="classic"]</code></td><td>' . esc_html__( 'Force classic player style', 'TTS SesoLibre' ) . '</td></tr>';
-		echo '<tr><td><code>[wp_tts_player style="sesolibre"]</code></td><td>' . esc_html__( 'Force SesoLibre player with audio mixing', 'TTS SesoLibre' ) . '</td></tr>';
-		echo '<tr><td><code>[wp_tts_player post_id="123"]</code></td><td>' . esc_html__( 'Player for specific post ID', 'TTS SesoLibre' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player]</code></td><td>' . esc_html__( 'Basic player for current post', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="classic"]</code></td><td>' . esc_html__( 'Force classic player style', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="sesolibre"]</code></td><td>' . esc_html__( 'Force SesoLibre player with audio mixing', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player post_id="123"]</code></td><td>' . esc_html__( 'Player for specific post ID', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
 		echo '</tbody>';
 		echo '</table>';
 		
-		echo '<p><strong>' . esc_html__( 'Note:', 'TTS SesoLibre' ) . '</strong> ' . 
-		     esc_html__( 'The shortcode will only display if TTS is enabled for the specified post and audio has been generated.', 'TTS SesoLibre' ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'Note:', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</strong> ' . 
+		     esc_html__( 'The shortcode will only display if TTS is enabled for the specified post and audio has been generated.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</div>';
 		
 		echo '</div>';
@@ -2684,7 +2684,7 @@ class AdminInterface {
 			// Verify nonce
 			if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ) {
 				wp_send_json_error( [
-					'message' => __( 'Security check failed.', 'TTS SesoLibre' )
+					'message' => __( 'Security check failed.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 				] );
 				return;
 			}
@@ -2692,7 +2692,7 @@ class AdminInterface {
 			// Check permissions
 			if ( ! current_user_can( 'manage_options' ) ) {
 				wp_send_json_error( [
-					'message' => __( 'Insufficient permissions.', 'TTS SesoLibre' )
+					'message' => __( 'Insufficient permissions.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 				] );
 				return;
 			}
@@ -2713,13 +2713,13 @@ class AdminInterface {
 			$this->config->set( 'player', $player_settings );
 			
 			wp_send_json_success( [
-				'message' => __( 'Player configuration saved successfully.', 'TTS SesoLibre' ),
+				'message' => __( 'Player configuration saved successfully.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'settings' => $player_settings
 			] );
 
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Failed to save player configuration.', 'TTS SesoLibre' ),
+				'message' => __( 'Failed to save player configuration.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage()
 			] );
 		}

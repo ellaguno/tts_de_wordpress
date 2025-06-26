@@ -114,16 +114,16 @@ class TTSException extends \Exception {
 	 */
 	public function getUserMessage(): string {
 		$userMessages = array(
-			'INVALID_TEXT'         => __( 'The text content is invalid or empty.', 'TTS de Wordpress' ),
-			'PROVIDER_ERROR'       => __( 'There was an error with the TTS service. Please try again.', 'TTS de Wordpress' ),
-			'QUOTA_EXCEEDED'       => __( 'The TTS service quota has been exceeded. Please try again later.', 'TTS de Wordpress' ),
-			'INVALID_VOICE'        => __( 'The selected voice is not available.', 'TTS de Wordpress' ),
-			'NETWORK_ERROR'        => __( 'Network connection error. Please check your internet connection.', 'TTS de Wordpress' ),
-			'AUTHENTICATION_ERROR' => __( 'Authentication failed. Please check your API credentials.', 'TTS de Wordpress' ),
-			'RATE_LIMIT_EXCEEDED'  => __( 'Rate limit exceeded. Please wait before trying again.', 'TTS de Wordpress' ),
-			'UNSUPPORTED_FORMAT'   => __( 'The requested audio format is not supported.', 'TTS de Wordpress' ),
-			'TEXT_TOO_LONG'        => __( 'The text is too long for processing.', 'TTS de Wordpress' ),
-			'CONFIGURATION_ERROR'  => __( 'Plugin configuration error. Please check your settings.', 'TTS de Wordpress' ),
+			'INVALID_TEXT'         => __( 'The text content is invalid or empty.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'PROVIDER_ERROR'       => __( 'There was an error with the TTS service. Please try again.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'QUOTA_EXCEEDED'       => __( 'The TTS service quota has been exceeded. Please try again later.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'INVALID_VOICE'        => __( 'The selected voice is not available.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'NETWORK_ERROR'        => __( 'Network connection error. Please check your internet connection.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'AUTHENTICATION_ERROR' => __( 'Authentication failed. Please check your API credentials.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'RATE_LIMIT_EXCEEDED'  => __( 'Rate limit exceeded. Please wait before trying again.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'UNSUPPORTED_FORMAT'   => __( 'The requested audio format is not supported.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'TEXT_TOO_LONG'        => __( 'The text is too long for processing.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'CONFIGURATION_ERROR'  => __( 'Plugin configuration error. Please check your settings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 		);
 
 		return $userMessages[ $this->getErrorType() ] ?? $this->getMessage();

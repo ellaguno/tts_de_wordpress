@@ -105,7 +105,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Failed to upload file "%1$s" to %2$s storage', 'TTS de Wordpress' ),
+			__( 'Failed to upload file "%1$s" to %2$s storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$filename,
 			$provider
 		);
@@ -140,7 +140,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Failed to delete file "%1$s" from %2$s storage', 'TTS de Wordpress' ),
+			__( 'Failed to delete file "%1$s" from %2$s storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$fileUrl,
 			$provider
 		);
@@ -173,7 +173,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Authentication failed for %s storage', 'TTS de Wordpress' ),
+			__( 'Authentication failed for %s storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$provider
 		);
 
@@ -205,7 +205,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Storage quota exceeded for %s', 'TTS de Wordpress' ),
+			__( 'Storage quota exceeded for %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$provider
 		);
 
@@ -233,7 +233,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'File "%1$s" not found in %2$s storage', 'TTS de Wordpress' ),
+			__( 'File "%1$s" not found in %2$s storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$filename,
 			$provider
 		);
@@ -266,7 +266,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'File "%1$s" is too large (%2$s). Maximum size for %3$s is %4$s', 'TTS de Wordpress' ),
+			__( 'File "%1$s" is too large (%2$s). Maximum size for %3$s is %4$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$filename,
 			size_format( $fileSize ),
 			$provider,
@@ -303,7 +303,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Network error during %1$s operation with %2$s storage', 'TTS de Wordpress' ),
+			__( 'Network error during %1$s operation with %2$s storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 			$operation,
 			$provider
 		);

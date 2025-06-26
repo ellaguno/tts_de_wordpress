@@ -65,25 +65,25 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <audio 
             controls 
             preload="none"
-            aria-label="<?php echo esc_attr(sprintf(__('Audio versión of: %s', 'TTS de Wordpress'), $post_title)); ?>"
+            aria-label="<?php echo esc_attr(sprintf(__('Versión en audio de: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), $post_title)); ?>"
             class="wp-tts-audio-element">
             <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-            <p><?php _e('Your browser does not support the audio element.', 'TTS de Wordpress'); ?></p>
+            <p><?php _e('Tu navegador no soporta el elemento de audio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></p>
         </audio>
     </div>
     
     <div class="wp-tts-player-meta">
-        <span class="wp-tts-label"><?php _e('Escucha el artículo', 'TTS de SesoLibre'); ?></span>
+        <span class="wp-tts-label"><?php _e('Escucha el artículo', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></span>
         <?php if ($voice_id || $provider): ?>
             <span class="wp-tts-voice-info">
                 <?php 
                 if ($voice_id) {
-                    echo sprintf(__('Voice: %s', 'TTS de Wordpress'), esc_html($voice_id));
+                    echo sprintf(__('Voz: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), esc_html($voice_id));
                     if ($provider) {
                         echo ' (' . esc_html(ucfirst(str_replace('_', ' ', $provider))) . ')';
                     }
                 } else if ($provider) {
-                    echo sprintf(__('Provider: %s', 'TTS de Wordpress'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
+                    echo sprintf(__('Proveedor: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
                 }
                 ?>
             </span>
@@ -91,7 +91,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <span class="wp-tts-download">
         <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
             <span class="dashicons dashicons-download"></span>
-            <?php _e('Descargar', 'TTS de Wordpress'); ?>
+            <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
             </a>
         </span>
     </div>
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         audioElement.addEventListener('error', function() {
             audioPlayer.classList.add('wp-tts-error');
             const errorMsg = document.createElement('p');
-            errorMsg.textContent = '<?php echo esc_js(__('Error loading audio. Please try downloading the file.', 'TTS de Wordpress')); ?>';
+            errorMsg.textContent = '<?php echo esc_js(__('Error cargando el audio. Por favor intenta descargar el archivo.', 'TTS-SesoLibre-v1.6.7-shortcode-docs')); ?>';
             errorMsg.style.color = '#d63638';
             errorMsg.style.fontSize = '12px';
             errorMsg.style.marginTop = '8px';

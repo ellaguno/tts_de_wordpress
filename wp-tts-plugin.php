@@ -8,7 +8,7 @@
  * Author URI: https://sesolibre.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: TTS SesoLibre
+ * Text Domain: TTS-SesoLibre-v1.6.7-shortcode-docs
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
@@ -91,7 +91,7 @@ add_action('plugins_loaded', 'wp_tts_plugin_init');
  * Add action links to plugin page
  */
 function wp_tts_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=wp-tts-settings') . '">' . __('Settings', 'TTS de Wordpress') . '</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=wp-tts-settings') . '">' . __('Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
@@ -102,8 +102,8 @@ add_filter('plugin_action_links_' . WP_TTS_PLUGIN_BASENAME, 'wp_tts_plugin_actio
  */
 function wp_tts_plugin_meta_links($links, $file) {
     if ($file === WP_TTS_PLUGIN_BASENAME) {
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/wiki" target="_blank">' . __('Documentation', 'TTS de Wordpress') . '</a>';
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/issues" target="_blank">' . __('Support', 'TTS de Wordpress') . '</a>';
+        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/wiki" target="_blank">' . __('Documentation', 'TTS-SesoLibre-v1.6.7-shortcode-docs') . '</a>';
+        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/issues" target="_blank">' . __('Support', 'TTS-SesoLibre-v1.6.7-shortcode-docs') . '</a>';
     }
     return $links;
 }

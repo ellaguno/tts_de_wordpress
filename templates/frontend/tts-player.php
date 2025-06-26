@@ -85,12 +85,12 @@ if (empty($main_audio_url)) {
      data-show-background-volume="<?php echo esc_attr($show_background_volume ? 'true' : 'false'); ?>">
      
     <div class="tts-branding">
-        Reproductor SesoLibre 
+        <?php _e('Reproductor SesoLibre', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?> 
     </div> 
     
     <div class="tts-controls">
         <div class="tts-main-controls">
-            <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Play/Pause', 'TTS SesoLibre'); ?>">
+            <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
                 ▶
             </button>
             
@@ -108,27 +108,27 @@ if (empty($main_audio_url)) {
                 <?php if ($show_voice_volume): ?>
                 <div class="tts-volume-control">
                     <label for="tts-voice-volume-<?php echo $post_id; ?>">
-                        <?php _e('Voice', 'TTS SesoLibre'); ?>
+                        <?php _e('Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                     </label>
                     <input type="range" 
                            id="tts-voice-volume-<?php echo $post_id; ?>"
                            class="tts-volume-slider tts-voice-slider" 
                            min="0" max="1" step="0.1" value="1"
-                           aria-label="<?php esc_attr_e('Voice Volume', 'TTS SesoLibre'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
                 </div>
                 <?php endif; ?>
                 
                 <?php if ($show_background_volume && !empty($background_url)): ?>
                 <div class="tts-volume-control">
                     <label for="tts-background-volume-<?php echo $post_id; ?>">
-                        <?php _e('Music', 'TTS SesoLibre'); ?>
+                        <?php _e('Música', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                     </label>
                     <input type="range" 
                            id="tts-background-volume-<?php echo $post_id; ?>"
                            class="tts-volume-slider tts-background-slider" 
                            min="0" max="1" step="0.1" 
                            value="<?php echo esc_attr($background_volume); ?>"
-                           aria-label="<?php esc_attr_e('Background Music Volume', 'TTS SesoLibre'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Música de Fondo', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
                 </div>
                 <?php endif; ?>
 
@@ -144,27 +144,27 @@ if (empty($main_audio_url)) {
     <div class="tts-info-bar">
         <?php if ($show_tts_service && !empty($provider_display)): ?>
             <span class="tts-info-item tts-service">
-                <strong><?php _e('Service:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($provider_display); ?>
+                <strong><?php _e('Servicio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($provider_display); ?>
             </span>
         <?php endif; ?>
         
         <?php if ($show_voice_name && !empty($voice_id)): ?>
             <span class="tts-info-item tts-voice">
-                <strong><?php _e('Voice:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($voice_id); ?>
+                <strong><?php _e('Voz:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($voice_id); ?>
             </span>
         <?php endif; ?>
         
         <?php if ($show_download_link): ?>
             <span class="tts-info-item tts-download">
                 <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-link">
-                    <?php _e('Download', 'TTS SesoLibre'); ?>
+                    <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                 </a>
             </span>
         <?php endif; ?>
         
         <?php if ($show_article_title && !empty($post_title)): ?>
             <span class="tts-info-item tts-title">
-                <strong><?php _e('Article:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($post_title); ?>
+                <strong><?php _e('Artículo:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($post_title); ?>
             </span>
         <?php endif; ?>
     </div>
@@ -175,6 +175,6 @@ if (empty($main_audio_url)) {
 
 <?php if ($use_custom_audio): ?>
 <p class="tts-custom-audio-notice" style="font-size: 12px; color: #666; margin-top: 10px; font-style: italic;">
-    <?php _e('Playing custom audio file', 'TTS SesoLibre'); ?>
+    <?php _e('Reproduciendo archivo de audio personalizado', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
 </p>
 <?php endif; ?>

@@ -112,7 +112,7 @@ class TTSService {
 				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
 				return [
 					'success' => false,
-					'message' => __( 'No TTS providers are configured. Please configure at least one provider in Settings > TTS Settings.', 'TTS de Wordpress' ),
+					'message' => __( 'No TTS providers are configured. Please configure at least one provider in Settings > TTS Settings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					'error_code' => 'NO_PROVIDERS_CONFIGURED',
 					'available_providers' => [
 						'openai' => 'OpenAI TTS',
@@ -186,7 +186,7 @@ class TTSService {
 				return [
 					'success' => false,
 					'message' => sprintf( 
-						__( 'TTS generation failed with %s: %s', 'TTS de Wordpress' ),
+						__( 'TTS generation failed with %s: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -201,7 +201,7 @@ class TTSService {
 			return [
 				'success' => false,
 				'message' => sprintf( 
-					__( 'TTS generation failed with provider %s. Please check your configuration and try again.', 'TTS de Wordpress' ),
+					__( 'TTS generation failed with provider %s. Please check your configuration and try again.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					$current_provider_name
 				),
 				'error_code' => 'GENERATION_FAILED',

@@ -393,28 +393,28 @@ class ConfigurationManager {
 		switch ( $provider ) {
 			case 'azure':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'API key is required', 'TTS de Wordpress' );
+					$errors[] = __( 'API key is required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				}
 				if ( empty( $config['region'] ) ) {
-					$errors[] = __( 'Region is required', 'TTS de Wordpress' );
+					$errors[] = __( 'Region is required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				}
 				break;
 
 			case 'google':
 				if ( empty( $config['credentials_json'] ) ) {
-					$errors[] = __( 'Service account credentials are required', 'TTS de Wordpress' );
+					$errors[] = __( 'Service account credentials are required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				}
 				break;
 
 			case 'polly':
 				if ( empty( $config['access_key'] ) || empty( $config['secret_key'] ) ) {
-					$errors[] = __( 'AWS access key and secret key are required', 'TTS de Wordpress' );
+					$errors[] = __( 'AWS access key and secret key are required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				}
 				break;
 
 			case 'elevenlabs':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'API key is required', 'TTS de Wordpress' );
+					$errors[] = __( 'API key is required', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 				}
 				break;
 		}
@@ -434,14 +434,14 @@ class ConfigurationManager {
 		if ( isset( $defaults['voice_speed'] ) ) {
 			$speed = floatval( $defaults['voice_speed'] );
 			if ( $speed < 0.25 || $speed > 4.0 ) {
-				$errors[] = __( 'Voice speed must be between 0.25 and 4.0', 'TTS de Wordpress' );
+				$errors[] = __( 'Voice speed must be between 0.25 and 4.0', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			}
 		}
 
 		if ( isset( $defaults['voice_pitch'] ) ) {
 			$pitch = intval( $defaults['voice_pitch'] );
 			if ( $pitch < -20 || $pitch > 20 ) {
-				$errors[] = __( 'Voice pitch must be between -20 and 20', 'TTS de Wordpress' );
+				$errors[] = __( 'Voice pitch must be between -20 and 20', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			}
 		}
 
