@@ -2448,6 +2448,15 @@ class AdminInterface {
 		echo '</td>';
 		echo '</tr>';
 		
+		// Player Information Section
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Player Information', 'TTS SesoLibre' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerInfoField( $config );
+		echo '<p class="description">' . esc_html__( 'Configure which information to show below the progress bar in the SesoLibre player.', 'TTS SesoLibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
 		echo '</table>';
 		echo '</div>';
 	}
@@ -2498,16 +2507,64 @@ class AdminInterface {
 		
 		echo '<div style="margin-bottom: 10px;">';
 		echo '<label>';
-		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_volume]" value="1" ' . checked( $show_voice_volume, true, false ) . ' />';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_volume]" value="1" class="tts-player-setting" data-setting="show_voice_volume" ' . checked( $show_voice_volume, true, false ) . ' />';
 		echo ' ' . esc_html__( 'Show Voice Volume Control', 'TTS SesoLibre' );
 		echo '</label>';
 		echo '</div>';
 		
 		echo '<div>';
 		echo '<label>';
-		echo '<input type="checkbox" name="wp_tts_config[player][show_background_volume]" value="1" ' . checked( $show_background_volume, true, false ) . ' />';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_background_volume]" value="1" class="tts-player-setting" data-setting="show_background_volume" ' . checked( $show_background_volume, true, false ) . ' />';
 		echo ' ' . esc_html__( 'Show Background Music Volume Control', 'TTS SesoLibre' );
 		echo '</label>';
+		echo '</div>';
+	}
+
+	/**
+	 * Render player information field
+	 */
+	private function renderPlayerInfoField( array $config ): void {
+		$show_tts_service = $config['player']['show_tts_service'] ?? true;
+		$show_voice_name = $config['player']['show_voice_name'] ?? true;
+		$show_download_link = $config['player']['show_download_link'] ?? true;
+		$show_article_title = $config['player']['show_article_title'] ?? true;
+		
+		echo '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">';
+		
+		// First column
+		echo '<div>';
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_tts_service]" value="1" class="tts-player-setting" data-setting="show_tts_service" ' . checked( $show_tts_service, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show TTS Service', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
+		
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_voice_name]" value="1" class="tts-player-setting" data-setting="show_voice_name" ' . checked( $show_voice_name, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show Voice Name', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
+		echo '</div>';
+		
+		// Second column
+		echo '<div>';
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_download_link]" value="1" class="tts-player-setting" data-setting="show_download_link" ' . checked( $show_download_link, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show Download Link', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
+		
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_article_title]" value="1" class="tts-player-setting" data-setting="show_article_title" ' . checked( $show_article_title, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Show Article Title', 'TTS SesoLibre' );
+		echo '</label>';
+		echo '</div>';
+		echo '</div>';
+		
 		echo '</div>';
 	}
 
@@ -2544,6 +2601,10 @@ class AdminInterface {
 			$player_settings['position'] = sanitize_text_field( $input['player']['position'] ?? 'before_content' );
 			$player_settings['show_voice_volume'] = isset( $input['player']['show_voice_volume'] ) ? true : false;
 			$player_settings['show_background_volume'] = isset( $input['player']['show_background_volume'] ) ? true : false;
+			$player_settings['show_tts_service'] = isset( $input['player']['show_tts_service'] ) ? true : false;
+			$player_settings['show_voice_name'] = isset( $input['player']['show_voice_name'] ) ? true : false;
+			$player_settings['show_download_link'] = isset( $input['player']['show_download_link'] ) ? true : false;
+			$player_settings['show_article_title'] = isset( $input['player']['show_article_title'] ) ? true : false;
 			
 			// Debug: Log what we're saving
 			error_log( 'TTS DEBUG: Saving player settings: ' . print_r( $player_settings, true ) );
@@ -2620,6 +2681,10 @@ class AdminInterface {
 			$player_settings['position'] = sanitize_text_field( $_POST['position'] ?? 'before_content' );
 			$player_settings['show_voice_volume'] = isset( $_POST['show_voice_volume'] ) && $_POST['show_voice_volume'] === '1';
 			$player_settings['show_background_volume'] = isset( $_POST['show_background_volume'] ) && $_POST['show_background_volume'] === '1';
+			$player_settings['show_tts_service'] = isset( $_POST['show_tts_service'] ) && $_POST['show_tts_service'] === '1';
+			$player_settings['show_voice_name'] = isset( $_POST['show_voice_name'] ) && $_POST['show_voice_name'] === '1';
+			$player_settings['show_download_link'] = isset( $_POST['show_download_link'] ) && $_POST['show_download_link'] === '1';
+			$player_settings['show_article_title'] = isset( $_POST['show_article_title'] ) && $_POST['show_article_title'] === '1';
 			
 			// Save directly to ConfigurationManager
 			$this->config->set( 'player', $player_settings );

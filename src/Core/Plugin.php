@@ -773,7 +773,11 @@ class Plugin {
 		// Player configuration from global settings
 		$player_config = [
 			'show_voice_volume' => $config->get('player.show_voice_volume', true),
-			'show_background_volume' => $config->get('player.show_background_volume', true)
+			'show_background_volume' => $config->get('player.show_background_volume', true),
+			'show_tts_service' => $config->get('player.show_tts_service', true),
+			'show_voice_name' => $config->get('player.show_voice_name', true),
+			'show_download_link' => $config->get('player.show_download_link', true),
+			'show_article_title' => $config->get('player.show_article_title', true)
 		];
 
 		// Choose template based on style

@@ -125,6 +125,10 @@ class ConfigurationManager {
 			'position'                  => 'before_content',
 			'show_voice_volume'         => true,
 			'show_background_volume'    => true,
+			'show_tts_service'          => true,
+			'show_voice_name'           => true,
+			'show_download_link'        => true,
+			'show_article_title'        => true,
 		),
 	);
 

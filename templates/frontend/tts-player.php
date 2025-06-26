@@ -24,6 +24,19 @@ $voice_config = $tts_data['voice'] ?? [];
 $provider = $voice_config['provider'] ?? '';
 $voice_id = $voice_config['voice_id'] ?? '';
 
+// Get human-readable provider and voice names
+$provider_names = [
+    'azure' => 'Azure TTS',
+    'google' => 'Google Cloud TTS', 
+    'polly' => 'Amazon Polly',
+    'elevenlabs' => 'ElevenLabs',
+    'openai' => 'OpenAI TTS'
+];
+$provider_display = $provider_names[$provider] ?? ucfirst($provider);
+
+// Get post title for display
+$post_title = get_the_title($post_id);
+
 // Get audio URLs
 $intro_url = '';
 $background_url = '';
@@ -51,6 +64,10 @@ if ($use_custom_audio) {
 $background_volume = $audio_assets['background_volume'] ?? 0.3;
 $show_voice_volume = $player_config['show_voice_volume'] ?? true;
 $show_background_volume = $player_config['show_background_volume'] ?? true;
+$show_tts_service = $player_config['show_tts_service'] ?? true;
+$show_voice_name = $player_config['show_voice_name'] ?? true;
+$show_download_link = $player_config['show_download_link'] ?? true;
+$show_article_title = $player_config['show_article_title'] ?? true;
 
 // Don't show player if no main audio
 if (empty($main_audio_url)) {
@@ -120,6 +137,38 @@ if (empty($main_audio_url)) {
         </div> 
 
     </div>
+    
+    <?php 
+    // Show player information if any option is enabled
+    if ($show_tts_service || $show_voice_name || $show_download_link || $show_article_title): ?>
+    <div class="tts-info-bar">
+        <?php if ($show_tts_service && !empty($provider_display)): ?>
+            <span class="tts-info-item tts-service">
+                <strong><?php _e('Service:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($provider_display); ?>
+            </span>
+        <?php endif; ?>
+        
+        <?php if ($show_voice_name && !empty($voice_id)): ?>
+            <span class="tts-info-item tts-voice">
+                <strong><?php _e('Voice:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($voice_id); ?>
+            </span>
+        <?php endif; ?>
+        
+        <?php if ($show_download_link): ?>
+            <span class="tts-info-item tts-download">
+                <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-link">
+                    <?php _e('Download', 'TTS SesoLibre'); ?>
+                </a>
+            </span>
+        <?php endif; ?>
+        
+        <?php if ($show_article_title && !empty($post_title)): ?>
+            <span class="tts-info-item tts-title">
+                <strong><?php _e('Article:', 'TTS SesoLibre'); ?></strong> <?php echo esc_html($post_title); ?>
+            </span>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
     
     <div class="tts-error-container"></div>
 </div>
