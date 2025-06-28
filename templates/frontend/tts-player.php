@@ -73,9 +73,57 @@ $show_article_title = $player_config['show_article_title'] ?? true;
 if (empty($main_audio_url)) {
     return;
 }
+
+// Get custom colors from ConfigurationManager
+$config = new \WP_TTS\Core\ConfigurationManager();
+$play_icon_color = $config->get('player.play_icon_color', '#007cba');
+$pause_icon_color = $config->get('player.pause_icon_color', '#007cba');
+$progress_color = $config->get('player.progress_color', '#007cba');
+$background_color = $config->get('player.player_background_color', '#f8f9fa');
+$text_color = $config->get('player.player_text_color', '#333333');
+
+// Generate unique player ID
+$player_id = 'tts-sesolibre-player-' . $post_id;
 ?>
 
+<style>
+/* SesoLibre Player Custom Colors */
+#<?php echo $player_id; ?> {
+    background: <?php echo esc_html($background_color); ?>;
+    color: <?php echo esc_html($text_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-play-pause {
+    background: <?php echo esc_html($play_icon_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-play-pause:hover {
+    background: <?php echo esc_html($pause_icon_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-progress-bar {
+    background: <?php echo esc_html($progress_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-speed-btn {
+    background: <?php echo esc_html($progress_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-speed-btn:hover {
+    background: <?php echo esc_html($pause_icon_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-speed-menu button.active {
+    background: <?php echo esc_html($progress_color); ?>;
+}
+
+#<?php echo $player_id; ?> .tts-article-title-above {
+    color: <?php echo esc_html($text_color); ?>;
+}
+</style>
+
 <div class="tts-sesolibre-player" 
+     id="<?php echo $player_id; ?>" 
      data-main-audio="<?php echo esc_attr($main_audio_url); ?>"
      data-intro-audio="<?php echo esc_attr($intro_url); ?>"
      data-background-audio="<?php echo esc_attr($background_url); ?>"

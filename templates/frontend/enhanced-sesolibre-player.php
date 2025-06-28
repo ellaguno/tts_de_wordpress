@@ -105,7 +105,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
 
 <?php if (!empty($custom_css)): ?>
 /* Custom CSS from admin settings */
-<?php echo wp_strip_all_tags($custom_css, true); ?>
+<?php echo $custom_css; ?>
 <?php endif; ?>
 </style>
 

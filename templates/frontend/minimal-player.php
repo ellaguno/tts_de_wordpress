@@ -31,7 +31,40 @@ $service_name = $provider_names[$provider] ?? ucfirst($provider);
 $voice_name = $voice_id;
 
 $download_link = $audio_url;
+
+// Get custom colors from ConfigurationManager
+$config = new \WP_TTS\Core\ConfigurationManager();
+$play_icon_color = $config->get('player.play_icon_color', '#007cba');
+$pause_icon_color = $config->get('player.pause_icon_color', '#007cba');
+$progress_color = $config->get('player.progress_color', '#007cba');
+$background_color = $config->get('player.player_background_color', '#f8f9fa');
+$text_color = $config->get('player.player_text_color', '#333333');
 ?>
+
+<style>
+/* Minimal Player Custom Colors */
+#<?php echo $player_id; ?> {
+    background: <?php echo esc_html($background_color); ?>;
+    color: <?php echo esc_html($text_color); ?>;
+}
+
+#<?php echo $player_id; ?> .wp-tts-minimal-play-btn {
+    background: <?php echo esc_html($play_icon_color); ?>;
+}
+
+#<?php echo $player_id; ?> .wp-tts-minimal-play-btn:hover {
+    background: <?php echo esc_html($pause_icon_color); ?>;
+}
+
+#<?php echo $player_id; ?> .progress-filled {
+    background: <?php echo esc_html($progress_color); ?>;
+}
+
+#<?php echo $player_id; ?> .waveform-bar.active,
+#<?php echo $player_id; ?> .waveform-bar.playing {
+    background: <?php echo esc_html($progress_color); ?>;
+}
+</style>
 
 <div class="wp-tts-minimal-player-container" id="<?php echo $player_id; ?>">
     <div class="wp-tts-minimal-player">
@@ -53,7 +86,7 @@ $download_link = $audio_url;
         <!-- Waveform/Progress Container -->
         <div class="wp-tts-minimal-progress-container">
             <div class="wp-tts-minimal-waveform">
-                <!-- Waveform bars -->
+                <!-- Waveform bars - Enhanced with 60 bars for better visualization -->
                 <div class="waveform-bar" style="height: 20%"></div>
                 <div class="waveform-bar" style="height: 35%"></div>
                 <div class="waveform-bar" style="height: 60%"></div>
@@ -84,6 +117,40 @@ $download_link = $audio_url;
                 <div class="waveform-bar" style="height: 85%"></div>
                 <div class="waveform-bar" style="height: 50%"></div>
                 <div class="waveform-bar" style="height: 75%"></div>
+                <!-- Additional bars for better waveform representation -->
+                <div class="waveform-bar" style="height: 42%"></div>
+                <div class="waveform-bar" style="height: 68%"></div>
+                <div class="waveform-bar" style="height: 38%"></div>
+                <div class="waveform-bar" style="height: 82%"></div>
+                <div class="waveform-bar" style="height: 28%"></div>
+                <div class="waveform-bar" style="height: 72%"></div>
+                <div class="waveform-bar" style="height: 58%"></div>
+                <div class="waveform-bar" style="height: 33%"></div>
+                <div class="waveform-bar" style="height: 77%"></div>
+                <div class="waveform-bar" style="height: 48%"></div>
+                <div class="waveform-bar" style="height: 63%"></div>
+                <div class="waveform-bar" style="height: 87%"></div>
+                <div class="waveform-bar" style="height: 22%"></div>
+                <div class="waveform-bar" style="height: 52%"></div>
+                <div class="waveform-bar" style="height: 78%"></div>
+                <div class="waveform-bar" style="height: 37%"></div>
+                <div class="waveform-bar" style="height: 92%"></div>
+                <div class="waveform-bar" style="height: 26%"></div>
+                <div class="waveform-bar" style="height: 61%"></div>
+                <div class="waveform-bar" style="height: 84%"></div>
+                <div class="waveform-bar" style="height: 46%"></div>
+                <div class="waveform-bar" style="height: 71%"></div>
+                <div class="waveform-bar" style="height: 34%"></div>
+                <div class="waveform-bar" style="height: 79%"></div>
+                <div class="waveform-bar" style="height: 43%"></div>
+                <div class="waveform-bar" style="height: 66%"></div>
+                <div class="waveform-bar" style="height: 89%"></div>
+                <div class="waveform-bar" style="height: 31%"></div>
+                <div class="waveform-bar" style="height: 56%"></div>
+                <div class="waveform-bar" style="height: 81%"></div>
+                <div class="waveform-bar" style="height: 39%"></div>
+                <div class="waveform-bar" style="height: 74%"></div>
+                <div class="waveform-bar" style="height: 49%"></div>
             </div>
             <div class="wp-tts-minimal-progress">
                 <div class="progress-filled"></div>
