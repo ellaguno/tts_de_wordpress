@@ -49,14 +49,14 @@ class Activator {
 		// Check WordPress version
 		if ( version_compare( $wp_version, '5.0', '<' ) ) {
 			throw new \Exception(
-				__( 'WordPress TTS Plugin requires WordPress 5.0 or higher.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere WordPress 5.0 o superior.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			);
 		}
 
 		// Check PHP version
 		if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			throw new \Exception(
-				__( 'WordPress TTS Plugin requires PHP 7.4 or higher.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere PHP 7.4 o superior.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			);
 		}
 
@@ -66,7 +66,7 @@ class Activator {
 			if ( ! extension_loaded( $extension ) ) {
 				throw new \Exception(
 					sprintf(
-						__( 'WordPress TTS Plugin requires the %s PHP extension.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 						$extension
 					)
 				);
@@ -77,7 +77,7 @@ class Activator {
 		$upload_dir = wp_upload_dir();
 		if ( ! is_writable( $upload_dir['basedir'] ) ) {
 			throw new \Exception(
-				__( 'WordPress TTS Plugin requires write permissions to the uploads directory.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
 			);
 		}
 	}
@@ -351,9 +351,9 @@ class Activator {
 		$admin_email = get_option( 'admin_email' );
 
 		if ( $admin_email ) {
-			$subject = __( 'WordPress TTS Plugin Activated', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+			$subject = __( 'Plugin TTS de WordPress Activado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 			$message = sprintf(
-				__( 'The WordPress TTS Plugin has been successfully activated on %s.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				get_bloginfo( 'name' )
 			);
 

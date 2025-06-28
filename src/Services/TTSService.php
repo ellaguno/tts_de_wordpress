@@ -112,7 +112,7 @@ class TTSService {
 				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
 				return [
 					'success' => false,
-					'message' => __( 'No TTS providers are configured. Please configure at least one provider in Settings > TTS Settings.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					'error_code' => 'NO_PROVIDERS_CONFIGURED',
 					'available_providers' => [
 						'openai' => 'OpenAI TTS',
@@ -186,7 +186,7 @@ class TTSService {
 				return [
 					'success' => false,
 					'message' => sprintf( 
-						__( 'TTS generation failed with %s: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'La generación TTS falló con %s: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -201,7 +201,7 @@ class TTSService {
 			return [
 				'success' => false,
 				'message' => sprintf( 
-					__( 'TTS generation failed with provider %s. Please check your configuration and try again.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 					$current_provider_name
 				),
 				'error_code' => 'GENERATION_FAILED',
@@ -481,11 +481,53 @@ class TTSService {
 				}
 				
 				// Check if should use custom text instead of post content
+				// Priority order: 1) Edited text, 2) Custom text, 3) Original post content
+				$edited_text = '';
+				$fallback_edited_text = get_post_meta( $post_id, '_tts_edited_text', true );
+				$use_edited_text = get_post_meta( $post_id, '_tts_use_edited_text', true );
+				
+				$this->logger->info( 'DEBUG: Checking for edited text', [
+					'post_id' => $post_id,
+					'fallback_edited_text_length' => strlen($fallback_edited_text),
+					'use_edited_text' => $use_edited_text ? 'TRUE' : 'FALSE',
+					'custom_text_config' => $custom_text_config
+				] );
+				
+				// First check for edited text (highest priority)
 				if ( !empty($custom_text_config['use_custom_text']) && !empty($custom_text_config['custom_text']) ) {
-					$full_text = $custom_text_config['custom_text'];
-					$this->logger->info( 'Using custom text for TTS generation', [
+					$edited_text = $custom_text_config['custom_text'];
+					$this->logger->info( 'Using edited text from unified system for TTS generation', [
 						'post_id' => $post_id,
-						'custom_text_length' => strlen( $full_text )
+						'edited_text_length' => strlen( $edited_text )
+					] );
+				} elseif ( !empty($fallback_edited_text) && $use_edited_text ) {
+					$edited_text = $fallback_edited_text;
+					$this->logger->info( 'Using edited text from fallback system for TTS generation', [
+						'post_id' => $post_id,
+						'edited_text_length' => strlen( $edited_text )
+					] );
+				} else {
+					$this->logger->info( 'No edited text found, will use original content', [
+						'post_id' => $post_id,
+						'fallback_edited_text_empty' => empty($fallback_edited_text),
+						'use_edited_text_false' => !$use_edited_text,
+						'custom_text_config_empty' => empty($custom_text_config['custom_text'])
+					] );
+				}
+				
+				// Use edited text if available, otherwise use original post content
+				if ( !empty($edited_text) ) {
+					$full_text = $edited_text;
+					$this->logger->info( 'Using edited text for TTS generation', [
+						'post_id' => $post_id,
+						'text_length' => strlen( $full_text ),
+						'text_source' => 'edited'
+					] );
+				} else {
+					$this->logger->info( 'Using original post content for TTS generation', [
+						'post_id' => $post_id,
+						'text_length' => strlen( $full_text ),
+						'text_source' => 'original'
 					] );
 				}
 				

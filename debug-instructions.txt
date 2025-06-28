@@ -1,0 +1,38 @@
+TTS DEBUGGING INSTRUCTIONS
+==========================
+
+The text editor modal buttons have been enhanced with detailed console debugging.
+
+WHAT WE CHANGED:
+- Added console.log statements to all button click handlers
+- Added debugging for AJAX requests and responses
+- Added debugging for page reload mechanisms
+
+TO DEBUG THE ISSUE:
+
+1. Open a WordPress post for editing
+2. Open your browser's Developer Tools (F12 or right-click -> Inspect)
+3. Go to the "Console" tab
+4. Click the "Edit Text Before Generate" button
+5. Make some text edits in the modal
+6. Click either "Save Only" or "Save & Generate Audio"
+7. Watch the console output carefully
+
+WHAT TO LOOK FOR:
+
+1. Does the button click get detected? (should see "TTS DEBUG: Save Only button clicked" or "TTS DEBUG: Save and Generate button clicked")
+2. Do the AJAX requests start? (should see "TTS DEBUG: Starting AJAX request...")
+3. Do the AJAX requests succeed? (should see success responses with data)
+4. Do the alerts show? (should see "TTS DEBUG: Showing success alert:")
+5. Does the page reload get scheduled? (should see "TTS DEBUG: Scheduling page reload...")
+6. Does the page actually reload? (should see "TTS DEBUG: Executing page reload")
+
+POSSIBLE ISSUES:
+
+1. If you don't see the button click detection - JavaScript event handlers aren't working
+2. If AJAX starts but no response - Backend issue (check WordPress debug logs)
+3. If AJAX succeeds but no alert shows - JavaScript alert() function might be blocked
+4. If page reload gets scheduled but doesn't execute - setTimeout() might be failing
+5. If everything looks good in console but user doesn't see results - Browser display issue
+
+Please share the console output with the developer for analysis.

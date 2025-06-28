@@ -293,6 +293,11 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                     </div>
 
                     <div class="wp-tts-actions" style="margin-top: 15px;">
+                        <button type="button" id="tts_edit_text" class="button button-secondary" style="margin-bottom: 10px;">
+                            <span class="dashicons dashicons-edit"></span>
+                            <?php _e('Edit Text Before Generate', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        </button>
+                        <br>
                         <button type="button" id="tts_generate_now" class="button button-primary" 
                                 <?php echo $status === 'processing' ? 'disabled' : ''; ?>>
                             <span class="dashicons dashicons-controls-play"></span>
@@ -566,9 +571,198 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
         text-align: center;
     }
 }
+
+/* Text Editor Modal Styles */
+.tts-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.tts-modal-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tts-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+}
+
+.tts-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #1d2327;
+}
+
+.tts-modal-close {
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px;
+    margin: -5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.tts-modal-close:hover {
+    background: #e5e5e5;
+    color: #333;
+}
+
+.tts-modal-body {
+    padding: 25px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.tts-editor-info {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.tts-validation-message {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tts-validation-message.tts-valid {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.tts-validation-message.tts-invalid {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.tts-editor-toolbar {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tts-editor-toolbar .button {
+    margin: 0;
+    font-size: 12px;
+    padding: 6px 12px;
+    height: auto;
+    line-height: 1.4;
+}
+
+#tts-editor-textarea {
+    width: 100%;
+    resize: vertical;
+    font-family: Monaco, Menlo, "Ubuntu Mono", monospace;
+    line-height: 1.6;
+    padding: 15px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.tts-editor-stats {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+.tts-modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid #e5e5e5;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.tts-modal-footer .button {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.tts-modal-footer .button .dashicons {
+    margin-top: 1px;
+}
+
+/* Responsive modal */
+@media (max-width: 768px) {
+    .tts-modal-backdrop {
+        padding: 10px;
+    }
+    
+    .tts-modal-container {
+        max-height: 95vh;
+    }
+    
+    .tts-modal-header,
+    .tts-modal-body,
+    .tts-modal-footer {
+        padding: 15px;
+    }
+    
+    .tts-modal-footer {
+        flex-direction: column;
+    }
+    
+    .tts-modal-footer .button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tts-editor-toolbar {
+        flex-direction: column;
+    }
+    
+    .tts-editor-toolbar .button {
+        width: 100%;
+        text-align: center;
+    }
+}
 </style>
 
 <script>
+var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 jQuery(document).ready(function($) {
     // Toggle conditional fields
     function toggleConditionalFields() {
@@ -732,9 +926,13 @@ jQuery(document).ready(function($) {
     
     // Generate audio
     $('#tts_generate_now, #tts_regenerate').on('click', function() {
+        console.log('TTS DEBUG: Generate Audio Now button clicked');
         const postId = $('#post_ID').val();
         
+        console.log('TTS DEBUG: Post ID:', postId);
+        
         if (!postId) {
+            console.log('TTS DEBUG: No post ID, showing alert');
             alert('<?php _e("Please save the post first", "TTS de Wordpress"); ?>');
             return;
         }
@@ -753,6 +951,8 @@ jQuery(document).ready(function($) {
             $('.wp-tts-progress-fill').css('width', progress + '%');
         }, 500);
         
+        console.log('TTS DEBUG: Starting Generate Audio AJAX request');
+        
         $.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -762,24 +962,30 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce("wp_tts_generate_audio"); ?>'
             },
             success: function(response) {
+                console.log('TTS DEBUG: Generate Audio AJAX success response:', response);
                 clearInterval(progressInterval);
                 $('.wp-tts-progress-fill').css('width', '100%');
                 
                 if (response.success) {
+                    console.log('TTS DEBUG: Audio generation successful, scheduling page reload');
                     setTimeout(function() {
+                        console.log('TTS DEBUG: Executing page reload');
                         location.reload(); // Reload to show updated status
                     }, 1000);
                 } else {
+                    console.log('TTS DEBUG: Audio generation failed:', response.data.message);
                     alert(response.data.message || '<?php _e("Generation failed", "TTS de Wordpress"); ?>');
                     $('#tts_generation_progress').hide();
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.log('TTS DEBUG: Generate Audio AJAX error:', xhr, status, error);
                 clearInterval(progressInterval);
                 alert('<?php _e("Generation failed", "TTS de Wordpress"); ?>');
                 $('#tts_generation_progress').hide();
             },
             complete: function() {
+                console.log('TTS DEBUG: Generate Audio AJAX complete');
                 $button.prop('disabled', false).text(originalText);
             }
         });
@@ -993,5 +1199,310 @@ jQuery(document).ready(function($) {
             toggle.innerHTML = '▶';
         }
     };
+    
+    // Text Editor Modal Functionality
+    let originalPostText = '';
+    
+    // Open text editor modal
+    $('#tts_edit_text').on('click', function() {
+        const postId = $('#post_ID').val();
+        
+        if (!postId) {
+            alert('<?php _e("Please save the post first", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            return;
+        }
+        
+        // Show loading
+        $(this).prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Loading...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        
+        // Extract content via AJAX
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'tts_extract_post_content',
+                post_id: postId,
+                nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
+            },
+            success: function(response) {
+                if (response.success) {
+                    originalPostText = response.data.text;
+                    showTextEditorModal(response.data);
+                } else {
+                    alert(response.data.message || '<?php _e("Error extracting content", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                }
+            },
+            error: function() {
+                alert('<?php _e("Error connecting to server", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            },
+            complete: function() {
+                $('#tts_edit_text').prop('disabled', false).html('<span class="dashicons dashicons-edit"></span> <?php _e("Edit Text Before Generate", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            }
+        });
+    });
+    
+    // Show text editor modal
+    function showTextEditorModal(data) {
+        // Create modal HTML
+        const modalHtml = `
+            <div id="tts-editor-modal" class="tts-modal-backdrop">
+                <div class="tts-modal-container">
+                    <div class="tts-modal-header">
+                        <h2><?php _e("Edit Text for TTS Generation", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></h2>
+                        <span class="tts-modal-close">&times;</span>
+                    </div>
+                    <div class="tts-modal-body">
+                        <div class="tts-editor-info">
+                            <strong><?php _e("Post:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></strong> ${data.post_title}
+                            <div class="tts-validation-message ${data.validation.valid ? 'tts-valid' : 'tts-invalid'}">
+                                ${data.validation.valid ? '✓' : '⚠'} ${data.validation.message}
+                            </div>
+                        </div>
+                        <div class="tts-editor-toolbar">
+                            <button type="button" id="tts-clean-text" class="button button-small">
+                                <span class="dashicons dashicons-admin-tools"></span> <?php _e("Clean Text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            </button>
+                            <button type="button" id="tts-reset-text" class="button button-small">
+                                <span class="dashicons dashicons-undo"></span> <?php _e("Reset to Original", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            </button>
+                        </div>
+                        <textarea id="tts-editor-textarea" rows="15" class="large-text">${data.text}</textarea>
+                        <div class="tts-editor-stats">
+                            <span id="tts-char-count">${data.character_count}</span> <?php _e("characters", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span style="margin: 0 10px;">|</span>
+                            <span id="tts-word-count">${data.word_count}</span> <?php _e("words", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span style="margin: 0 10px;">|</span>
+                            <span id="tts-cost-estimate">$${((data.character_count / 1000000) * 15).toFixed(4)}</span> <?php _e("estimated cost", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                        </div>
+                    </div>
+                    <div class="tts-modal-footer">
+                        <button type="button" id="tts-save-and-generate" class="button button-primary">
+                            <span class="dashicons dashicons-controls-play"></span> <?php _e("Save & Generate Audio", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                        </button>
+                        <button type="button" id="tts-save-only" class="button button-secondary">
+                            <span class="dashicons dashicons-saved"></span> <?php _e("Save Only", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                        </button>
+                        <button type="button" class="button tts-modal-close"><?php _e("Cancel", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing modal
+        $('#tts-editor-modal').remove();
+        
+        // Add modal to body
+        $('body').append(modalHtml);
+        
+        // Update stats on text change
+        $('#tts-editor-textarea').on('input', updateEditorStats);
+        
+        // Initial stats update
+        updateEditorStats();
+    }
+    
+    // Update editor statistics
+    function updateEditorStats() {
+        const text = $('#tts-editor-textarea').val();
+        const charCount = text.length;
+        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const costEstimate = ((charCount / 1000000) * 15).toFixed(4);
+        
+        $('#tts-char-count').text(charCount.toLocaleString());
+        $('#tts-word-count').text(wordCount.toLocaleString());
+        $('#tts-cost-estimate').text('$' + costEstimate);
+    }
+    
+    // Close modal
+    $(document).on('click', '.tts-modal-close', function() {
+        $('#tts-editor-modal').remove();
+    });
+    
+    // Clean text
+    $(document).on('click', '#tts-clean-text', function() {
+        let text = $('#tts-editor-textarea').val();
+        text = text.replace(/\s+/g, ' '); // Multiple spaces
+        text = text.replace(/\[\s*\]/g, ''); // Empty brackets
+        text = text.replace(/\(\s*\)/g, ''); // Empty parentheses
+        text = text.trim();
+        $('#tts-editor-textarea').val(text);
+        updateEditorStats();
+    });
+    
+    // Reset text
+    $(document).on('click', '#tts-reset-text', function() {
+        if (originalPostText && confirm('<?php _e("Are you sure you want to reset to the original text? All changes will be lost.", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>')) {
+            $('#tts-editor-textarea').val(originalPostText);
+            updateEditorStats();
+        }
+    });
+    
+    // Save only
+    $(document).on('click', '#tts-save-only', function() {
+        console.log('TTS DEBUG: Save Only button clicked');
+        const postId = $('#post_ID').val();
+        const text = $('#tts-editor-textarea').val().trim();
+        
+        console.log('TTS DEBUG: Post ID:', postId);
+        console.log('TTS DEBUG: Text length:', text.length);
+        
+        if (!text) {
+            console.log('TTS DEBUG: Text is empty, showing alert');
+            alert('<?php _e("Text cannot be empty", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            return;
+        }
+        
+        const $button = $(this);
+        const originalText = $button.html();
+        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        
+        console.log('TTS DEBUG: Starting AJAX request to save text');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'tts_save_edited_text',
+                post_id: postId,
+                text: text,
+                nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
+            },
+            success: function(response) {
+                console.log('TTS DEBUG: Save Only AJAX success response:', response);
+                if (response.success) {
+                    const charCount = response.data.character_count || 0;
+                    const wordCount = response.data.word_count || 0;
+                    let message = '<?php _e("Text saved successfully!", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                    message += '\n<?php _e("Characters:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + charCount;
+                    message += '\n<?php _e("Words:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + wordCount;
+                    message += '\n\n<?php _e("You can now use the Generate Audio button to create TTS from your edited text.", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                    console.log('TTS DEBUG: Showing success alert:', message);
+                    alert(message);
+                    console.log('TTS DEBUG: Removing modal');
+                    $('#tts-editor-modal').remove();
+                } else {
+                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                    console.log('TTS DEBUG: Save failed:', errorMsg);
+                    alert('<?php _e("Save failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>\n\n' + errorMsg);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('TTS DEBUG: Save Only AJAX error:', xhr, status, error);
+                alert('<?php _e("Error connecting to server:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + error);
+            },
+            complete: function() {
+                console.log('TTS DEBUG: Save Only AJAX complete, restoring button');
+                $button.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Save and generate
+    $(document).on('click', '#tts-save-and-generate', function() {
+        console.log('TTS DEBUG: Save and Generate button clicked');
+        const postId = $('#post_ID').val();
+        const text = $('#tts-editor-textarea').val().trim();
+        const provider = $('#tts_voice_provider').val();
+        const voice = $('#tts_voice_id').val();
+        
+        console.log('TTS DEBUG: Post ID:', postId);
+        console.log('TTS DEBUG: Text length:', text.length);
+        console.log('TTS DEBUG: Provider:', provider);
+        console.log('TTS DEBUG: Voice:', voice);
+        
+        if (!text) {
+            console.log('TTS DEBUG: Text is empty, showing alert');
+            alert('<?php _e("Text cannot be empty", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            return;
+        }
+        
+        const $button = $(this);
+        const originalText = $button.html();
+        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving & Generating...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        
+        console.log('TTS DEBUG: Starting save text AJAX request');
+        
+        // First save the text
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'tts_save_edited_text',
+                post_id: postId,
+                text: text,
+                nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
+            },
+            success: function(response) {
+                console.log('TTS DEBUG: Save text AJAX success response:', response);
+                if (response.success) {
+                    console.log('TTS DEBUG: Text saved successfully, starting audio generation');
+                    // Then generate audio
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'tts_generate_from_edited',
+                            post_id: postId,
+                            provider: provider,
+                            voice: voice,
+                            nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
+                        },
+                        success: function(genResponse) {
+                            console.log('TTS DEBUG: Generate audio AJAX success response:', genResponse);
+                            if (genResponse.success) {
+                                // Show detailed success message
+                                const audioUrl = genResponse.data.audio_url || '';
+                                let message = '<?php _e("Audio generated successfully!", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                                if (audioUrl) {
+                                    message += '\n<?php _e("Audio URL:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + audioUrl;
+                                }
+                                console.log('TTS DEBUG: Showing success alert:', message);
+                                alert(message);
+                                
+                                console.log('TTS DEBUG: Removing modal');
+                                $('#tts-editor-modal').remove();
+                                
+                                console.log('TTS DEBUG: Scheduling page reload in 500ms');
+                                // Force reload after short delay to ensure modal is closed
+                                setTimeout(function() {
+                                    console.log('TTS DEBUG: Executing page reload');
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                const errorMsg = genResponse.data?.message || genResponse.message || '<?php _e("Error generating audio", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                                console.log('TTS DEBUG: Audio generation failed:', errorMsg);
+                                alert('<?php _e("Generation failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + errorMsg);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('TTS DEBUG: Generate audio AJAX error:', xhr, status, error);
+                            alert('<?php _e("Error generating audio:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + error);
+                        },
+                        complete: function() {
+                            console.log('TTS DEBUG: Generate audio AJAX complete');
+                            $button.prop('disabled', false).html(originalText);
+                        }
+                    });
+                } else {
+                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                    console.log('TTS DEBUG: Text save failed:', response);
+                    alert('<?php _e("Save failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>\n\n' + errorMsg);
+                    $button.prop('disabled', false).html(originalText);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('TTS DEBUG: Save text AJAX error:', xhr, status, error);
+                alert('<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                $button.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Close modal on background click
+    $(document).on('click', '.tts-modal-backdrop', function(e) {
+        if (e.target === this) {
+            $(this).remove();
+        }
+    });
 });
 </script>
