@@ -185,6 +185,55 @@
                 url: $(this).attr('href')
             });
         });
+
+        // Speed control functionality
+        setupSpeedControl($player, $audio);
+    }
+
+    /**
+     * Setup speed control for player
+     */
+    function setupSpeedControl($player, $audio) {
+        var $speedBtn = $player.find('.wp-tts-speed-btn');
+        var $speedMenu = $player.find('.wp-tts-speed-menu');
+        var audio = $audio[0];
+
+        if ($speedBtn.length && $speedMenu.length) {
+            // Toggle speed menu
+            $speedBtn.on('click', function(e) {
+                e.stopPropagation();
+                $speedMenu.toggle();
+            });
+
+            // Handle speed selection
+            $speedMenu.find('button').on('click', function(e) {
+                e.stopPropagation();
+                var speed = parseFloat($(this).data('speed'));
+                
+                if (audio && !isNaN(speed)) {
+                    audio.playbackRate = speed;
+                    
+                    // Update active state
+                    $speedMenu.find('button').removeClass('active');
+                    $(this).addClass('active');
+                    
+                    // Hide menu
+                    $speedMenu.hide();
+                    
+                    // Fire custom event
+                    $(document).trigger('wp-tts-speed-change', {
+                        player: $player,
+                        audio: audio,
+                        speed: speed
+                    });
+                }
+            });
+
+            // Close menu when clicking outside
+            $(document).on('click', function() {
+                $speedMenu.hide();
+            });
+        }
     }
 
     /**

@@ -649,6 +649,10 @@ class Plugin {
 			}
 			
 			if ( $enabled && $audio_url ) {
+				// Get current player style
+				$player_style = $this->config->get('player.style', 'classic');
+				
+				// Always enqueue common player styles
 				wp_enqueue_style(
 					'wp-tts-player',
 					WP_TTS_PLUGIN_URL . 'assets/css/frontend-player.css',
@@ -656,21 +660,64 @@ class Plugin {
 					$this->version
 				);
 				
-				// Enqueue new TTS SesoLibre player assets
-				wp_enqueue_style(
-					'wp-tts-sesolibre-player',
-					WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
-					array(),
-					$this->version
-				);
-				
-				wp_enqueue_script(
-					'wp-tts-sesolibre-player',
-					WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
-					array( 'jquery' ),
-					$this->version,
-					true
-				);
+				// Enqueue style-specific assets based on player type
+				switch ($player_style) {
+					case 'sesolibre':
+						wp_enqueue_style(
+							'wp-tts-sesolibre-player',
+							WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
+							array(),
+							$this->version
+						);
+						
+						wp_enqueue_script(
+							'wp-tts-sesolibre-player',
+							WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
+							array( 'jquery' ),
+							$this->version,
+							true
+						);
+						break;
+						
+					case 'minimal':
+						wp_enqueue_style(
+							'wp-tts-minimal-player',
+							WP_TTS_PLUGIN_URL . 'assets/css/minimal-player.css',
+							array(),
+							$this->version
+						);
+						
+						wp_enqueue_script(
+							'wp-tts-minimal-player',
+							WP_TTS_PLUGIN_URL . 'assets/js/minimal-player.js',
+							array( 'jquery' ),
+							$this->version,
+							true
+						);
+						break;
+						
+					case 'enhanced_sesolibre':
+						wp_enqueue_style(
+							'wp-tts-enhanced-sesolibre-player',
+							WP_TTS_PLUGIN_URL . 'assets/css/enhanced-sesolibre-player.css',
+							array(),
+							$this->version
+						);
+						
+						wp_enqueue_script(
+							'wp-tts-enhanced-sesolibre-player',
+							WP_TTS_PLUGIN_URL . 'assets/js/enhanced-sesolibre-player.js',
+							array( 'jquery' ),
+							$this->version,
+							true
+						);
+						break;
+						
+					case 'classic':
+					default:
+						// Classic player uses the common styles already loaded
+						break;
+				}
 			}
 		}
 
@@ -796,13 +843,27 @@ class Plugin {
 			'show_tts_service' => $config->get('player.show_tts_service', true),
 			'show_voice_name' => $config->get('player.show_voice_name', true),
 			'show_download_link' => $config->get('player.show_download_link', true),
-			'show_article_title' => $config->get('player.show_article_title', true)
+			'show_article_title' => $config->get('player.show_article_title', true),
+			'show_featured_image' => $config->get('player.show_featured_image', true),
+			'show_speed_control' => $config->get('player.show_speed_control', true)
 		];
 
 		// Choose template based on style
-		$template_file = $style === 'sesolibre' ? 
-			'templates/frontend/tts-player.php' : 
-			'templates/frontend/audio-player.php';
+		switch ($style) {
+			case 'sesolibre':
+				$template_file = 'templates/frontend/tts-player.php';
+				break;
+			case 'minimal':
+				$template_file = 'templates/frontend/minimal-player.php';
+				break;
+			case 'enhanced_sesolibre':
+				$template_file = 'templates/frontend/enhanced-sesolibre-player.php';
+				break;
+			case 'classic':
+			default:
+				$template_file = 'templates/frontend/audio-player.php';
+				break;
+		}
 
 		// Make variables available to the template
 		ob_start();

@@ -70,6 +70,24 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
             <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
             <p><?php _e('Tu navegador no soporta el elemento de audio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></p>
         </audio>
+        
+        <?php if ($player_config['show_speed_control'] ?? true): ?>
+        <div class="wp-tts-speed-control">
+            <button class="wp-tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.94,2.55 2,6.81 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.09,17.93L17.97,16.54C16.64,18.34 14.47,19.5 12,19.5M8,8V16L16,12L8,8Z"></path>
+                </svg>
+            </button>
+            <div class="wp-tts-speed-menu" style="display: none;">
+                <button data-speed="0.5">0.5x</button>
+                <button data-speed="0.75">0.75x</button>
+                <button data-speed="1" class="active">1x</button>
+                <button data-speed="1.25">1.25x</button>
+                <button data-speed="1.5">1.5x</button>
+                <button data-speed="2">2x</button>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     
     <div class="wp-tts-player-meta">
@@ -90,7 +108,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <?php endif; ?>
         <span class="wp-tts-download">
         <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
-            <span class="dashicons dashicons-download"></span>
+            <span class="wp-tts-headphones">🎧</span>
             <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
             </a>
         </span>

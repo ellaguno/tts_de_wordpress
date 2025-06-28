@@ -89,6 +89,12 @@ if (empty($main_audio_url)) {
     </div> 
     
     <div class="tts-controls">
+        <?php if ($show_article_title && !empty($post_title)): ?>
+        <div class="tts-article-title-above">
+            <?php echo esc_html($post_title); ?>
+        </div>
+        <?php endif; ?>
+        
         <div class="tts-main-controls">
             <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
                 ▶
@@ -101,6 +107,24 @@ if (empty($main_audio_url)) {
             <div class="tts-time-display">
                 <span class="tts-current-time">0:00</span> / <span class="tts-total-time">0:00</span>
             </div>
+            
+            <?php if ($player_config['show_speed_control'] ?? true): ?>
+            <div class="tts-speed-control">
+                <button class="tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.94,2.55 2,6.81 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.09,17.93L17.97,16.54C16.64,18.34 14.47,19.5 12,19.5M8,8V16L16,12L8,8Z"></path>
+                    </svg>
+                </button>
+                <div class="tts-speed-menu" style="display: none;">
+                    <button data-speed="0.5">0.5x</button>
+                    <button data-speed="0.75">0.75x</button>
+                    <button data-speed="1" class="active">1x</button>
+                    <button data-speed="1.25">1.25x</button>
+                    <button data-speed="1.5">1.5x</button>
+                    <button data-speed="2">2x</button>
+                </div>
+            </div>
+            <?php endif; ?>
 
         
             <?php if ($show_voice_volume || ($show_background_volume && !empty($background_url))): ?>
@@ -157,16 +181,12 @@ if (empty($main_audio_url)) {
         <?php if ($show_download_link): ?>
             <span class="tts-info-item tts-download">
                 <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-link">
+                    <span class="tts-headphones">🎧</span>
                     <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
                 </a>
             </span>
         <?php endif; ?>
         
-        <?php if ($show_article_title && !empty($post_title)): ?>
-            <span class="tts-info-item tts-title">
-                <strong><?php _e('Artículo:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($post_title); ?>
-            </span>
-        <?php endif; ?>
     </div>
     <?php endif; ?>
     

@@ -13,6 +13,13 @@
     position: relative;
 }
 
+.wp-tts-player-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
 .wp-tts-player-header {
     display: flex;
     align-items: center;
@@ -23,6 +30,73 @@
 .wp-tts-icon {
     font-size: 18px;
     margin-right: 4px;
+}
+
+/* Speed Control */
+.wp-tts-speed-control {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.wp-tts-speed-btn {
+    background: #007cba;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wp-tts-speed-btn:hover {
+    background: #005a87;
+}
+
+.wp-tts-speed-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.wp-tts-speed-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    min-width: 80px;
+}
+
+.wp-tts-speed-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-align: center;
+}
+
+.wp-tts-speed-menu button:hover {
+    background: #f5f5f5;
+}
+
+.wp-tts-speed-menu button.active {
+    background: #007cba;
+    color: white;
+}
+
+.wp-tts-headphones {
+    margin-right: 6px;
 }
 
 .wp-tts-label {

@@ -2802,6 +2802,8 @@ class AdminInterface {
 		echo '<select name="wp_tts_config[player][style]" id="player_style" class="tts-player-setting" data-setting="style">';
 		echo '<option value="classic"' . selected( $player_style, 'classic', false ) . '>' . esc_html__( 'Reproductor Clásico', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '<option value="sesolibre"' . selected( $player_style, 'sesolibre', false ) . '>' . esc_html__( 'Reproductor SesoLibre (con Mezcla de Audio)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
+		echo '<option value="minimal"' . selected( $player_style, 'minimal', false ) . '>' . esc_html__( 'Reproductor Minimalista', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
+		echo '<option value="enhanced_sesolibre"' . selected( $player_style, 'enhanced_sesolibre', false ) . '>' . esc_html__( 'Reproductor SesoLibre Mejorado (con Imagen Destacada)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</option>';
 		echo '</select>';
 	}
 
@@ -2895,9 +2897,88 @@ class AdminInterface {
 		echo ' ' . esc_html__( 'Mostrar Título del Artículo', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
 		echo '</label>';
 		echo '</div>';
+		
+		$show_featured_image = $config['player']['show_featured_image'] ?? true;
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_featured_image]" value="1" class="tts-player-setting" data-setting="show_featured_image" ' . checked( $show_featured_image, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Mostrar Imagen Destacada', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+		echo '</div>';
+		
+		$show_speed_control = $config['player']['show_speed_control'] ?? true;
+		echo '<div style="margin-bottom: 10px;">';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[player][show_speed_control]" value="1" class="tts-player-setting" data-setting="show_speed_control" ' . checked( $show_speed_control, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Mostrar Control de Velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+		echo '</div>';
 		echo '</div>';
 		
 		echo '</table>';
+		
+		// CSS Customization section
+		echo '<div style="margin-top: 30px;">';
+		echo '<h3>' . esc_html__( 'Personalización CSS del Reproductor Mejorado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
+		echo '<p>' . esc_html__( 'Personaliza los colores y estilos del reproductor SesoLibre mejorado.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '<table class="form-table">';
+		
+		// Play icon color
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Color del Icono de Play', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerColorField( $config, 'play_icon_color', '#007cba' );
+		echo '<p class="description">' . esc_html__( 'Color del icono de reproducir en el reproductor mejorado.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Pause icon color
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Color del Icono de Pausa', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerColorField( $config, 'pause_icon_color', '#007cba' );
+		echo '<p class="description">' . esc_html__( 'Color del icono de pausa en el reproductor mejorado.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Progress color
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Color de la Barra de Progreso', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerColorField( $config, 'progress_color', '#007cba' );
+		echo '<p class="description">' . esc_html__( 'Color de la barra de progreso y elementos activos.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Background color
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Color de Fondo del Reproductor', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerColorField( $config, 'player_background_color', '#f8f9fa' );
+		echo '<p class="description">' . esc_html__( 'Color de fondo principal del reproductor.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Text color
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Color del Texto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerColorField( $config, 'player_text_color', '#333333' );
+		echo '<p class="description">' . esc_html__( 'Color del texto principal en el reproductor.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		// Custom CSS
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'CSS Personalizado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderPlayerCustomCSSField( $config );
+		echo '<p class="description">' . esc_html__( 'CSS personalizado para el reproductor mejorado. Use selectores como .tts-enhanced-sesolibre-player para personalizar estilos específicos.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
 		
 		// Shortcode documentation section
 		echo '<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px;">';
@@ -2910,6 +2991,8 @@ class AdminInterface {
 		echo '<tr><td><code>[wp_tts_player]</code></td><td>' . esc_html__( 'Reproductor básico para la entrada actual', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
 		echo '<tr><td><code>[wp_tts_player style="classic"]</code></td><td>' . esc_html__( 'Forzar estilo de reproductor clásico', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
 		echo '<tr><td><code>[wp_tts_player style="sesolibre"]</code></td><td>' . esc_html__( 'Forzar reproductor SesoLibre con mezcla de audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="minimal"]</code></td><td>' . esc_html__( 'Forzar reproductor minimalista con visualización de ondas', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
+		echo '<tr><td><code>[wp_tts_player style="enhanced_sesolibre"]</code></td><td>' . esc_html__( 'Forzar reproductor SesoLibre mejorado con imagen destacada', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
 		echo '<tr><td><code>[wp_tts_player post_id="123"]</code></td><td>' . esc_html__( 'Reproductor para ID de entrada específico', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</td></tr>';
 		echo '</tbody>';
 		echo '</table>';
@@ -2958,6 +3041,16 @@ class AdminInterface {
 			$player_settings['show_voice_name'] = isset( $input['player']['show_voice_name'] ) ? true : false;
 			$player_settings['show_download_link'] = isset( $input['player']['show_download_link'] ) ? true : false;
 			$player_settings['show_article_title'] = isset( $input['player']['show_article_title'] ) ? true : false;
+			$player_settings['show_featured_image'] = isset( $input['player']['show_featured_image'] ) ? true : false;
+			$player_settings['show_speed_control'] = isset( $input['player']['show_speed_control'] ) ? true : false;
+			
+			// CSS customization settings for enhanced player
+			$player_settings['play_icon_color'] = sanitize_hex_color( $input['player']['play_icon_color'] ?? '#007cba' );
+			$player_settings['pause_icon_color'] = sanitize_hex_color( $input['player']['pause_icon_color'] ?? '#007cba' );
+			$player_settings['progress_color'] = sanitize_hex_color( $input['player']['progress_color'] ?? '#007cba' );
+			$player_settings['player_background_color'] = sanitize_hex_color( $input['player']['player_background_color'] ?? '#f8f9fa' );
+			$player_settings['player_text_color'] = sanitize_hex_color( $input['player']['player_text_color'] ?? '#333333' );
+			$player_settings['enhanced_player_css'] = wp_strip_all_tags( $input['player']['enhanced_player_css'] ?? '', true );
 			
 			// Debug: Log what we're saving
 			error_log( 'TTS DEBUG: Saving player settings: ' . print_r( $player_settings, true ) );
@@ -3038,6 +3131,16 @@ class AdminInterface {
 			$player_settings['show_voice_name'] = isset( $_POST['show_voice_name'] ) && $_POST['show_voice_name'] === '1';
 			$player_settings['show_download_link'] = isset( $_POST['show_download_link'] ) && $_POST['show_download_link'] === '1';
 			$player_settings['show_article_title'] = isset( $_POST['show_article_title'] ) && $_POST['show_article_title'] === '1';
+			$player_settings['show_featured_image'] = isset( $_POST['show_featured_image'] ) && $_POST['show_featured_image'] === '1';
+			$player_settings['show_speed_control'] = isset( $_POST['show_speed_control'] ) && $_POST['show_speed_control'] === '1';
+			
+			// CSS customization settings for enhanced player
+			$player_settings['play_icon_color'] = sanitize_hex_color( $_POST['play_icon_color'] ?? '#007cba' );
+			$player_settings['pause_icon_color'] = sanitize_hex_color( $_POST['pause_icon_color'] ?? '#007cba' );
+			$player_settings['progress_color'] = sanitize_hex_color( $_POST['progress_color'] ?? '#007cba' );
+			$player_settings['player_background_color'] = sanitize_hex_color( $_POST['player_background_color'] ?? '#f8f9fa' );
+			$player_settings['player_text_color'] = sanitize_hex_color( $_POST['player_text_color'] ?? '#333333' );
+			$player_settings['enhanced_player_css'] = wp_strip_all_tags( $_POST['enhanced_player_css'] ?? '', true );
 			
 			// Save directly to ConfigurationManager
 			$this->config->set( 'player', $player_settings );
@@ -3486,5 +3589,75 @@ class AdminInterface {
 			] );
 			error_log('TTS DEBUG: Exception ERROR response sent for generation');
 		}
+	}
+
+	/**
+	 * Render player color field
+	 */
+	private function renderPlayerColorField( array $config, string $field_name, string $default_value ): void {
+		$value = $config['player'][$field_name] ?? $default_value;
+		
+		echo '<div class="tts-color-picker-container">';
+		echo '<input type="color" name="wp_tts_config[player][' . esc_attr($field_name) . ']" ';
+		echo 'value="' . esc_attr($value) . '" ';
+		echo 'class="tts-player-color-setting" data-setting="' . esc_attr($field_name) . '" />';
+		echo '<input type="text" name="wp_tts_config[player][' . esc_attr($field_name) . '_text]" ';
+		echo 'value="' . esc_attr($value) . '" ';
+		echo 'class="tts-color-text-input" style="margin-left: 10px; width: 100px; font-family: monospace;" ';
+		echo 'placeholder="' . esc_attr($default_value) . '" />';
+		echo '</div>';
+		
+		echo '<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const colorInput = document.querySelector(\'input[name="wp_tts_config[player][' . esc_js($field_name) . ']"]\');
+			const textInput = document.querySelector(\'input[name="wp_tts_config[player][' . esc_js($field_name) . '_text]"]\');
+			
+			if (colorInput && textInput) {
+				colorInput.addEventListener("input", function() {
+					textInput.value = this.value;
+				});
+				
+				textInput.addEventListener("input", function() {
+					if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+						colorInput.value = this.value;
+					}
+				});
+			}
+		});
+		</script>';
+	}
+
+	/**
+	 * Render player custom CSS field
+	 */
+	private function renderPlayerCustomCSSField( array $config ): void {
+		$custom_css = $config['player']['enhanced_player_css'] ?? '';
+		
+		echo '<textarea name="wp_tts_config[player][enhanced_player_css]" ';
+		echo 'rows="10" cols="50" ';
+		echo 'class="tts-custom-css-textarea" ';
+		echo 'style="width: 100%; font-family: monospace;" ';
+		echo 'placeholder="/* Ejemplo de CSS personalizado:\n.tts-enhanced-sesolibre-player {\n    border-radius: 20px;\n}\n\n.tts-enhanced-sesolibre-player .tts-play-pause {\n    background: linear-gradient(45deg, #007cba, #17a2b8);\n}\n\n.tts-enhanced-sesolibre-player .tts-article-title-above {\n    color: #2c3e50;\n    font-weight: bold;\n}\n\n/* Personalizar barra de información */\n.tts-enhanced-sesolibre-player .tts-compact-info-bar {\n    background: #f0f8ff;\n    border-top: 2px solid #007cba;\n}\n\n.tts-enhanced-sesolibre-player .tts-info-compact {\n    color: #1e3a8a;\n    font-weight: 600;\n}\n*/">';
+		echo esc_textarea($custom_css);
+		echo '</textarea>';
+		
+		echo '<div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border: 1px solid #b8daff; border-radius: 4px;">';
+		echo '<strong>' . esc_html__('Selectores CSS útiles:', 'TTS-SesoLibre-v1.6.7-shortcode-docs') . '</strong>';
+		echo '<ul style="margin: 5px 0 0 20px; font-size: 12px;">';
+		echo '<li><code>.tts-enhanced-sesolibre-player</code> - Contenedor principal</li>';
+		echo '<li><code>.tts-play-pause</code> - Botón de play/pausa</li>';
+		echo '<li><code>.tts-progress-bar</code> - Barra de progreso</li>';
+		echo '<li><code>.tts-featured-image-compact</code> - Imagen destacada</li>';
+		echo '<li><code>.tts-article-title-above</code> - Título del artículo</li>';
+		echo '<li><code>.tts-compact-info-bar</code> - Barra de información (fondo)</li>';
+		echo '<li><code>.tts-info-compact</code> - Elementos de información (texto)</li>';
+		echo '<li><code>.tts-info-separator</code> - Separadores entre info (•)</li>';
+		echo '<li><code>.tts-download-compact</code> - Enlace de descarga</li>';
+		echo '<li><code>.tts-volume-slider-compact</code> - Controles de volumen</li>';
+		echo '<li><code>.tts-speed-btn</code> - Botón de velocidad</li>';
+		echo '<li><code>.tts-headphones</code> - Icono de audífonos</li>';
+		echo '</ul>';
+		echo '<p style="margin-top: 10px; font-size: 11px; color: #666;"><strong>Variables CSS:</strong> --play-icon-color, --pause-icon-color, --progress-color, --background-color, --text-color</p>';
+		echo '</div>';
 	}
 }

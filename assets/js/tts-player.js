@@ -32,8 +32,14 @@ class TTSSesoLibrePlayer {
         // Setup event listeners
         this.setupEventListeners();
         
+        // Setup speed control
+        this.setupSpeedControl();
+        
         // Load metadata
         this.loadAudioMetadata();
+        
+        // Default playback rate
+        this.playbackRate = 1.0;
         
         console.log('TTS SesoLibre Player initialized:', {
             audioUrls: this.audioUrls,
@@ -51,7 +57,9 @@ class TTSSesoLibrePlayer {
             voiceSlider: this.element.querySelector('.tts-voice-slider'),
             backgroundSlider: this.element.querySelector('.tts-background-slider'),
             phaseIndicator: this.element.querySelector('.tts-phase-indicator'),
-            errorContainer: this.element.querySelector('.tts-error-container')
+            errorContainer: this.element.querySelector('.tts-error-container'),
+            speedBtn: this.element.querySelector('.tts-speed-btn'),
+            speedMenu: this.element.querySelector('.tts-speed-menu')
         };
     }
     
@@ -131,6 +139,51 @@ class TTSSesoLibrePlayer {
                 this.setBackgroundVolume(parseFloat(e.target.value));
             });
         }
+    }
+    
+    setupSpeedControl() {
+        if (this.elements.speedBtn && this.elements.speedMenu) {
+            // Toggle speed menu
+            this.elements.speedBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = this.elements.speedMenu.style.display === 'block';
+                this.elements.speedMenu.style.display = isVisible ? 'none' : 'block';
+            });
+
+            // Handle speed selection
+            this.elements.speedMenu.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const speed = parseFloat(button.dataset.speed);
+                    this.setPlaybackRate(speed);
+                    
+                    // Update active state
+                    this.elements.speedMenu.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Hide menu
+                    this.elements.speedMenu.style.display = 'none';
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', () => {
+                if (this.elements.speedMenu) {
+                    this.elements.speedMenu.style.display = 'none';
+                }
+            });
+        }
+    }
+    
+    setPlaybackRate(rate) {
+        this.playbackRate = rate;
+        
+        // Apply to all audio elements except background
+        if (this.audioElements.main) this.audioElements.main.playbackRate = rate;
+        if (this.audioElements.intro) this.audioElements.intro.playbackRate = rate;
+        if (this.audioElements.outro) this.audioElements.outro.playbackRate = rate;
+        
+        // Background music keeps normal speed
     }
     
     loadAudioMetadata() {
