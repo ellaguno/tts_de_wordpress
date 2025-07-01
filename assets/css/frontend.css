@@ -1,0 +1,86 @@
+/**
+ * WordPress TTS Plugin - Frontend Styles
+ */
+
+.wp-tts-player {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.wp-tts-player audio {
+    width: 100%;
+    height: 40px;
+}
+
+.wp-tts-player-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.wp-tts-play-button {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.wp-tts-play-button:hover {
+    background: #005a87;
+}
+
+.wp-tts-play-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.wp-tts-speed-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.wp-tts-speed-control label {
+    font-size: 12px;
+    color: #666;
+}
+
+.wp-tts-speed-control select {
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.wp-tts-player-info {
+    font-size: 12px;
+    color: #666;
+    text-align: right;
+}
+
+.wp-tts-error {
+    color: #d63638;
+    background: #fcf2f3;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #d63638;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .wp-tts-player-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .wp-tts-speed-control {
+        justify-content: space-between;
+    }
+}

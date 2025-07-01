@@ -1,0 +1,52 @@
+{
+    "name": "wp-tts/wordpress-tts-plugin",
+    "description": "WordPress Text-to-Speech Plugin with multi-provider support and Spanish language optimization",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "google/cloud-text-to-speech": "^2.2",
+        "aws/aws-sdk-php": "^3.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "league/container": "^4.0",
+        "monolog/monolog": "^2.0",
+        "symfony/validator": "^5.0|^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "squizlabs/php_codesniffer": "^3.6",
+        "phpstan/phpstan": "^1.0",
+        "wp-coding-standards/wpcs": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "WP_TTS\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WP_TTS\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpcs": "phpcs --standard=WordPress src/",
+        "phpstan": "phpstan analyse src/ --level=8",
+        "quality": [
+            "@phpcs",
+            "@phpstan"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

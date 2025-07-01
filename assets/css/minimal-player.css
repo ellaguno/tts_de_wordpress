@@ -1,0 +1,395 @@
+/**
+ * Minimal TTS Player Styles
+ * Clean, minimalist design with waveform visualization
+ */
+
+.wp-tts-minimal-player-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 20px 0;
+    max-width: 100%;
+    position: relative;
+}
+
+.wp-tts-minimal-player {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 50px;
+    padding: 8px 16px;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.wp-tts-minimal-player:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Play/Pause Button */
+.wp-tts-minimal-play-btn {
+    background: #007cba;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+    flex-shrink: 0;
+}
+
+.wp-tts-minimal-play-btn:hover {
+    background: #005a87;
+    transform: scale(1.05);
+}
+
+.wp-tts-minimal-play-btn:active {
+    transform: scale(0.95);
+}
+
+.wp-tts-minimal-play-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.wp-tts-minimal-play-btn.playing .play-icon {
+    display: none;
+}
+
+.wp-tts-minimal-play-btn.playing .pause-icon {
+    display: block !important;
+}
+
+/* Time Display */
+.wp-tts-minimal-time,
+.wp-tts-minimal-duration {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    min-width: 30px;
+}
+
+/* Progress Container */
+.wp-tts-minimal-progress-container {
+    flex: 1;
+    position: relative;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Waveform */
+.wp-tts-minimal-waveform {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    width: 100%;
+    padding: 0 4px;
+    gap: 1px;
+}
+
+.waveform-bar {
+    background: #cbd5e0;
+    width: 2px;
+    border-radius: 1px;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.waveform-bar.active {
+    background: #007cba;
+    opacity: 1;
+}
+
+.waveform-bar.playing {
+    background: #007cba;
+    opacity: 1;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Progress Bar */
+.wp-tts-minimal-progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(203, 213, 224, 0.5);
+    border-radius: 1px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.wp-tts-minimal-progress .progress-filled {
+    height: 100%;
+    background: #007cba;
+    border-radius: 1px;
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+/* Settings Button */
+.wp-tts-minimal-settings-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.wp-tts-minimal-settings-btn:hover {
+    background: #e9ecef;
+    color: #007cba;
+}
+
+.wp-tts-minimal-settings-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Settings Panel */
+.wp-tts-minimal-settings-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 8px;
+    min-width: 200px;
+}
+
+.settings-content {
+    padding: 12px;
+}
+
+.setting-item {
+    margin-bottom: 12px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-item label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.setting-item select {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    background: white;
+    font-size: 12px;
+}
+
+.download-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #007cba;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.download-link:hover {
+    background: #f8f9fa;
+}
+
+.download-link svg {
+    width: 12px;
+    height: 12px;
+}
+
+.audio-info {
+    font-size: 11px;
+    color: #666;
+}
+
+.service-info {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.voice-info {
+    opacity: 0.8;
+}
+
+/* Loading Indicator */
+.wp-tts-minimal-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #666;
+    backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e9ecef;
+    border-top: 2px solid #007cba;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.wp-tts-minimal-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff2f2;
+    color: #d63384;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1px solid #f5c6cb;
+}
+
+.retry-btn {
+    background: none;
+    border: none;
+    color: #d63384;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    margin-left: 4px;
+}
+
+.retry-btn:hover {
+    color: #b02a5b;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .wp-tts-minimal-player {
+        padding: 6px 12px;
+        gap: 8px;
+    }
+    
+    .wp-tts-minimal-play-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .wp-tts-minimal-play-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .wp-tts-minimal-time,
+    .wp-tts-minimal-duration {
+        font-size: 10px;
+        min-width: 28px;
+    }
+    
+    .waveform-bar {
+        width: 1.5px;
+    }
+    
+    .wp-tts-minimal-settings-panel {
+        right: -8px;
+        min-width: 180px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .wp-tts-minimal-player {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .wp-tts-minimal-time,
+    .wp-tts-minimal-duration {
+        color: #a0aec0;
+    }
+    
+    .waveform-bar {
+        background: #4a5568;
+    }
+    
+    .wp-tts-minimal-progress {
+        background: rgba(74, 85, 104, 0.5);
+    }
+    
+    .wp-tts-minimal-settings-btn {
+        color: #a0aec0;
+    }
+    
+    .wp-tts-minimal-settings-btn:hover {
+        background: #4a5568;
+        color: #007cba;
+    }
+    
+    .wp-tts-minimal-settings-panel {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .setting-item label {
+        color: #a0aec0;
+    }
+    
+    .setting-item select {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .audio-info {
+        color: #a0aec0;
+    }
+    
+    .wp-tts-minimal-loading {
+        background: rgba(45, 55, 72, 0.95);
+        color: #a0aec0;
+    }
+    
+    .loading-spinner {
+        border-color: #4a5568;
+        border-top-color: #007cba;
+    }
+}

@@ -1,0 +1,408 @@
+/* Reglas para los íconos SVG */
+.tts-play-pause svg {
+    fill: currentColor;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+}
+
+.tts-play-pause .pause-icon {
+    display: none;
+}
+
+.tts-play-pause.playing .play-icon {
+    display: none;
+}
+
+.tts-play-pause.playing .pause-icon {
+    display: block;
+}
+
+.tts-play-pause:not(.playing) .play-icon {
+    display: block;
+}
+
+.tts-play-pause:not(.playing) .pause-icon {
+    display: none;
+}
+
+/* Estilos básicos del reproductor */
+.tts-sesolibre-player {
+    background: #d5d5d5;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    position: relative;
+}
+
+/* Ocultar iframe de Play.ht */
+#playht-iframe-wrapper {
+    display: none;
+}
+
+.tts-branding {
+    position: absolute;
+    top: 2px;
+    right: 16px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #888;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* Estructura de controles */
+.tts-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.tts-main-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tts-play-pause {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.tts-play-pause:hover {
+    background: #45a049;
+}
+
+/* Información de tiempo */
+.tts-time-display {
+    font-size: 14px;
+    color: #666;
+    font-weight: 400;
+    white-space: nowrap;
+    min-width: 70px;
+}
+
+/* Barra de progreso */
+.tts-progress {
+    flex-grow: 1;
+    background: #eee;
+    height: 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    margin: 0 12px;
+}
+
+.tts-progress-bar {
+    background: #4CAF50;
+    height: 100%;
+    border-radius: 3px;
+    width: 0;
+    transition: width 0.1s ease;
+}
+
+/* Controles de volumen */
+.tts-volume-controls {
+    display: none; /* Hidden by default, only show if enabled */
+    margin-top: 1px;
+    padding-top: 1px;
+    /* border-top: 1px solid #eee; */
+    gap: 16px;
+    justify-content: center;
+}
+
+.tts-volume-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+}
+
+.tts-volume-control label {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Estilizado de sliders */
+.tts-volume-slider {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    border-radius: 2px;
+    background: #ddd;
+    outline: none;
+    margin: 10px 0;
+}
+
+.tts-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #0d6efd;
+    cursor: pointer;
+    box-shadow: 0 0 2px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+}
+
+.tts-volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.tts-volume-slider:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mostrar controles cuando están habilitados */
+.tts-volume-controls.enabled {
+    display: flex;
+}
+
+/* Estados de música */
+.tts-volume-control.music-volume {
+    opacity: 0.5;
+}
+
+.tts-volume-control.music-volume.has-music {
+    opacity: 1;
+}
+
+.tts-error-container {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    display: none;
+}
+
+.tts-error-container.show {
+    display: block;
+}
+
+.tts-custom-audio-notice {
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Phase indicators */
+.tts-phase-indicator {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tts-phase-indicator.active {
+    opacity: 1;
+}
+
+.tts-phase-indicator.intro { color: #ff6b6b; }
+.tts-phase-indicator.main { color: #4ecdc4; }
+.tts-phase-indicator.outro { color: #45b7d1; }
+
+/* Info Bar Styles */
+.tts-info-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #ccc;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.3;
+}
+
+.tts-info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.tts-info-item strong {
+    font-weight: 500;
+    color: #333;
+}
+
+.tts-download-link {
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.tts-download-link:hover {
+    color: #005177;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tts-sesolibre-player {
+        padding: 12px 16px;
+        margin: 15px 0;
+    }
+    
+    .tts-main-controls {
+        gap: 8px;
+    }
+    
+    .tts-progress {
+        margin: 0 8px;
+    }
+    
+    .tts-time-display {
+        font-size: 12px;
+        min-width: 60px;
+    }
+    
+    .tts-volume-controls.enabled {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .tts-volume-control {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .tts-volume-slider {
+        width: 100px;
+    }
+    
+    .tts-info-bar {
+        gap: 8px;
+        font-size: 10px;
+    }
+    
+    .tts-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tts-main-controls {
+        gap: 6px;
+    }
+    
+    .tts-play-pause {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+    
+    .tts-progress {
+        margin: 0 6px;
+    }
+    
+    .tts-branding {
+        font-size: 11px;
+        top: 8px;
+        right: 12px;
+    }
+    
+    .tts-info-bar {
+        flex-direction: column;
+        gap: 6px;
+        font-size: 10px;
+    }
+    
+    .tts-info-item {
+        font-size: 10px;
+    }
+}
+
+/* Speed Control Styles */
+.tts-speed-control {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tts-speed-btn {
+    background: #007cba;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+}
+
+.tts-speed-btn:hover {
+    background: #005a87;
+}
+
+.tts-speed-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.tts-speed-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    min-width: 80px;
+}
+
+.tts-speed-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-align: center;
+}
+
+.tts-speed-menu button:hover {
+    background: #f5f5f5;
+}
+
+.tts-speed-menu button.active {
+    background: #007cba;
+    color: white;
+}

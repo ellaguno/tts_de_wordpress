@@ -1,0 +1,3 @@
+# Denegar acceso a archivos de credenciales
+Order deny,allow
+Deny from all

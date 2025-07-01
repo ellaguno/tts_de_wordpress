@@ -1,0 +1,184 @@
+/**
+ * WordPress TTS Plugin - Admin Styles
+ */
+
+.wp-tts-settings {
+    max-width: 800px;
+}
+
+.wp-tts-settings .form-table {
+    margin-top: 20px;
+}
+
+.wp-tts-settings .form-table th {
+    width: 200px;
+}
+
+.wp-tts-settings .description {
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* TTS Tools Page */
+.wp-tts-tools .card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.wp-tts-tools .card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #23282d;
+    font-size: 1.3em;
+}
+
+.wp-tts-tools pre {
+    background: #f1f1f1;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.wp-tts-tools textarea {
+    width: 100%;
+    min-height: 100px;
+    margin-bottom: 10px;
+}
+
+.wp-tts-tools .button-primary {
+    margin-bottom: 15px;
+}
+
+#test-result {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+#test-result audio {
+    width: 100%;
+    margin: 10px 0;
+}
+
+#test-result p {
+    margin: 5px 0;
+}
+
+#test-result .error {
+    color: #d63638;
+    background: #fcf2f3;
+    border-left: 4px solid #d63638;
+    padding: 12px;
+}
+
+#test-result .success {
+    color: #00a32a;
+    background: #f0f6fc;
+    border-left: 4px solid #00a32a;
+    padding: 12px;
+}
+
+/* Meta Box Styles */
+.wp-tts-meta-box {
+    margin: 0;
+}
+
+.wp-tts-meta-box .form-field {
+    margin-bottom: 15px;
+}
+
+.wp-tts-meta-box label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.wp-tts-meta-box select,
+.wp-tts-meta-box input[type="text"] {
+    width: 100%;
+}
+
+.wp-tts-meta-box .description {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.wp-tts-audio-controls {
+    margin-top: 10px;
+}
+
+.wp-tts-audio-controls .button {
+    margin-right: 10px;
+}
+
+.wp-tts-status {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.wp-tts-status.pending {
+    background: #fcf2f3;
+    color: #d63638;
+}
+
+.wp-tts-status.processing {
+    background: #fff8e1;
+    color: #f57c00;
+}
+
+.wp-tts-status.completed {
+    background: #f0f6fc;
+    color: #00a32a;
+}
+
+.wp-tts-status.error {
+    background: #fcf2f3;
+    color: #d63638;
+}
+
+/* Provider Test Results */
+.test-provider-result {
+    margin-left: 10px;
+    font-size: 12px;
+}
+
+.test-provider-result.success {
+    color: #00a32a;
+}
+
+.test-provider-result.error {
+    color: #d63638;
+}
+
+/* Loading States */
+.wp-tts-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wp-tts-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #0073aa;
+    border-radius: 50%;
+    animation: wp-tts-spin 1s linear infinite;
+    margin-left: 5px;
+}
+
+@keyframes wp-tts-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
