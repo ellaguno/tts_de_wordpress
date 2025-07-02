@@ -67,6 +67,7 @@ class TTSSesoLibrePlayer {
         // Main audio (TTS)
         if (this.audioUrls.main) {
             this.audioElements.main = new Audio(this.audioUrls.main);
+            this.audioElements.main.crossOrigin = 'anonymous';
             this.audioElements.main.preload = 'metadata';
             this.setupMainAudioEvents();
         }
@@ -74,6 +75,7 @@ class TTSSesoLibrePlayer {
         // Background music (looped)
         if (this.audioUrls.background) {
             this.audioElements.background = new Audio(this.audioUrls.background);
+            this.audioElements.background.crossOrigin = 'anonymous';
             this.audioElements.background.loop = true;
             this.audioElements.background.volume = this.config.backgroundVolume;
             this.audioElements.background.preload = 'metadata';
@@ -82,12 +84,14 @@ class TTSSesoLibrePlayer {
         // Intro audio
         if (this.audioUrls.intro) {
             this.audioElements.intro = new Audio(this.audioUrls.intro);
+            this.audioElements.intro.crossOrigin = 'anonymous';
             this.audioElements.intro.preload = 'metadata';
         }
         
         // Outro audio
         if (this.audioUrls.outro) {
             this.audioElements.outro = new Audio(this.audioUrls.outro);
+            this.audioElements.outro.crossOrigin = 'anonymous';
             this.audioElements.outro.preload = 'metadata';
         }
     }
@@ -438,9 +442,43 @@ class TTSSesoLibrePlayer {
     handleAudioError(audioType, error) {
         console.error(`Audio error (${audioType}):`, error);
         
+        const audio = this.audioElements[audioType];
+        let errorMessage = '';
+        
+        if (audio && audio.error) {
+            switch (audio.error.code) {
+                case audio.error.MEDIA_ERR_ABORTED:
+                    errorMessage = 'Carga de audio cancelada';
+                    break;
+                case audio.error.MEDIA_ERR_NETWORK:
+                    errorMessage = 'Error de red al cargar audio';
+                    break;
+                case audio.error.MEDIA_ERR_DECODE:
+                    errorMessage = 'Error al decodificar audio';
+                    break;
+                case audio.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    errorMessage = 'Formato de audio no soportado';
+                    break;
+                default:
+                    errorMessage = 'Error desconocido al cargar audio';
+            }
+        } else {
+            // Likely CORS error for external URLs
+            if (audio && audio.src && (audio.src.includes('buzzsprout.com') || !audio.src.includes(window.location.hostname))) {
+                errorMessage = 'Audio externo cargado (limitaciones de metadatos)';
+                console.info(`External audio from ${audioType}: Metadata may be limited due to CORS policy`);
+                // Don't show error for external audio, just log it
+                return;
+            } else {
+                errorMessage = 'Error al cargar los metadatos de audio';
+            }
+        }
+        
         if (audioType === 'main') {
-            this.showError('Error al cargar el audio principal');
+            this.showError(errorMessage);
             this.pause();
+        } else {
+            console.warn(`${audioType} audio error: ${errorMessage}`);
         }
     }
     

@@ -193,36 +193,24 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			$client->close();
 			
 			$audio_data = $audio_content;
-			
-			// Generate unique filename
-			$filename = 'google_' . md5( $text . $voice_id . time() ) . '.' . $output_format_ext;
-			$upload_dir = wp_upload_dir();
-			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
-			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
-
-			// Ensure directory exists
-			wp_mkdir_p( dirname( $file_path ) );
-
-			// Save audio file
-			if ( file_put_contents( $file_path, $audio_data ) === false ) {
-				throw new ProviderException( 'Failed to save audio file' );
-			}
 
 			$this->logger->info( 'Google Cloud TTS generation completed', [
-				'file_path' => $file_path,
-				'file_size' => filesize( $file_path ),
+				'audio_data_size' => strlen( $audio_data ),
+				'voice_id' => $voice_id
 			] );
 
+			// Return raw audio data instead of saving to file
+			// The TTSService will handle storage using the configured storage provider
 			return [
 				'success' => true,
-				'audio_url' => $file_url,
-				'file_path' => $file_path,
+				'audio_data' => $audio_data,
 				'provider' => $this->name,
 				'voice' => $voice_id,
 				'format' => $output_format_ext,
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
 					'characters' => strlen( $text ),
+					'data_size' => strlen( $audio_data ),
 				],
 			];
 

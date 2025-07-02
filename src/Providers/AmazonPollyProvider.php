@@ -6,6 +6,8 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\VoiceValidator;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * Amazon Polly TTS Provider
@@ -88,20 +90,29 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			throw new ProviderException( 'AWS SDK for PHP (Polly) not found. Run "composer require aws/aws-sdk-php".' );
 		}
 		
-		$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'Joanna'; // Assuming $this->config is populated by TTSService
+		$voice_id = $options['voice'] ?? $this->credentials['default_voice'] ?? 'Lucia'; // Use valid Polly voice
+		
+		// Validate and fix voice
+		$voice_id = VoiceValidator::fixVoice( 'polly', $voice_id );
+		
 		$output_format = $options['output_format'] ?? 'mp3'; // Polly supports mp3, ogg_vorbis, pcm
-		$engine = $options['engine'] ?? $this->config['default_engine'] ?? 'standard'; // 'standard' or 'neural'
+		$engine = $options['engine'] ?? $this->credentials['default_engine'] ?? 'standard'; // 'standard' or 'neural'
 		// SampleRate is often dictated by the voice/engine, but can be specified.
 		// For mp3, common rates are 22050, 16000, 8000. For neural, often higher.
-		$sample_rate = $options['sample_rate'] ?? $this->config['default_sample_rate'] ?? '22050';
-
+		$sample_rate = $options['sample_rate'] ?? $this->credentials['default_sample_rate'] ?? '22050';
 
 		$this->logger->info( 'Starting Amazon Polly TTS generation', [
 			'text_length' => strlen( $text ),
 			'voice' => $voice_id,
 			'engine' => $engine,
 			'output_format' => $output_format,
+			'needs_chunking' => TextChunker::needsChunking( $text, 'polly' )
 		] );
+
+		// Check if text needs chunking
+		if ( TextChunker::needsChunking( $text, 'polly' ) ) {
+			return $this->generateChunkedSpeech( $text, $voice_id, $options );
+		}
 		
 		try {
 			$pollyClient = new \Aws\Polly\PollyClient( [
@@ -161,8 +172,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 
 			return [
 				'success' => true,
-				'audio_url' => $file_url,
-				'file_path' => $file_path,
+				'audio_data' => $audio_data,
 				'provider' => $this->name,
 				'voice' => $voice_id,
 				'format' => $output_format,
@@ -180,6 +190,105 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			] );
 			throw new ProviderException( 'Amazon Polly generation failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Generate speech for chunked text
+	 *
+	 * @param string $text Text to convert (will be chunked)
+	 * @param string $voice_id Voice ID
+	 * @param array $options Additional options
+	 * @return array Result array with combined audio
+	 * @throws ProviderException If generation fails
+	 */
+	private function generateChunkedSpeech( string $text, string $voice_id, array $options ): array {
+		$chunks = TextChunker::chunkText( $text, 'polly' );
+		$audio_chunks = [];
+		
+		$output_format = $options['output_format'] ?? 'mp3';
+		$engine = $options['engine'] ?? $this->credentials['default_engine'] ?? 'standard';
+		$sample_rate = $options['sample_rate'] ?? $this->credentials['default_sample_rate'] ?? '22050';
+		
+		$this->logger->info( 'Amazon Polly: Generating chunked speech', [
+			'total_chunks' => count( $chunks ),
+			'voice_id' => $voice_id
+		] );
+
+		try {
+			$pollyClient = new \Aws\Polly\PollyClient( [
+				'version'     => 'latest',
+				'region'      => $this->credentials['region'],
+				'credentials' => [
+					'key'    => $this->credentials['access_key'],
+					'secret' => $this->credentials['secret_key'],
+				],
+			] );
+
+			foreach ( $chunks as $index => $chunk ) {
+				$this->logger->debug( "Amazon Polly: Processing chunk " . ($index + 1) . "/" . count( $chunks ), [
+					'chunk_length' => strlen( $chunk )
+				] );
+
+				$request_args = [
+					'Text'         => $chunk,
+					'VoiceId'      => $voice_id,
+					'OutputFormat' => $output_format,
+					'Engine'       => $engine,
+					'SampleRate'   => $sample_rate,
+				];
+
+				$result = $pollyClient->synthesizeSpeech( $request_args );
+				
+				if ( ! isset( $result['AudioStream'] ) ) {
+					throw new ProviderException( "Amazon Polly: Invalid response for chunk " . ($index + 1) . ": No AudioStream" );
+				}
+				
+				$audio_data = $result['AudioStream']->getContents();
+				$audio_chunks[] = $audio_data;
+			}
+
+			// Combine all audio chunks
+			$combined_audio = $this->combineAudioChunks( $audio_chunks );
+
+			$this->logger->info( 'Amazon Polly: Chunked speech generation completed', [
+				'total_chunks' => count( $chunks ),
+				'combined_audio_size' => strlen( $combined_audio ),
+				'voice_id' => $voice_id
+			] );
+
+			return [
+				'success' => true,
+				'audio_data' => $combined_audio,
+				'provider' => $this->name,
+				'voice' => $voice_id,
+				'format' => $output_format,
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'engine' => $engine,
+					'sample_rate' => $sample_rate,
+					'characters' => strlen( $text ),
+					'chunks_processed' => count( $chunks ),
+				],
+			];
+
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'Amazon Polly chunked TTS generation failed', [
+				'error' => $e->getMessage(),
+			] );
+			throw new ProviderException( 'Amazon Polly chunked generation failed: ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Combine multiple audio chunks into single audio
+	 *
+	 * @param array $audio_chunks Array of audio binary data
+	 * @return string Combined audio data
+	 */
+	private function combineAudioChunks( array $audio_chunks ): string {
+		// For MP3 files, simple concatenation works for most cases
+		// For production, you might want to use FFmpeg for proper audio merging
+		return implode( '', $audio_chunks );
 	}
 
 	/**

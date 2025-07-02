@@ -517,9 +517,17 @@ class AdminInterface {
 		echo '</div>';
 		
 		// Buzzsprout configuration
-		echo '<div class="tts-storage-provider-config" id="buzzsprout-config">';
+		echo '<div class="tts-storage-provider-config" id="buzzsprout-config" style="display: none;">';
 		echo '<h3>' . esc_html__( 'Configuración de Buzzsprout', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
 		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Habilitar Buzzsprout', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutEnabledField();
+		echo '<p class="description">' . esc_html__( 'Habilita el almacenamiento en Buzzsprout.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
 		
 		echo '<tr>';
 		echo '<th scope="row">' . esc_html__( 'Token API', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
@@ -534,6 +542,101 @@ class AdminInterface {
 		echo '<td>';
 		$this->renderBuzzsproutPodcastIdField();
 		echo '<p class="description">' . esc_html__( 'Tu ID de podcast de Buzzsprout.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Auto-publicar episodios', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutAutoPublishField();
+		echo '<p class="description">' . esc_html__( 'Publica automáticamente los episodios en BuzzSprout.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Mantener episodios privados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutPrivateField();
+		echo '<p class="description">' . esc_html__( 'Los episodios se mantendrán privados en lugar de públicos.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Tags por defecto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutTagsField();
+		echo '<p class="description">' . esc_html__( 'Tags que se agregarán a todos los episodios (separados por comas).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Incluir enlace al artículo', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderBuzzsproutIncludeLinkField();
+		echo '<p class="description">' . esc_html__( 'Incluye un enlace al artículo original en la descripción del episodio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+		
+		// Amazon S3 configuration
+		echo '<div class="tts-storage-provider-config" id="s3-config" style="display: none;">';
+		echo '<h3>' . esc_html__( 'Configuración de Amazon S3', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
+		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Habilitar Amazon S3', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderS3EnabledField();
+		echo '<p class="description">' . esc_html__( 'Habilita el almacenamiento en Amazon S3.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Access Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderS3AccessKeyField();
+		echo '<p class="description">' . esc_html__( 'Tu AWS Access Key ID.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Secret Key', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderS3SecretKeyField();
+		echo '<p class="description">' . esc_html__( 'Tu AWS Secret Access Key.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Bucket', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderS3BucketField();
+		echo '<p class="description">' . esc_html__( 'Nombre del bucket de S3.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Región', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		$this->renderS3RegionField();
+		echo '<p class="description">' . esc_html__( 'Región de AWS (ej: us-east-1).', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+		
+		echo '</table>';
+		echo '</div>';
+		
+		// Google Cloud Storage configuration
+		echo '<div class="tts-storage-provider-config" id="gcs-config" style="display: none;">';
+		echo '<h3>' . esc_html__( 'Configuración de Google Cloud Storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</h3>';
+		echo '<table class="form-table">';
+		
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Habilitar Google Cloud Storage', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</th>';
+		echo '<td>';
+		echo '<p class="description" style="color: #d63638;">' . esc_html__( 'Google Cloud Storage no está implementado aún. Usa Local Storage o BuzzSprout.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
 		
@@ -736,14 +839,19 @@ class AdminInterface {
 		jQuery(document).ready(function($) {
 			// Show/hide storage provider configs based on selection
 			function toggleStorageConfig() {
-				var provider = $('select[name="wp_tts_config[storage][provider]"]').val();
+				var provider = $('select[name="wp_tts_config[defaults][default_storage]"]').val();
 				$('.tts-storage-provider-config').hide();
 				if (provider === 'buzzsprout') {
 					$('#buzzsprout-config').show();
+				} else if (provider === 's3') {
+					$('#s3-config').show();
+				} else if (provider === 'gcs') {
+					$('#gcs-config').show();
 				}
+				// Local storage doesn't need additional config
 			}
 			
-			$('select[name="wp_tts_config[storage][provider]"]').on('change', toggleStorageConfig);
+			$('select[name="wp_tts_config[defaults][default_storage]"]').on('change', toggleStorageConfig);
 			toggleStorageConfig(); // Initial state
 			
 			// Media Library Integration for Audio Assets
@@ -1808,8 +1916,7 @@ class AdminInterface {
 	 * Render Storage Provider field
 	 */
 	public function renderStorageProviderField(): void {
-		$config = get_option( 'wp_tts_config', [] );
-		$current = $config['storage']['provider'] ?? 'local';
+		$current = $this->config->get( 'defaults.default_storage', 'local' );
 		$providers = [
 			'local' => 'Local Storage',
 			's3' => 'Amazon S3',
@@ -1817,19 +1924,30 @@ class AdminInterface {
 			'buzzsprout' => 'Buzzsprout'
 		];
 		
-		echo '<select name="wp_tts_config[storage][provider]">';
+		echo '<select name="wp_tts_config[defaults][default_storage]">';
 		foreach ( $providers as $key => $label ) {
 			echo '<option value="' . esc_attr( $key ) . '"' . selected( $current, $key, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select>';
 		echo '<p class="description">' . esc_html__( 'Selecciona dónde almacenar los archivos de audio generados.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
-/**
+
+	/**
+	 * Render Buzzsprout Enabled field
+	 */
+	public function renderBuzzsproutEnabledField(): void {
+		$enabled = $this->config->get( 'storage.buzzsprout.enabled', false );
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[storage][buzzsprout][enabled]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Habilitar almacenamiento en Buzzsprout', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+	}
+
+	/**
 	 * Render Buzzsprout API Token field
 	 */
 	public function renderBuzzsproutApiTokenField(): void {
-		$config = get_option( 'wp_tts_config', [] );
-		$value = $config['storage']['buzzsprout']['api_token'] ?? '';
+		$value = $this->config->get( 'storage.buzzsprout.api_token', '' );
 		echo '<input type="password" name="wp_tts_config[storage][buzzsprout][api_token]" value="' . esc_attr( $value ) . '" class="regular-text" />';
 		echo '<p class="description">' . esc_html__( 'Ingresa tu token API de Buzzsprout para almacenamiento de audio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
 	}
@@ -1838,10 +1956,107 @@ class AdminInterface {
 	 * Render Buzzsprout Podcast ID field
 	 */
 	public function renderBuzzsproutPodcastIdField(): void {
-		$config = get_option( 'wp_tts_config', [] );
-		$value = $config['storage']['buzzsprout']['podcast_id'] ?? '';
+		$value = $this->config->get( 'storage.buzzsprout.podcast_id', '' );
 		echo '<input type="text" name="wp_tts_config[storage][buzzsprout][podcast_id]" value="' . esc_attr( $value ) . '" class="regular-text" />';
 		echo '<p class="description">' . esc_html__( 'Ingresa tu ID de Podcast de Buzzsprout donde se almacenarán los archivos de audio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) . '</p>';
+	}
+
+	/**
+	 * Render Buzzsprout Auto Publish field
+	 */
+	public function renderBuzzsproutAutoPublishField(): void {
+		$enabled = $this->config->get( 'storage.buzzsprout.auto_publish', false );
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[storage][buzzsprout][auto_publish]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Publicar episodios automáticamente', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render Buzzsprout Private field
+	 */
+	public function renderBuzzsproutPrivateField(): void {
+		$enabled = $this->config->get( 'storage.buzzsprout.make_private', false );
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[storage][buzzsprout][make_private]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Mantener episodios como privados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render Buzzsprout Tags field
+	 */
+	public function renderBuzzsproutTagsField(): void {
+		$value = $this->config->get( 'storage.buzzsprout.default_tags', 'tts,generated' );
+		echo '<input type="text" name="wp_tts_config[storage][buzzsprout][default_tags]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+	}
+
+	/**
+	 * Render Buzzsprout Include Link field
+	 */
+	public function renderBuzzsproutIncludeLinkField(): void {
+		$enabled = $this->config->get( 'storage.buzzsprout.include_link', true );
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[storage][buzzsprout][include_link]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Incluir enlace al artículo en la descripción', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render S3 Enabled field
+	 */
+	public function renderS3EnabledField(): void {
+		$enabled = $this->config->get( 'storage.s3.enabled', false );
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[storage][s3][enabled]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Habilitar almacenamiento en Amazon S3', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+		echo '</label>';
+	}
+
+	/**
+	 * Render S3 Access Key field
+	 */
+	public function renderS3AccessKeyField(): void {
+		$value = $this->config->get( 'storage.s3.access_key', '' );
+		echo '<input type="text" name="wp_tts_config[storage][s3][access_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+	}
+
+	/**
+	 * Render S3 Secret Key field
+	 */
+	public function renderS3SecretKeyField(): void {
+		$value = $this->config->get( 'storage.s3.secret_key', '' );
+		echo '<input type="password" name="wp_tts_config[storage][s3][secret_key]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+	}
+
+	/**
+	 * Render S3 Bucket field
+	 */
+	public function renderS3BucketField(): void {
+		$value = $this->config->get( 'storage.s3.bucket', '' );
+		echo '<input type="text" name="wp_tts_config[storage][s3][bucket]" value="' . esc_attr( $value ) . '" class="regular-text" />';
+	}
+
+	/**
+	 * Render S3 Region field
+	 */
+	public function renderS3RegionField(): void {
+		$value = $this->config->get( 'storage.s3.region', 'us-east-1' );
+		$regions = [
+			'us-east-1' => 'US East (N. Virginia)',
+			'us-east-2' => 'US East (Ohio)',
+			'us-west-1' => 'US West (N. California)',
+			'us-west-2' => 'US West (Oregon)',
+			'eu-west-1' => 'Europe (Ireland)',
+			'eu-central-1' => 'Europe (Frankfurt)',
+			'ap-southeast-1' => 'Asia Pacific (Singapore)',
+		];
+		
+		echo '<select name="wp_tts_config[storage][s3][region]">';
+		foreach ( $regions as $key => $label ) {
+			echo '<option value="' . esc_attr( $key ) . '"' . selected( $value, $key, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select>';
 	}
 	
 	/**
@@ -2629,6 +2844,11 @@ class AdminInterface {
 	private function renderHiddenStorageFields( array $config ): void {
 		$storage = $config['storage'] ?? [];
 		
+		// Ensure storage is an array
+		if ( ! is_array( $storage ) ) {
+			$storage = [];
+		}
+		
 		foreach ( $storage as $storage_provider => $storage_config ) {
 			if ( is_array( $storage_config ) ) {
 				foreach ( $storage_config as $key => $value ) {
@@ -3012,6 +3232,9 @@ class AdminInterface {
 	 * Sanitize and save settings
 	 */
 	public function sanitizeSettings( $input ): array {
+		// Debug: Log the incoming input structure
+		error_log( 'TTS DEBUG: sanitizeSettings input structure: ' . print_r( $input, true ) );
+		
 		// Get current configuration
 		$config = $this->config;
 		
@@ -3067,6 +3290,49 @@ class AdminInterface {
 			error_log( 'TTS DEBUG: Settings after save: ' . print_r( $saved_settings, true ) );
 		}
 		
+		// Process storage settings
+		if ( isset( $input['storage'] ) && is_array( $input['storage'] ) ) {
+			foreach ( $input['storage'] as $storage_provider => $settings ) {
+				// Skip if settings is not an array (defensive programming)
+				if ( ! is_array( $settings ) ) {
+					error_log( "TTS DEBUG: Skipping storage provider '$storage_provider' - settings is not an array: " . print_r( $settings, true ) );
+					continue;
+				}
+				
+				error_log( "TTS DEBUG: Processing storage provider '$storage_provider' with settings: " . print_r( $settings, true ) );
+				
+				// Sanitize storage provider settings
+				$sanitized = [];
+				
+				// Handle checkbox fields - ensure they're set to false if not present
+				$checkbox_fields = ['enabled', 'auto_publish', 'make_private', 'include_link'];
+				foreach ( $checkbox_fields as $checkbox_field ) {
+					$sanitized[$checkbox_field] = isset( $settings[$checkbox_field] ) ? (bool) $settings[$checkbox_field] : false;
+				}
+				
+				// Handle other fields
+				foreach ( $settings as $key => $value ) {
+					if ( in_array( $key, $checkbox_fields ) ) {
+						// Already handled above
+						continue;
+					} elseif ( in_array( $key, ['max_file_size'] ) ) {
+						$sanitized[$key] = (int) $value;
+					} else {
+						$sanitized[$key] = sanitize_text_field( $value );
+					}
+				}
+				
+				error_log( "TTS DEBUG: Sanitized storage settings for '$storage_provider': " . print_r( $sanitized, true ) );
+				
+				// Update storage configuration
+				$current_storage = $config->getStorageConfig( $storage_provider );
+				$updated_storage = array_merge( $current_storage, $sanitized );
+				$config->set( "storage.{$storage_provider}", $updated_storage, false );
+				
+				error_log( "TTS DEBUG: Updated storage config for '$storage_provider': " . print_r( $updated_storage, true ) );
+			}
+		}
+		
 		// Process audio assets settings
 		if ( isset( $input['audio_assets'] ) ) {
 			$audio_assets = [];
@@ -3098,6 +3364,9 @@ class AdminInterface {
 			}
 			$config->updateDefaults( $defaults );
 		}
+		
+		// Ensure all changes are saved to database
+		$config->save();
 		
 		// Return the input as-is (settings are saved via ConfigurationManager)
 		return $input;

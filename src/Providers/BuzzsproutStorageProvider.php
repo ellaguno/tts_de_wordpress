@@ -2,7 +2,7 @@
 
 namespace WP_TTS\Providers;
 
-use WP_TTS\Interfaces\StorageProviderInterface;
+use WP_TTS\Interfaces\SimpleStorageProviderInterface;
 use WP_TTS\Exceptions\StorageException;
 use WP_TTS\Utils\Logger;
 
@@ -14,7 +14,7 @@ use WP_TTS\Utils\Logger;
  * @package WP_TTS\Providers
  * @since 1.0.0
  */
-class BuzzsproutStorageProvider implements StorageProviderInterface {
+class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 	/**
 	 * Provider name
@@ -47,12 +47,17 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 	/**
 	 * Constructor
 	 *
-	 * @param array  $credentials Buzzsprout credentials.
-	 * @param Logger $logger      Logger instance.
+	 * @param array $credentials Buzzsprout credentials.
 	 */
-	public function __construct( array $credentials, Logger $logger ) {
+	public function __construct( array $credentials ) {
 		$this->credentials = $credentials;
-		$this->logger      = $logger;
+		// Create logger instance if not provided
+		if ( class_exists( 'WP_TTS\\Utils\\Logger' ) ) {
+			$this->logger = new Logger();
+		} else {
+			// Fallback to error_log if Logger not available
+			$this->logger = null;
+		}
 	}
 
 	/**
@@ -75,6 +80,41 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 	}
 
 	/**
+	 * Store audio file (SimpleStorageProviderInterface implementation)
+	 *
+	 * @param string $audio_data Audio file data
+	 * @param string $filename Filename
+	 * @param array  $metadata Additional metadata
+	 * @return array Storage result with URL and metadata
+	 * @throws \Exception If storage fails
+	 */
+	public function store( string $audio_data, string $filename, array $metadata = array() ): array {
+		if ( ! $this->isConfigured() ) {
+			throw new \Exception( 'Buzzsprout storage provider is not properly configured' );
+		}
+
+		$this->log( 'info', 'Starting Buzzsprout file store', [
+			'filename' => $filename,
+			'data_size' => strlen( $audio_data ),
+		] );
+
+		// Save to temporary file first
+		$temp_file = $this->createTempFile( $filename );
+		if ( file_put_contents( $temp_file, $audio_data ) === false ) {
+			throw new \Exception( 'Failed to create temporary file for Buzzsprout upload' );
+		}
+
+		try {
+			$result = $this->uploadFile( $temp_file, $filename, $metadata );
+			unlink( $temp_file ); // Clean up temp file
+			return $result;
+		} catch ( \Exception $e ) {
+			unlink( $temp_file ); // Clean up temp file on error
+			throw $e;
+		}
+	}
+
+	/**
 	 * Upload audio file
 	 *
 	 * @param string $file_path Local file path.
@@ -92,23 +132,54 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			throw new StorageException( 'File does not exist: ' . $file_path );
 		}
 
-		$this->logger->info( 'Starting Buzzsprout file upload', [
+		$this->log( 'info', 'Starting Buzzsprout file upload', [
 			'file_path' => $file_path,
 			'filename' => $filename,
 			'file_size' => filesize( $file_path ),
 		] );
 
 		try {
-			// Prepare upload data
+			// Debug: Log admin configuration
+			$this->log( 'info', 'BuzzSprout: Admin configuration debug', [
+				'auto_publish' => $this->credentials['auto_publish'] ?? 'NOT_SET',
+				'make_private' => $this->credentials['make_private'] ?? 'NOT_SET',
+				'include_link' => $this->credentials['include_link'] ?? 'NOT_SET',
+				'default_tags' => $this->credentials['default_tags'] ?? 'NOT_SET',
+				'all_credentials' => array_keys($this->credentials)
+			] );
+			
+			// Debug: Log metadata received
+			$this->log( 'info', 'BuzzSprout: Metadata debug', [
+				'post_title' => $metadata['post_title'] ?? 'NOT_SET',
+				'post_url' => $metadata['post_url'] ?? 'NOT_SET',
+				'featured_image_url' => $metadata['featured_image_url'] ?? 'NOT_SET',
+				'post_id' => $metadata['post_id'] ?? 'NOT_SET',
+				'all_metadata_keys' => array_keys($metadata)
+			] );
+			
+			// Prepare upload data using article metadata and admin configuration
 			$upload_data = [
-				'title' => $metadata['title'] ?? pathinfo( $filename, PATHINFO_FILENAME ),
-				'description' => $metadata['description'] ?? 'TTS Generated Audio',
+				'title' => $this->getEpisodeTitle( $metadata, $filename ),
+				'description' => $this->getEpisodeDescription( $metadata ),
 				'summary' => $metadata['summary'] ?? '',
-				'artist' => $metadata['artist'] ?? get_bloginfo( 'name' ),
-				'tags' => $metadata['tags'] ?? 'tts,generated',
-				'published' => false, // Don't publish automatically
-				'private' => true, // Keep private by default
+				'artist' => $metadata['artist'] ?? $this->getSiteName(),
+				'tags' => $metadata['tags'] ?? $this->credentials['default_tags'] ?? 'tts,generated',
+				'published' => $this->credentials['auto_publish'] ?? false,
+				'private' => $this->credentials['make_private'] ?? false,
 			];
+			
+			// Add episode artwork if available
+			$artwork_url = $this->getEpisodeArtwork( $metadata );
+			$this->log( 'info', 'BuzzSprout: Artwork URL debug', [
+				'artwork_url' => $artwork_url,
+				'will_add_to_upload' => !empty($artwork_url)
+			] );
+			if ( $artwork_url ) {
+				$upload_data['artwork_url'] = $artwork_url;
+			}
+			
+			// Debug: Log final upload data
+			$this->log( 'info', 'BuzzSprout: Final upload data', $upload_data );
 
 			// Upload file to Buzzsprout
 			$response = $this->uploadToBuzzsprout( $file_path, $filename, $upload_data );
@@ -117,7 +188,7 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 				throw new StorageException( 'Invalid response from Buzzsprout API' );
 			}
 
-			$this->logger->info( 'Buzzsprout file upload completed', [
+			$this->log( 'info', 'Buzzsprout file upload completed', [
 				'episode_id' => $response['id'] ?? '',
 				'audio_url' => $response['audio_url'],
 			] );
@@ -137,12 +208,91 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			];
 
 		} catch ( \Exception $e ) {
-			$this->logger->error( 'Buzzsprout file upload failed', [
+			$this->log( 'error', 'Buzzsprout file upload failed', [
 				'error' => $e->getMessage(),
 				'file_path' => $file_path,
 			] );
 			throw new StorageException( 'Buzzsprout upload failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Create temporary file safely
+	 *
+	 * @param string $filename Base filename for temp file
+	 * @return string Temporary file path
+	 * @throws \Exception If temp file creation fails
+	 */
+	private function createTempFile( string $filename ): string {
+		// Try WordPress wp_tempnam first
+		if ( function_exists( 'wp_tempnam' ) ) {
+			$temp_file = wp_tempnam( $filename );
+			if ( $temp_file ) {
+				return $temp_file;
+			}
+		}
+
+		// Fallback to system temp directory
+		$temp_dir = sys_get_temp_dir();
+		if ( ! $temp_dir || ! is_writable( $temp_dir ) ) {
+			// Try WordPress uploads temp if system temp not available
+			$upload_dir = function_exists( 'wp_upload_dir' ) ? wp_upload_dir() : null;
+			if ( $upload_dir && ! empty( $upload_dir['basedir'] ) ) {
+				$temp_dir = $upload_dir['basedir'] . '/tmp';
+				if ( ! file_exists( $temp_dir ) ) {
+					if ( function_exists( 'wp_mkdir_p' ) ) {
+						wp_mkdir_p( $temp_dir );
+					} else {
+						// Fallback to native PHP
+						if ( ! mkdir( $temp_dir, 0755, true ) ) {
+							throw new \Exception( 'Cannot create temporary directory: ' . $temp_dir );
+						}
+					}
+				}
+			} else {
+				throw new \Exception( 'No writable temporary directory available for Buzzsprout upload' );
+			}
+		}
+
+		// Generate unique temp filename
+		$safe_filename = function_exists( 'sanitize_file_name' ) ? sanitize_file_name( $filename ) : $this->sanitizeFilename( $filename );
+		$temp_file = $temp_dir . '/' . uniqid( 'buzzsprout_', true ) . '_' . $safe_filename;
+		
+		// Test if we can write to the temp file
+		if ( file_put_contents( $temp_file, '' ) === false ) {
+			throw new \Exception( 'Cannot create temporary file for Buzzsprout upload: ' . $temp_file );
+		}
+
+		return $temp_file;
+	}
+
+	/**
+	 * Sanitize filename for cross-platform safety
+	 *
+	 * @param string $filename Original filename
+	 * @return string Sanitized filename
+	 */
+	private function sanitizeFilename( string $filename ): string {
+		// Remove or replace problematic characters
+		$filename = preg_replace( '/[^a-zA-Z0-9._-]/', '_', $filename );
+		// Remove multiple underscores
+		$filename = preg_replace( '/_+/', '_', $filename );
+		// Trim underscores from start/end
+		$filename = trim( $filename, '_' );
+		// Ensure it's not empty
+		return empty( $filename ) ? 'file' : $filename;
+	}
+
+	/**
+	 * Get site name safely
+	 *
+	 * @return string Site name
+	 */
+	private function getSiteName(): string {
+		if ( function_exists( 'get_bloginfo' ) ) {
+			return get_bloginfo( 'name' ) ?: 'TTS Site';
+		}
+		return 'TTS Site';
 	}
 
 	/**
@@ -157,7 +307,7 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			throw new StorageException( 'Buzzsprout storage provider is not configured' );
 		}
 
-		$this->logger->info( 'Starting Buzzsprout file deletion', [
+		$this->log( 'info', 'Starting Buzzsprout file deletion', [
 			'file_url' => $file_url,
 		] );
 
@@ -172,14 +322,14 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			// Delete episode from Buzzsprout
 			$response = $this->deleteFromBuzzsprout( $episode_id );
 
-			$this->logger->info( 'Buzzsprout file deletion completed', [
+			$this->log( 'info', 'Buzzsprout file deletion completed', [
 				'episode_id' => $episode_id,
 			] );
 
 			return $response;
 
 		} catch ( \Exception $e ) {
-			$this->logger->error( 'Buzzsprout file deletion failed', [
+			$this->log( 'error', 'Buzzsprout file deletion failed', [
 				'error' => $e->getMessage(),
 				'file_url' => $file_url,
 			] );
@@ -194,16 +344,16 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 	 * @return array File information.
 	 * @throws StorageException If file not found.
 	 */
-	public function getFileInfo( string $file_url ): array {
+	public function getFileInfo( string $file_url ): ?array {
 		if ( ! $this->isConfigured() ) {
-			throw new StorageException( 'Buzzsprout storage provider is not configured' );
+			return null;
 		}
 
 		try {
 			$episode_id = $this->extractEpisodeId( $file_url );
 
 			if ( ! $episode_id ) {
-				throw new StorageException( 'Could not extract episode ID from URL' );
+				return null;
 			}
 
 			$response = $this->getEpisodeInfo( $episode_id );
@@ -218,7 +368,7 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			];
 
 		} catch ( \Exception $e ) {
-			throw new StorageException( 'Failed to get file info: ' . $e->getMessage() );
+			return null;
 		}
 	}
 
@@ -250,7 +400,7 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 			return $files;
 
 		} catch ( \Exception $e ) {
-			$this->logger->error( 'Failed to list Buzzsprout files', [
+			$this->log( 'error', 'Failed to list Buzzsprout files', [
 				'error' => $e->getMessage(),
 			] );
 			return [];
@@ -321,20 +471,76 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 	 * @throws StorageException If upload fails.
 	 */
 	private function uploadToBuzzsprout( string $file_path, string $filename, array $upload_data ): array {
-		// For now, return mock response since we don't have actual Buzzsprout integration
-		// In production, this would use Buzzsprout API
-		
-		$mock_episode_id = 'ep_' . md5( $filename . time() );
-		$mock_audio_url = 'https://www.buzzsprout.com/episodes/' . $mock_episode_id . '.mp3';
+		$this->log( 'info', 'BuzzSprout: Starting real API upload', [
+			'file_path' => $file_path,
+			'filename' => $filename,
+			'podcast_id' => $this->credentials['podcast_id']
+		] );
 
-		return [
-			'id' => $mock_episode_id,
+		$ch = curl_init();
+		curl_setopt( $ch, CURLOPT_URL, $this->api_base_url . '/' . $this->credentials['podcast_id'] . '/episodes.json' );
+		curl_setopt( $ch, CURLOPT_POST, true );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
+			'Authorization: Token token=' . $this->credentials['api_token']
+		] );
+		// Prepare POST fields
+		$post_fields = [
 			'title' => $upload_data['title'],
-			'audio_url' => $mock_audio_url,
-			'duration' => $this->estimateAudioDuration( $file_path ),
-			'file_size' => filesize( $file_path ),
-			'published_at' => date( 'Y-m-d\TH:i:s\Z' ),
+			'description' => $upload_data['description'],
+			'published' => $upload_data['published'] ? 'true' : 'false',
+			'private' => $upload_data['private'] ? 'true' : 'false',
+			'audio_file' => new \CURLFile( $file_path, 'audio/mpeg', $filename )
 		];
+		
+		// Add artwork if provided
+		if ( ! empty( $upload_data['artwork_url'] ) ) {
+			$post_fields['artwork_url'] = $upload_data['artwork_url'];
+		}
+		
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields );
+		curl_setopt( $ch, CURLOPT_TIMEOUT, 120 ); // 2 minutes timeout for upload
+		curl_setopt( $ch, CURLOPT_VERBOSE, false );
+
+		$response = curl_exec( $ch );
+		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		$curl_error = curl_error( $ch );
+		$upload_info = curl_getinfo( $ch );
+		curl_close( $ch );
+
+		$this->log( 'info', 'BuzzSprout: API response received', [
+			'http_code' => $http_code,
+			'upload_time' => round( $upload_info['total_time'], 2 ),
+			'response_length' => strlen( $response )
+		] );
+
+		if ( ! empty( $curl_error ) ) {
+			throw new StorageException( 'BuzzSprout cURL error: ' . $curl_error );
+		}
+
+		if ( $http_code === 201 ) {
+			$episode_data = json_decode( $response, true );
+			if ( $episode_data && isset( $episode_data['id'] ) ) {
+				$this->log( 'info', 'BuzzSprout: Upload successful', [
+					'episode_id' => $episode_data['id'],
+					'audio_url' => $episode_data['audio_url'] ?? 'N/A'
+				] );
+				return $episode_data;
+			} else {
+				throw new StorageException( 'BuzzSprout: Invalid JSON response' );
+			}
+		} elseif ( $http_code === 401 ) {
+			throw new StorageException( 'BuzzSprout: Invalid API token or unauthorized' );
+		} elseif ( $http_code === 422 ) {
+			$error_data = json_decode( $response, true );
+			$error_msg = 'BuzzSprout: Validation error';
+			if ( $error_data ) {
+				$error_msg .= ' - ' . json_encode( $error_data );
+			}
+			throw new StorageException( $error_msg );
+		} else {
+			throw new StorageException( "BuzzSprout: HTTP error $http_code - $response" );
+		}
 	}
 
 	/**
@@ -432,5 +638,199 @@ class BuzzsproutStorageProvider implements StorageProviderInterface {
 		// Rough calculation: MP3 at 128kbps = ~16KB per second
 		$file_size = filesize( $file_path );
 		return max( 1, round( $file_size / 16000 ) );
+	}
+
+	/**
+	 * Delete audio file
+	 *
+	 * @param string $identifier File identifier (URL or path)
+	 * @return bool Success status
+	 */
+	public function delete( string $identifier ): bool {
+		// For now, return true (mock implementation)
+		// In production, this would call Buzzsprout API to delete episode
+		$this->log( 'info', 'Mock delete operation for Buzzsprout', [
+			'identifier' => $identifier
+		] );
+		return true;
+	}
+
+	/**
+	 * Check if file exists
+	 *
+	 * @param string $identifier File identifier (URL or path)
+	 * @return bool
+	 */
+	public function exists( string $identifier ): bool {
+		// For now, return false (mock implementation)
+		// In production, this would check if episode exists in Buzzsprout
+		return false;
+	}
+
+
+	/**
+	 * Get provider configuration
+	 *
+	 * @return array
+	 */
+	public function getConfig(): array {
+		return $this->credentials;
+	}
+
+	/**
+	 * Test provider connection/configuration
+	 *
+	 * @return bool
+	 */
+	public function test(): bool {
+		return $this->isConfigured();
+	}
+
+	/**
+	 * Get episode title from article metadata
+	 *
+	 * @param array $metadata Article metadata
+	 * @param string $filename Fallback filename
+	 * @return string Episode title
+	 */
+	private function getEpisodeTitle( array $metadata, string $filename ): string {
+		// Use article title if available
+		if ( ! empty( $metadata['post_title'] ) ) {
+			return $metadata['post_title'];
+		}
+		
+		// Use custom title if provided
+		if ( ! empty( $metadata['title'] ) ) {
+			return $metadata['title'];
+		}
+		
+		// Fallback to filename without extension
+		return pathinfo( $filename, PATHINFO_FILENAME );
+	}
+	
+	/**
+	 * Get episode description with article URL
+	 *
+	 * @param array $metadata Article metadata
+	 * @return string Episode description
+	 */
+	private function getEpisodeDescription( array $metadata ): string {
+		$description = '';
+		
+		// Add custom description if provided (excerpt, etc.)
+		if ( ! empty( $metadata['description'] ) ) {
+			$description = $metadata['description'];
+		}
+		
+		// Add article URL if available and enabled in configuration
+		$include_link = $this->credentials['include_link'] ?? true;
+		if ( $include_link ) {
+			if ( ! empty( $metadata['post_url'] ) ) {
+				if ( !empty($description) ) {
+					$description .= "\n\n";
+				}
+				$description .= "Lee el artículo completo en: " . $metadata['post_url'];
+			} elseif ( ! empty( $metadata['permalink'] ) ) {
+				if ( !empty($description) ) {
+					$description .= "\n\n";
+				}
+				$description .= "Lee el artículo completo en: " . $metadata['permalink'];
+			}
+		}
+		
+		// Add site info
+		$site_name = $this->getSiteName();
+		if ( $site_name !== 'TTS Site' ) {
+			if ( !empty($description) ) {
+				$description .= "\n\n";
+			}
+			$description .= "📱 Publicado en: " . $site_name;
+		}
+		
+		// If we still have no description, add a minimal one
+		if ( empty($description) ) {
+			$description = "Episodio de audio generado desde " . $this->getSiteName();
+		}
+		
+		return $description;
+	}
+	
+	/**
+	 * Get episode artwork URL from featured image
+	 *
+	 * @param array $metadata Article metadata
+	 * @return string|null Artwork URL or null if not available
+	 */
+	private function getEpisodeArtwork( array $metadata ): ?string {
+		$this->log( 'info', 'BuzzSprout: getEpisodeArtwork() called', [
+			'metadata_keys' => array_keys($metadata)
+		] );
+		
+		// Try different metadata keys for featured image
+		$image_keys = [
+			'featured_image_url',
+			'thumbnail_url', 
+			'post_thumbnail',
+			'featured_image',
+			'image_url'
+		];
+		
+		foreach ( $image_keys as $key ) {
+			$this->log( 'info', "BuzzSprout: Checking metadata key '$key'", [
+				'value' => $metadata[$key] ?? 'NOT_SET',
+				'is_url' => isset($metadata[$key]) ? filter_var( $metadata[$key], FILTER_VALIDATE_URL ) : false
+			] );
+			
+			if ( ! empty( $metadata[$key] ) && filter_var( $metadata[$key], FILTER_VALIDATE_URL ) ) {
+				$this->log( 'info', 'BuzzSprout: Found artwork URL from metadata', [
+					'key' => $key,
+					'url' => $metadata[$key]
+				] );
+				return $metadata[$key];
+			}
+		}
+		
+		// If we have a post ID, try to get featured image directly
+		if ( ! empty( $metadata['post_id'] ) && function_exists( 'get_the_post_thumbnail_url' ) ) {
+			$this->log( 'info', 'BuzzSprout: Attempting to get featured image from post ID', [
+				'post_id' => $metadata['post_id']
+			] );
+			
+			$thumbnail_url = get_the_post_thumbnail_url( $metadata['post_id'], 'large' );
+			if ( $thumbnail_url ) {
+				$this->log( 'info', 'BuzzSprout: Found artwork URL from post ID', [
+					'post_id' => $metadata['post_id'],
+					'url' => $thumbnail_url
+				] );
+				return $thumbnail_url;
+			} else {
+				$this->log( 'info', 'BuzzSprout: No featured image found for post ID', [
+					'post_id' => $metadata['post_id']
+				] );
+			}
+		}
+		
+		$this->log( 'info', 'BuzzSprout: No artwork URL found', [
+			'post_id' => $metadata['post_id'] ?? 'NOT_SET',
+			'has_get_thumbnail_function' => function_exists( 'get_the_post_thumbnail_url' )
+		] );
+		
+		return null;
+	}
+	
+	/**
+	 * Helper method for logging with fallback
+	 *
+	 * @param string $level Log level (info, error, debug)
+	 * @param string $message Log message
+	 * @param array $context Log context
+	 */
+	private function log( string $level, string $message, array $context = [] ): void {
+		if ( $this->logger ) {
+			$this->logger->{$level}( $message, $context );
+		} else {
+			$context_str = empty( $context ) ? '' : ' ' . json_encode( $context );
+			error_log( "[BuzzSprout {$level}] {$message}{$context_str}" );
+		}
 	}
 }

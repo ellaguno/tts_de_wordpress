@@ -65,6 +65,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <audio 
             controls 
             preload="none"
+            crossorigin="anonymous"
             aria-label="<?php echo esc_attr(sprintf(__('Versión en audio de: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), $post_title)); ?>"
             class="wp-tts-audio-element">
             <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">

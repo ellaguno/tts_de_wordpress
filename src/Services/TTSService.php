@@ -10,6 +10,8 @@ namespace WP_TTS\Services;
 use WP_TTS\Utils\Logger;
 use WP_TTS\Utils\TTSMetaManager;
 use WP_TTS\Interfaces\CacheServiceInterface;
+use WP_TTS\Core\StorageProviderFactory;
+use WP_TTS\Core\ConfigurationManager;
 
 /**
  * Main TTS service coordinator
@@ -38,6 +40,20 @@ class TTSService {
 	private $logger;
 	
 	/**
+	 * Storage provider factory
+	 *
+	 * @var StorageProviderFactory
+	 */
+	private $storage_factory;
+	
+	/**
+	 * Configuration manager
+	 *
+	 * @var ConfigurationManager
+	 */
+	private $config_manager;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param RoundRobinManager     $round_robin Round robin manager.
@@ -48,6 +64,8 @@ class TTSService {
 		$this->round_robin = $round_robin;
 		$this->cache = $cache;
 		$this->logger = $logger;
+		$this->config_manager = new ConfigurationManager();
+		$this->storage_factory = new StorageProviderFactory( $this->config_manager );
 	}
 	
 	/**
@@ -140,9 +158,98 @@ class TTSService {
 					'speech_options' => $speech_call_options
 				]);
 
+				// Generate audio using provider (this might return raw audio data or a URL)
 				$audio_result = $provider_instance->generateSpeech( $text, $speech_call_options );
 				
 				if ( $audio_result && isset($audio_result['success']) && $audio_result['success'] ) {
+					// If provider returned raw audio data, store it using storage provider
+					if ( isset($audio_result['audio_data']) && !isset($audio_result['audio_url']) ) {
+						$this->logger->info( 'Provider returned raw audio data, storing with storage provider' );
+						
+						try {
+							$this->logger->info( 'Attempting to get storage provider from factory' );
+							$storage_provider = $this->storage_factory->getEnabledProvider();
+							$this->logger->info( 'Storage provider obtained successfully', [
+								'provider_class' => get_class($storage_provider)
+							]);
+							
+							// Generate filename
+							$hash = md5( $text . $current_provider_name . time() );
+							$voice_suffix = isset($speech_call_options['voice']) ? '-' . $speech_call_options['voice'] : '';
+							$filename = "{$current_provider_name}{$voice_suffix}-{$hash}.mp3";
+							
+							// Prepare metadata including post information
+							$metadata = [
+								'provider' => $current_provider_name,
+								'voice' => $speech_call_options['voice'] ?? null,
+								'text_length' => strlen( $text ),
+								'generated_at' => current_time( 'mysql' )
+							];
+
+							// Add post metadata if available from options
+							if ( isset($options['post_id']) ) {
+								$post_id = $options['post_id'];
+								$post = get_post( $post_id );
+								
+								if ( $post ) {
+									$metadata['post_id'] = $post_id;
+									$metadata['post_title'] = $post->post_title;
+									$metadata['post_url'] = get_permalink( $post_id );
+									$metadata['permalink'] = get_permalink( $post_id );
+									
+									// Get featured image
+									$featured_image_url = get_the_post_thumbnail_url( $post_id, 'large' );
+									if ( $featured_image_url ) {
+										$metadata['featured_image_url'] = $featured_image_url;
+									}
+									
+									// Add post excerpt as description if available
+									if ( !empty($post->post_excerpt) ) {
+										$metadata['description'] = $post->post_excerpt;
+									}
+									
+									$this->logger->info( 'Added post metadata for storage', [
+										'post_id' => $post_id,
+										'post_title' => $post->post_title,
+										'has_featured_image' => !empty($featured_image_url)
+									]);
+								}
+							}
+
+							// Store audio using storage provider
+							$storage_result = $storage_provider->store( 
+								$audio_result['audio_data'], 
+								$filename,
+								$metadata
+							);
+							
+							$audio_result['audio_url'] = $storage_result['url'];
+							$audio_result['storage_provider'] = $storage_provider->getName();
+							
+							$this->logger->info( 'Audio stored successfully', [
+								'storage_provider' => $storage_provider->getName(),
+								'audio_url' => $audio_result['audio_url']
+							]);
+							
+						} catch ( \Exception $storage_error ) {
+							$this->logger->error( 'Failed to store audio with storage provider', [
+								'error' => $storage_error->getMessage(),
+								'error_type' => get_class($storage_error),
+								'error_trace' => $storage_error->getTraceAsString(),
+								'provider' => $current_provider_name
+							]);
+							// Return error if storage fails
+							return [
+								'success' => false,
+								'message' => sprintf( 
+									__( 'La generación TTS fue exitosa pero falló el almacenamiento: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+									$storage_error->getMessage()
+								),
+								'error_code' => 'STORAGE_FAILED',
+								'provider' => $current_provider_name
+							];
+						}
+					}
 					$this->cache->cacheAudioUrl( $textHash, $audio_result['audio_url'], null, [
 						'provider' => $current_provider_name,
 						'generated_at' => time(),

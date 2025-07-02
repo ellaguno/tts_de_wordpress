@@ -11,6 +11,8 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\VoiceValidator;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * Microsoft Azure TTS provider implementation
@@ -71,11 +73,20 @@ class AzureTTSProvider implements TTSProviderInterface {
 		try {
 			// Get voice from options or use default
 			$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-MX-DaliaNeural');
+			
+			// Validate and fix voice
+			$voice_id = VoiceValidator::fixVoice( 'azure', $voice_id );
 
 			$this->logger->info( 'Azure TTS: Starting speech generation', [
 				'text_length' => strlen( $text ),
-				'voice_id' => $voice_id
+				'voice_id' => $voice_id,
+				'needs_chunking' => TextChunker::needsChunking( $text, 'azure' )
 			] );
+
+			// Check if text needs chunking
+			if ( TextChunker::needsChunking( $text, 'azure' ) ) {
+				return $this->generateChunkedSpeech( $text, $voice_id, $options );
+			}
 
 			// Get access token
 			$access_token = $this->getAccessToken();
@@ -94,24 +105,23 @@ class AzureTTSProvider implements TTSProviderInterface {
 				throw new ProviderException( 'Azure TTS: Failed to generate audio' );
 			}
 
-			// Save audio file
-			$audio_url = $this->saveAudioFile( $audio_data, $voice_id );
-
 			$this->logger->info( 'Azure TTS: Speech generation completed', [
-				'audio_url' => $audio_url,
+				'audio_data_size' => strlen( $audio_data ),
 				'voice_id' => $voice_id
 			] );
 
+			// Return raw audio data instead of saving to file
+			// The TTSService will handle storage using the configured storage provider
 			return [
 				'success' => true,
-				'audio_url' => $audio_url,
-				'file_path' => $this->getFilePathFromUrl( $audio_url ),
+				'audio_data' => $audio_data,
 				'provider' => 'azure_tts',
 				'voice' => $voice_id,
 				'format' => 'mp3',
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
 					'characters' => strlen( $text ),
+					'data_size' => strlen( $audio_data ),
 				],
 			];
 
@@ -403,6 +413,82 @@ class AzureTTSProvider implements TTSProviderInterface {
 		}
 
 		return wp_remote_retrieve_body( $response );
+	}
+
+	/**
+	 * Generate speech for chunked text
+	 *
+	 * @param string $text Text to convert (will be chunked)
+	 * @param string $voice_id Voice ID
+	 * @param array $options Additional options
+	 * @return array Result array with combined audio
+	 * @throws ProviderException If generation fails
+	 */
+	private function generateChunkedSpeech( string $text, string $voice_id, array $options ): array {
+		$chunks = TextChunker::chunkText( $text, 'azure' );
+		$audio_chunks = [];
+		
+		$this->logger->info( 'Azure TTS: Generating chunked speech', [
+			'total_chunks' => count( $chunks ),
+			'voice_id' => $voice_id
+		] );
+
+		// Get access token once for all chunks
+		$access_token = $this->getAccessToken();
+		if ( ! $access_token ) {
+			throw new ProviderException( 'Azure TTS: Failed to obtain access token for chunked generation' );
+		}
+
+		foreach ( $chunks as $index => $chunk ) {
+			$this->logger->debug( "Azure TTS: Processing chunk " . ($index + 1) . "/" . count( $chunks ), [
+				'chunk_length' => strlen( $chunk )
+			] );
+
+			$ssml = $this->buildSSML( $chunk, $voice_id, $options );
+			$audio_data = $this->makeTTSRequest( $ssml, $access_token );
+
+			if ( ! $audio_data ) {
+				throw new ProviderException( "Azure TTS: Failed to generate audio for chunk " . ($index + 1) );
+			}
+
+			$audio_chunks[] = $audio_data;
+		}
+
+		// Combine all audio chunks
+		$combined_audio = $this->combineAudioChunks( $audio_chunks );
+
+		$this->logger->info( 'Azure TTS: Chunked speech generation completed', [
+			'total_chunks' => count( $chunks ),
+			'combined_audio_size' => strlen( $combined_audio ),
+			'voice_id' => $voice_id
+		] );
+
+		return [
+			'success' => true,
+			'audio_data' => $combined_audio,
+			'provider' => 'azure_tts',
+			'voice' => $voice_id,
+			'format' => 'mp3',
+			'duration' => $this->estimateAudioDuration( $text ),
+			'metadata' => [
+				'characters' => strlen( $text ),
+				'chunks_processed' => count( $chunks ),
+				'voice' => $voice_id,
+				'format' => 'mp3'
+			]
+		];
+	}
+
+	/**
+	 * Combine multiple audio chunks into single audio
+	 *
+	 * @param array $audio_chunks Array of audio binary data
+	 * @return string Combined audio data
+	 */
+	private function combineAudioChunks( array $audio_chunks ): string {
+		// For MP3 files, simple concatenation works for most cases
+		// For production, you might want to use FFmpeg for proper audio merging
+		return implode( '', $audio_chunks );
 	}
 
 	/**

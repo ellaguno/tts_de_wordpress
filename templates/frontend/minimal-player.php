@@ -202,7 +202,7 @@ $text_color = $config->get('player.player_text_color', '#333333');
     </div>
 
     <!-- Hidden Audio Element -->
-    <audio class="wp-tts-audio" preload="none">
+    <audio class="wp-tts-audio" preload="none" crossorigin="anonymous">
         <source src="<?php echo $audio_url; ?>" type="audio/mpeg">
         <source src="<?php echo $audio_url; ?>" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.

@@ -62,12 +62,14 @@ class TTSEnhancedSesoLibrePlayer {
     createAudioElements() {
         // Main TTS audio
         this.mainAudio = new Audio();
+        this.mainAudio.crossOrigin = 'anonymous';
         this.mainAudio.preload = 'metadata';
         this.mainAudio.src = this.mainAudioUrl;
 
         // Intro audio
         if (this.introAudioUrl) {
             this.introAudio = new Audio();
+            this.introAudio.crossOrigin = 'anonymous';
             this.introAudio.preload = 'metadata';
             this.introAudio.src = this.introAudioUrl;
         }
@@ -75,6 +77,7 @@ class TTSEnhancedSesoLibrePlayer {
         // Background music
         if (this.backgroundAudioUrl) {
             this.backgroundAudio = new Audio();
+            this.backgroundAudio.crossOrigin = 'anonymous';
             this.backgroundAudio.preload = 'metadata';
             this.backgroundAudio.src = this.backgroundAudioUrl;
             this.backgroundAudio.loop = true;
@@ -84,6 +87,7 @@ class TTSEnhancedSesoLibrePlayer {
         // Outro audio
         if (this.outroAudioUrl) {
             this.outroAudio = new Audio();
+            this.outroAudio.crossOrigin = 'anonymous';
             this.outroAudio.preload = 'metadata';
             this.outroAudio.src = this.outroAudioUrl;
         }
@@ -165,7 +169,7 @@ class TTSEnhancedSesoLibrePlayer {
         this.mainAudio.addEventListener('loadedmetadata', () => this.calculateTotalDuration());
         this.mainAudio.addEventListener('timeupdate', () => this.updateMainProgress());
         this.mainAudio.addEventListener('ended', () => this.onMainEnded());
-        this.mainAudio.addEventListener('error', () => this.showError('Error al cargar el audio principal'));
+        this.mainAudio.addEventListener('error', (e) => this.handleAudioError('main', e));
         this.mainAudio.addEventListener('waiting', () => this.showLoading());
         this.mainAudio.addEventListener('canplay', () => this.hideLoading());
 
@@ -659,6 +663,53 @@ class TTSEnhancedSesoLibrePlayer {
         }
         
         this.container.classList.remove('initialized');
+    }
+
+    handleAudioError(audioType, error) {
+        console.error(`Audio error (${audioType}):`, error);
+        
+        const audio = audioType === 'main' ? this.mainAudio : 
+                     audioType === 'intro' ? this.introAudio :
+                     audioType === 'background' ? this.backgroundAudio :
+                     audioType === 'outro' ? this.outroAudio : null;
+        
+        let errorMessage = '';
+        
+        if (audio && audio.error) {
+            switch (audio.error.code) {
+                case audio.error.MEDIA_ERR_ABORTED:
+                    errorMessage = 'Carga de audio cancelada';
+                    break;
+                case audio.error.MEDIA_ERR_NETWORK:
+                    errorMessage = 'Error de red al cargar audio';
+                    break;
+                case audio.error.MEDIA_ERR_DECODE:
+                    errorMessage = 'Error al decodificar audio';
+                    break;
+                case audio.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    errorMessage = 'Formato de audio no soportado';
+                    break;
+                default:
+                    errorMessage = 'Error desconocido al cargar audio';
+            }
+        } else {
+            // Likely CORS error for external URLs
+            if (audio && audio.src && (audio.src.includes('buzzsprout.com') || !audio.src.includes(window.location.hostname))) {
+                errorMessage = 'Audio externo cargado (limitaciones de metadatos)';
+                console.info(`External audio from ${audioType}: Metadata may be limited due to CORS policy`);
+                // Don't show error for external audio, just log it
+                return;
+            } else {
+                errorMessage = 'Error al cargar los metadatos de audio';
+            }
+        }
+        
+        if (audioType === 'main') {
+            this.showError(errorMessage);
+            this.pause();
+        } else {
+            console.warn(`${audioType} audio error: ${errorMessage}`);
+        }
     }
 }
 

@@ -14,6 +14,7 @@ class ConfigurationManager {
 	 * Option names for WordPress options table
 	 */
 	private const OPTION_PROVIDERS     = 'wp_tts_providers_config';
+	private const OPTION_STORAGE       = 'wp_tts_storage_config';
 	private const OPTION_DEFAULTS      = 'wp_tts_default_settings';
 	private const OPTION_ROUND_ROBIN   = 'wp_tts_round_robin_state';
 	private const OPTION_CACHE         = 'wp_tts_cache_settings';
@@ -48,7 +49,7 @@ class ConfigurationManager {
 				'access_key'    => '',
 				'secret_key'    => '',
 				'region'        => 'us-east-1',
-				'default_voice' => 'Mia',
+				'default_voice' => 'es-MX-DaliaNeural',
 				'quota_limit'   => 5000000,
 				'priority'      => 3,
 			),
@@ -66,6 +67,9 @@ class ConfigurationManager {
 				'api_token'    => '',
 				'podcast_id'   => '',
 				'auto_publish' => false,
+				'make_private' => false,
+				'default_tags' => 'tts,generated',
+				'include_link' => true,
 			),
 			'spotify'    => array(
 				'enabled'       => false,
@@ -152,6 +156,7 @@ class ConfigurationManager {
 	private function loadConfiguration(): void {
 		$this->config = array(
 			'providers'     => $this->getOption( self::OPTION_PROVIDERS, $this->defaults['providers'] ),
+			'storage'       => $this->getOption( self::OPTION_STORAGE, $this->defaults['storage'] ),
 			'defaults'      => $this->getOption( self::OPTION_DEFAULTS, $this->defaults['defaults'] ),
 			'round_robin'   => $this->getOption(
 				self::OPTION_ROUND_ROBIN,
@@ -264,10 +269,17 @@ class ConfigurationManager {
 	 */
 	public function getEnabledStorageProviders(): array {
 		$storage = $this->get( 'storage', array() );
+		
+		// Ensure storage is an array
+		if ( ! is_array( $storage ) ) {
+			error_log( "[ConfigurationManager] getEnabledStorageProviders() storage is not array: " . gettype( $storage ) );
+			return array();
+		}
+		
 		$enabled = array();
 
 		foreach ( $storage as $name => $config ) {
-			if ( ! empty( $config['enabled'] ) ) {
+			if ( is_array( $config ) && ! empty( $config['enabled'] ) ) {
 				$enabled[] = $name;
 			}
 		}
@@ -281,7 +293,15 @@ class ConfigurationManager {
 	 * @return array Default settings
 	 */
 	public function getDefaults(): array {
-		return $this->get( 'defaults', $this->defaults['defaults'] );
+		$defaults = $this->get( 'defaults', $this->defaults['defaults'] );
+		
+		// Ensure we always return an array
+		if ( ! is_array( $defaults ) ) {
+			error_log( "[ConfigurationManager] getDefaults() returned non-array: " . gettype( $defaults ) );
+			return $this->defaults['defaults'];
+		}
+		
+		return $defaults;
 	}
 
 	/**
@@ -453,6 +473,7 @@ class ConfigurationManager {
 	 */
 	public function save(): void {
 		update_option( self::OPTION_PROVIDERS, $this->config['providers'] );
+		update_option( self::OPTION_STORAGE, $this->config['storage'] );
 		update_option( self::OPTION_DEFAULTS, $this->config['defaults'] );
 		update_option( self::OPTION_ROUND_ROBIN, $this->config['round_robin'] );
 		update_option( self::OPTION_CACHE, $this->config['cache'] );
