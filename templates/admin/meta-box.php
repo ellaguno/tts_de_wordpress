@@ -133,6 +133,20 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                 $audio_assets = $tts_data['audio_assets'] ?? [];
             }
             
+            // If no post-specific audio assets, check for defaults
+            $config = get_option('wp_tts_config', []);
+            $default_intro = $config['audio_assets']['default_intro'] ?? '';
+            $default_outro = $config['audio_assets']['default_outro'] ?? '';
+            $default_background = $config['audio_assets']['default_background'] ?? '';
+            
+            // Merge defaults with post-specific values (post-specific takes precedence)
+            $audio_assets = array_merge([
+                'intro_audio' => $default_intro,
+                'outro_audio' => $default_outro,
+                'background_audio' => $default_background,
+                'background_volume' => 0.3
+            ], $audio_assets);
+            
             $asset_types = [
                 'intro_audio' => __('Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
                 'background_audio' => __('Background Music', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
@@ -144,10 +158,31 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                 $asset_id = $audio_assets[$asset_key] ?? '';
                 $asset_url = $asset_id ? wp_get_attachment_url($asset_id) : '';
                 $asset_title = $asset_id ? get_the_title($asset_id) : '';
+                
+                // Check if this is a default value
+                $is_default = false;
+                $default_id = '';
+                if ($asset_key === 'intro_audio' && $default_intro) {
+                    $is_default = ($asset_id === $default_intro);
+                    $default_id = $default_intro;
+                } elseif ($asset_key === 'outro_audio' && $default_outro) {
+                    $is_default = ($asset_id === $default_outro);
+                    $default_id = $default_outro;
+                } elseif ($asset_key === 'background_audio' && $default_background) {
+                    $is_default = ($asset_id === $default_background);
+                    $default_id = $default_background;
+                }
             ?>
             
             <div class="tts-audio-asset" style="margin-bottom: 20px; padding: 15px; border: 1px solid #e2e4e7; border-radius: 4px;">
-                <h4 style="margin: 0 0 10px 0;"><?php echo esc_html($asset_label); ?></h4>
+                <h4 style="margin: 0 0 10px 0;">
+                    <?php echo esc_html($asset_label); ?>
+                    <?php if ($is_default): ?>
+                        <span style="background: #0073aa; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 500; margin-left: 6px;">
+                            <?php _e('DEFAULT', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        </span>
+                    <?php endif; ?>
+                </h4>
                 
                 <div class="tts-media-selector" data-type="<?php echo esc_attr($asset_key); ?>">
                     <input type="hidden" name="tts_<?php echo esc_attr($asset_key); ?>" value="<?php echo esc_attr($asset_id); ?>" class="tts-media-id" />
@@ -165,6 +200,9 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                     <div class="tts-media-buttons">
                         <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
                         <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
+                        <?php if ($default_id && !$is_default): ?>
+                            <button type="button" class="button tts-use-default" data-default-id="<?php echo esc_attr($default_id); ?>"><?php _e('Use Default', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -789,6 +827,11 @@ jQuery(document).ready(function($) {
                 },
                 success: function(response) {
                     console.log('TTS enabled state saved:', response);
+                    
+                    // If enabling TTS for the first time, load default assets
+                    if (isEnabled && response.success && response.data && response.data.load_defaults) {
+                        loadDefaultAudioAssets();
+                    }
                 },
                 error: function() {
                     console.log('Failed to save TTS enabled state');
@@ -797,6 +840,32 @@ jQuery(document).ready(function($) {
         }
     });
     toggleConditionalFields(); // Initial state
+    
+    // Function to load default audio assets
+    function loadDefaultAudioAssets() {
+        const postId = $('#post_ID').val();
+        
+        if (postId) {
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'tts_load_default_assets',
+                    post_id: postId,
+                    nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Default assets loaded, reloading page');
+                        location.reload();
+                    }
+                },
+                error: function() {
+                    console.log('Failed to load default assets');
+                }
+            });
+        }
+    }
     
     // Initialize voices for preselected provider
     function initializeVoices() {
@@ -1139,8 +1208,8 @@ jQuery(document).ready(function($) {
         var type = $container.data('type');
         
         if (defaultId) {
-            // Clear the custom selection to fall back to default
-            $container.find('.tts-media-id').val('');
+            // Set the default ID as the selected value
+            $container.find('.tts-media-id').val(defaultId);
             
             // Auto-save the change
             var postId = $('#post_ID').val();
@@ -1153,7 +1222,7 @@ jQuery(document).ready(function($) {
                         action: 'tts_auto_save_audio_asset',
                         post_id: postId,
                         asset_type: type,
-                        attachment_id: '',
+                        attachment_id: defaultId,
                         nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
                     },
                     success: function() {

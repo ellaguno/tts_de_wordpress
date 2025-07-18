@@ -100,6 +100,18 @@ class OpenAITTSProvider implements TTSProviderInterface {
 		
 		$api_key = $this->config['api_key'];
 		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'alloy');
+		
+		// Validate OpenAI voice ID - only accept valid OpenAI voices
+		$valid_voices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer', 'ash', 'sage', 'coral'];
+		if (!in_array($voice_id, $valid_voices)) {
+			$this->logger->warning('Invalid OpenAI voice ID provided, using default', [
+				'provided_voice' => $voice_id,
+				'valid_voices' => $valid_voices,
+				'using_default' => 'alloy'
+			]);
+			$voice_id = $this->config['default_voice'] ?? 'alloy';
+		}
+		
 		$model = $options['model'] ?? $this->config['default_model'] ?? 'tts-1'; // Allow model override from config
 		$output_format = $options['output_format'] ?? 'mp3'; // OpenAI supports mp3, opus, aac, flac
 		
@@ -205,7 +217,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
-		// OpenAI TTS voices
+		// OpenAI TTS voices (updated with new voices)
 		return [
 			[ 'id' => 'alloy', 'name' => 'Alloy (Neutral)', 'gender' => 'Neutral', 'language' => 'multi' ],
 			[ 'id' => 'echo', 'name' => 'Echo (Male)', 'gender' => 'Male', 'language' => 'multi' ],
@@ -213,6 +225,9 @@ class OpenAITTSProvider implements TTSProviderInterface {
 			[ 'id' => 'onyx', 'name' => 'Onyx (Male)', 'gender' => 'Male', 'language' => 'multi' ],
 			[ 'id' => 'nova', 'name' => 'Nova (Female)', 'gender' => 'Female', 'language' => 'multi' ],
 			[ 'id' => 'shimmer', 'name' => 'Shimmer (Female)', 'gender' => 'Female', 'language' => 'multi' ],
+			[ 'id' => 'ash', 'name' => 'Ash (Neutral)', 'gender' => 'Neutral', 'language' => 'multi' ],
+			[ 'id' => 'sage', 'name' => 'Sage (Neutral)', 'gender' => 'Neutral', 'language' => 'multi' ],
+			[ 'id' => 'coral', 'name' => 'Coral (Female)', 'gender' => 'Female', 'language' => 'multi' ],
 		];
 	}
 
@@ -262,6 +277,9 @@ class OpenAITTSProvider implements TTSProviderInterface {
 					'onyx' => 'Onyx (Male)',
 					'nova' => 'Nova (Female)',
 					'shimmer' => 'Shimmer (Female)',
+					'ash' => 'Ash (Neutral)',
+					'sage' => 'Sage (Neutral)',
+					'coral' => 'Coral (Female)',
 				],
 				'default' => 'alloy',
 				'description' => 'Default voice to use when none is specified for a post.',

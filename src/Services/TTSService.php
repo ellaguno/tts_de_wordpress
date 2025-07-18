@@ -238,16 +238,46 @@ class TTSService {
 								'error_trace' => $storage_error->getTraceAsString(),
 								'provider' => $current_provider_name
 							]);
-							// Return error if storage fails
-							return [
-								'success' => false,
-								'message' => sprintf( 
-									__( 'La generación TTS fue exitosa pero falló el almacenamiento: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-									$storage_error->getMessage()
-								),
-								'error_code' => 'STORAGE_FAILED',
-								'provider' => $current_provider_name
-							];
+							
+							// Try fallback to local storage if primary storage fails
+							$this->logger->info( 'Attempting fallback to local storage' );
+							try {
+								$local_storage = $this->storage_factory->getProvider( 'local' );
+								$this->logger->info( 'Local storage provider obtained for fallback' );
+								
+								$fallback_result = $local_storage->store( 
+									$audio_result['audio_data'], 
+									$filename,
+									$metadata
+								);
+								
+								$audio_result['audio_url'] = $fallback_result['url'];
+								$audio_result['storage_provider'] = $local_storage->getName();
+								
+								$this->logger->info( 'Audio stored successfully with local storage fallback', [
+									'original_provider' => $storage_provider->getName(),
+									'fallback_provider' => $local_storage->getName(),
+									'audio_url' => $audio_result['audio_url']
+								]);
+								
+							} catch ( \Exception $fallback_error ) {
+								$this->logger->error( 'Local storage fallback also failed', [
+									'original_error' => $storage_error->getMessage(),
+									'fallback_error' => $fallback_error->getMessage()
+								]);
+								
+								// Return error if both storage methods fail
+								return [
+									'success' => false,
+									'message' => sprintf( 
+										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+										$storage_error->getMessage(),
+										$fallback_error->getMessage()
+									),
+									'error_code' => 'STORAGE_FAILED',
+									'provider' => $current_provider_name
+								];
+							}
 						}
 					}
 					$this->cache->cacheAudioUrl( $textHash, $audio_result['audio_url'], null, [

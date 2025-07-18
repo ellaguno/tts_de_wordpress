@@ -207,6 +207,7 @@ class Plugin {
 		add_action( 'wp_ajax_tts_auto_save_enabled', array( $this, 'handleAutoSaveEnabled' ) );
 		add_action( 'wp_ajax_tts_auto_save_provider', array( $this, 'handleAutoSaveProvider' ) );
 		add_action( 'wp_ajax_tts_auto_save_voice', array( $this, 'handleAutoSaveVoice' ) );
+		add_action( 'wp_ajax_tts_load_default_assets', array( $this, 'handleLoadDefaultAssets' ) );
 
 		// Custom hooks for extensibility
 		do_action( 'wp_tts_plugin_loaded', $this );
@@ -708,7 +709,7 @@ class Plugin {
 							'wp-tts-enhanced-sesolibre-player',
 							WP_TTS_PLUGIN_URL . 'assets/js/enhanced-sesolibre-player.js',
 							array( 'jquery' ),
-							$this->version,
+							$this->version . '-' . time(),
 							true
 						);
 						break;
@@ -1028,12 +1029,17 @@ class Plugin {
 
 		try {
 			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+				// Check if this is the first time enabling TTS
+				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
+				$is_first_time = $enabled && empty( $tts_data['audio_assets'] );
+				
 				$result = \WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
 				
 				if ( $result ) {
 					wp_send_json_success( [
 						'message' => __( 'Estado de TTS habilitado guardado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-						'enabled' => $enabled
+						'enabled' => $enabled,
+						'load_defaults' => $is_first_time
 					] );
 				} else {
 					wp_send_json_error( [
@@ -1162,6 +1168,75 @@ class Plugin {
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
 				'message' => __( 'Error al guardar la voz de TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'error' => $e->getMessage()
+			] );
+		}
+	}
+
+	/**
+	 * Handle AJAX request to load default audio assets
+	 */
+	public function handleLoadDefaultAssets(): void {
+		// Verify nonce and permissions
+		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+			! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+			], 403 );
+			return;
+		}
+
+		$post_id = intval( $_POST['post_id'] );
+
+		if ( ! $post_id ) {
+			wp_send_json_error( [
+				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+			] );
+			return;
+		}
+
+		try {
+			// Get default audio assets from configuration
+			$config = get_option( 'wp_tts_config', [] );
+			$default_intro = $config['audio_assets']['default_intro'] ?? '';
+			$default_outro = $config['audio_assets']['default_outro'] ?? '';
+			$default_background = $config['audio_assets']['default_background'] ?? '';
+
+			// Only load defaults if they exist
+			if ( $default_intro || $default_outro || $default_background ) {
+				if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+					$audio_assets = [
+						'intro_audio' => $default_intro,
+						'outro_audio' => $default_outro,
+						'background_audio' => $default_background,
+						'background_volume' => 0.3
+					];
+
+					$result = \WP_TTS\Utils\TTSMetaManager::updateTTSSection( $post_id, 'audio_assets', $audio_assets );
+					
+					if ( $result ) {
+						wp_send_json_success( [
+							'message' => __( 'Recursos de audio por defecto cargados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+							'assets' => $audio_assets
+						] );
+					} else {
+						wp_send_json_error( [
+							'message' => __( 'Falló al cargar recursos de audio por defecto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+						] );
+					}
+				} else {
+					wp_send_json_error( [
+						'message' => __( 'TTSMetaManager no disponible', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+					] );
+				}
+			} else {
+				wp_send_json_success( [
+					'message' => __( 'No hay recursos de audio por defecto configurados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				] );
+			}
+		} catch ( \Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Error al cargar recursos de audio por defecto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
 				'error' => $e->getMessage()
 			] );
 		}

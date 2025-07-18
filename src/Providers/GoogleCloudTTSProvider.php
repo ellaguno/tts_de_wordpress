@@ -136,9 +136,23 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			throw new ProviderException( 'Google Cloud SDK for PHP not found. Run "composer require google/cloud-text-to-speech".' );
 		}
 		
-		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-MX-Wavenet-A');
-		// Google voice names are like 'es-MX-Wavenet-A'. We need language code and name separately.
-		$language_code = substr( $voice_id, 0, 5 ); // e.g., es-MX
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-ES-Standard-A');
+		
+		// Validate Google voice ID - get all available voices and check if provided voice exists
+		$all_voices = $this->getAvailableVoices();
+		$valid_voice_ids = array_column($all_voices, 'id');
+		
+		if (!in_array($voice_id, $valid_voice_ids)) {
+			$this->logger->warning('Invalid Google TTS voice ID provided, using default', [
+				'provided_voice' => $voice_id,
+				'valid_voices' => $valid_voice_ids,
+				'using_default' => 'es-ES-Standard-A'
+			]);
+			$voice_id = $this->config['default_voice'] ?? 'es-ES-Standard-A';
+		}
+		
+		// Google voice names are like 'es-ES-Standard-A'. We need language code and name separately.
+		$language_code = substr( $voice_id, 0, 5 ); // e.g., es-ES
 		$voice_name = $voice_id;
 		
 		$output_format_enum = \Google\Cloud\TextToSpeech\V1\AudioEncoding::MP3; // Default to MP3
@@ -229,28 +243,32 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
-		// Standard voices for common languages
+		// Standard voices (free tier) for common languages
 		$voices = [
-			// Spanish (Mexico)
-			'es-MX' => [
-				[ 'id' => 'es-MX-Wavenet-A', 'name' => 'Wavenet A (Mexican Spanish Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-MX-Wavenet-B', 'name' => 'Wavenet B (Mexican Spanish Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-MX-Wavenet-C', 'name' => 'Wavenet C (Mexican Spanish Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-MX-Wavenet-D', 'name' => 'Wavenet D (Mexican Spanish Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-			],
-			// Spanish (Spain)
+			// Spanish (Spain) - Standard voices available
 			'es-ES' => [
-				[ 'id' => 'es-ES-Wavenet-A', 'name' => 'Wavenet A (Spanish Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-ES-Wavenet-B', 'name' => 'Wavenet B (Spanish Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-ES-Wavenet-C', 'name' => 'Wavenet C (Spanish Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-ES-Wavenet-D', 'name' => 'Wavenet D (Spanish Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-D', 'name' => 'Standard D (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-E', 'name' => 'Standard E (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-F', 'name' => 'Standard F (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-G', 'name' => 'Standard G (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-H', 'name' => 'Standard H (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
 			],
-			// English (US)
+			// Spanish (Mexico) - Note: No Standard voices available for es-MX, using es-ES as fallback
+			'es-MX' => [
+				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Spanish Female) - Fallback', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Spanish Male) - Fallback', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Spanish Female) - Fallback', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-E', 'name' => 'Standard E (Spanish Male) - Fallback', 'gender' => 'Male', 'type' => 'Standard' ],
+			],
+			// English (US) - Standard voices available
 			'en-US' => [
-				[ 'id' => 'en-US-Wavenet-A', 'name' => 'Wavenet A (English US Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'en-US-Wavenet-B', 'name' => 'Wavenet B (English US Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'en-US-Wavenet-C', 'name' => 'Wavenet C (English US Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'en-US-Wavenet-D', 'name' => 'Wavenet D (English US Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				[ 'id' => 'en-US-Standard-A', 'name' => 'Standard A (English US Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-B', 'name' => 'Standard B (English US Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-C', 'name' => 'Standard C (English US Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-D', 'name' => 'Standard D (English US Male)', 'gender' => 'Male', 'type' => 'Standard' ],
 			],
 		];
 

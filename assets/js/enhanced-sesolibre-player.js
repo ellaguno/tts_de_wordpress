@@ -694,8 +694,7 @@ class TTSEnhancedSesoLibrePlayer {
             }
         } else {
             // Likely CORS error for external URLs
-            if (audio && audio.src && (audio.src.includes('buzzsprout.com') || !audio.src.includes(window.location.hostname))) {
-                errorMessage = 'Audio externo cargado (limitaciones de metadatos)';
+            if (audio && audio.src && (audio.src.includes('buzzsprout.com') || audio.src.includes('audio.buzzsprout.com') || !audio.src.includes(window.location.hostname))) {
                 console.info(`External audio from ${audioType}: Metadata may be limited due to CORS policy`);
                 // Don't show error for external audio, just log it
                 return;
