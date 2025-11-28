@@ -44,7 +44,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Enable/Disable TTS -->
     <div class="wp-tts-field">
         <div class="wp-tts-field-header">
-            <label for="tts_enabled" class="wp-tts-field-label"><?php _e('Enable TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
+            <label for="tts_enabled" class="wp-tts-field-label"><?php _e('Enable TTS', 'wp-tts-sesolibre'); ?></label>
             <label class="wp-tts-toggle">
                 <input type="checkbox" 
                        id="tts_enabled" 
@@ -55,46 +55,46 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             </label>
         </div>
         <p class="wp-tts-field-description">
-            <?php _e('Enable text-to-speech conversion for this post', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+            <?php _e('Enable text-to-speech conversion for this post', 'wp-tts-sesolibre'); ?>
         </p>
     </div>
 
     <!-- TTS Provider Selection -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
+            <label for="tts_voice_provider" class="wp-tts-field-label"><?php _e('TTS Provider', 'wp-tts-sesolibre'); ?></label>
         </div>
         <div class="wp-tts-field-content">
             <?php if (empty($enabled_providers)): ?>
                 <div class="notice notice-warning inline" style="margin: 0; padding: 8px 12px;">
                     <p style="margin: 0;">
-                        <?php _e('No TTS providers are currently enabled. Please go to', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        <?php _e('No TTS providers are currently enabled. Please go to', 'wp-tts-sesolibre'); ?>
                         <a href="<?php echo admin_url('options-general.php?page=wp-tts-settings'); ?>" target="_blank">
-                            <?php _e('TTS Settings', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                            <?php _e('TTS Settings', 'wp-tts-sesolibre'); ?>
                         </a>
-                        <?php _e('to enable at least one provider.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        <?php _e('to enable at least one provider.', 'wp-tts-sesolibre'); ?>
                     </p>
                 </div>
                 <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select" disabled>
-                    <option value=""><?php _e('No providers enabled', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
+                    <option value=""><?php _e('No providers enabled', 'wp-tts-sesolibre'); ?></option>
                 </select>
             <?php else: ?>
                 <select id="tts_voice_provider" name="tts_voice_provider" class="wp-tts-select">
-                    <option value=""><?php _e('Use default provider', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
+                    <option value=""><?php _e('Use default provider', 'wp-tts-sesolibre'); ?></option>
                     <?php foreach ($enabled_providers as $provider_name): ?>
                         <?php $provider_config = $config->getProviderConfig($provider_name); ?>
                         <option value="<?php echo esc_attr($provider_name); ?>" 
                                 <?php selected($provider, $provider_name); ?>>
                             <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider_name))); ?>
                             <?php if ($provider_name === $defaults['default_provider']): ?>
-                                (<?php _e('Default', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>)
+                                (<?php _e('Default', 'wp-tts-sesolibre'); ?>)
                             <?php endif; ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             <?php endif; ?>
             <p class="wp-tts-field-description">
-                <?php _e('Select the TTS provider for this post', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <?php _e('Select the TTS provider for this post', 'wp-tts-sesolibre'); ?>
             </p>
         </div>
     </div>
@@ -102,15 +102,15 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Voice Selection -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label for="tts_voice_id" class="wp-tts-field-label"><?php _e('Voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
+            <label for="tts_voice_id" class="wp-tts-field-label"><?php _e('Voice', 'wp-tts-sesolibre'); ?></label>
         </div>
         <div class="wp-tts-field-content">
             <select id="tts_voice_id" name="tts_voice_id" class="wp-tts-select">
-                <option value=""><?php _e('Use default voice', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></option>
+                <option value=""><?php _e('Use default voice', 'wp-tts-sesolibre'); ?></option>
                 <!-- Voices will be loaded via AJAX based on provider selection -->
             </select>
             <p class="wp-tts-field-description">
-                <?php _e('Select the voice for text-to-speech conversion', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <?php _e('Select the voice for text-to-speech conversion', 'wp-tts-sesolibre'); ?>
             </p>
         </div>
     </div>
@@ -120,8 +120,8 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
         <div class="wp-tts-field-header" style="cursor: pointer;" onclick="toggleAudioAssets()">
             <label class="wp-tts-field-label">
                 <span id="audio-assets-toggle" style="margin-right: 8px;">▶</span>
-                <?php _e('Audio Assets', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <small style="color: #666; font-weight: normal;"><?php _e('(Click to expand)', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></small>
+                <?php _e('Audio Assets', 'wp-tts-sesolibre'); ?>
+                <small style="color: #666; font-weight: normal;"><?php _e('(Click to expand)', 'wp-tts-sesolibre'); ?></small>
             </label>
         </div>
         <div class="wp-tts-field-content" id="audio-assets-content" style="display: none;">
@@ -148,10 +148,10 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             ], $audio_assets);
             
             $asset_types = [
-                'intro_audio' => __('Intro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
-                'background_audio' => __('Background Music', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
-                'outro_audio' => __('Outro Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'),
-                'custom_audio' => __('Custom Audio (replaces TTS)', 'TTS-SesoLibre-v1.6.7-shortcode-docs')
+                'intro_audio' => __('Intro Audio', 'wp-tts-sesolibre'),
+                'background_audio' => __('Background Music', 'wp-tts-sesolibre'),
+                'outro_audio' => __('Outro Audio', 'wp-tts-sesolibre'),
+                'custom_audio' => __('Custom Audio (replaces TTS)', 'wp-tts-sesolibre')
             ];
             
             foreach ($asset_types as $asset_key => $asset_label): 
@@ -179,7 +179,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                     <?php echo esc_html($asset_label); ?>
                     <?php if ($is_default): ?>
                         <span style="background: #0073aa; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 500; margin-left: 6px;">
-                            <?php _e('DEFAULT', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                            <?php _e('DEFAULT', 'wp-tts-sesolibre'); ?>
                         </span>
                     <?php endif; ?>
                 </h4>
@@ -191,24 +191,24 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                         <?php if ($asset_url): ?>
                             <audio controls style="width: 100%; margin-bottom: 10px;">
                                 <source src="<?php echo esc_url($asset_url); ?>" type="audio/mpeg">
-                                <?php _e('Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Your browser does not support the audio element.', 'wp-tts-sesolibre'); ?>
                             </audio>
                         <?php endif; ?>
                         <p class="tts-media-title"><?php echo esc_html($asset_title); ?></p>
                     </div>
                     
                     <div class="tts-media-buttons">
-                        <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
-                        <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
+                        <button type="button" class="button tts-select-media"><?php _e('Select Audio', 'wp-tts-sesolibre'); ?></button>
+                        <button type="button" class="button tts-remove-media" style="<?php echo $asset_id ? '' : 'display: none;'; ?>"><?php _e('Remove', 'wp-tts-sesolibre'); ?></button>
                         <?php if ($default_id && !$is_default): ?>
-                            <button type="button" class="button tts-use-default" data-default-id="<?php echo esc_attr($default_id); ?>"><?php _e('Use Default', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></button>
+                            <button type="button" class="button tts-use-default" data-default-id="<?php echo esc_attr($default_id); ?>"><?php _e('Use Default', 'wp-tts-sesolibre'); ?></button>
                         <?php endif; ?>
                     </div>
                 </div>
                 
                 <?php if ($asset_key === 'background_audio'): ?>
                 <div style="margin-top: 10px;">
-                    <label><?php _e('Default Volume:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
+                    <label><?php _e('Default Volume:', 'wp-tts-sesolibre'); ?></label>
                     <input type="range" name="tts_background_volume" 
                            value="<?php echo esc_attr($audio_assets['background_volume'] ?? 0.3); ?>" 
                            min="0" max="1" step="0.1" style="width: 150px; margin-left: 10px;">
@@ -220,12 +220,12 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
             <?php endforeach; ?>
             
             <p class="wp-tts-field-description">
-                <?php _e('Configure audio assets for enhanced playback experience:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <br>• <strong><?php _e('Intro Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Plays before the main TTS audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <br>• <strong><?php _e('Background Music:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Loops during main TTS audio playback', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <br>• <strong><?php _e('Outro Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Plays after the main TTS audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <br>• <strong><?php _e('Custom Audio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php _e('Replaces auto-generated TTS entirely', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
-                <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></em>
+                <?php _e('Configure audio assets for enhanced playback experience:', 'wp-tts-sesolibre'); ?>
+                <br>• <strong><?php _e('Intro Audio:', 'wp-tts-sesolibre'); ?></strong> <?php _e('Plays before the main TTS audio', 'wp-tts-sesolibre'); ?>
+                <br>• <strong><?php _e('Background Music:', 'wp-tts-sesolibre'); ?></strong> <?php _e('Loops during main TTS audio playback', 'wp-tts-sesolibre'); ?>
+                <br>• <strong><?php _e('Outro Audio:', 'wp-tts-sesolibre'); ?></strong> <?php _e('Plays after the main TTS audio', 'wp-tts-sesolibre'); ?>
+                <br>• <strong><?php _e('Custom Audio:', 'wp-tts-sesolibre'); ?></strong> <?php _e('Replaces auto-generated TTS entirely', 'wp-tts-sesolibre'); ?>
+                <br><em><?php _e('Supported formats: MP3, WAV, OGG', 'wp-tts-sesolibre'); ?></em>
             </p>
         </div>
     </div>
@@ -233,25 +233,25 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
     <!-- Generation Status and Controls -->
     <div class="wp-tts-field wp-tts-conditional" data-depends="tts_enabled">
         <div class="wp-tts-field-header">
-            <label class="wp-tts-field-label"><?php _e('Audio Status', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></label>
+            <label class="wp-tts-field-label"><?php _e('Audio Status', 'wp-tts-sesolibre'); ?></label>
         </div>
         <div class="wp-tts-field-content">
                     <div class="wp-tts-status-container">
                         <?php if ($audio_url): ?>
                             <div class="wp-tts-status wp-tts-status-success">
                                 <span class="dashicons dashicons-yes-alt"></span>
-                                <?php _e('Audio generated successfully', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Audio generated successfully', 'wp-tts-sesolibre'); ?>
                                 <a href="<?php echo esc_url($audio_url); ?>" target="_blank" class="button button-small">
-                                    <?php _e('Listen', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                    <?php _e('Listen', 'wp-tts-sesolibre'); ?>
                                 </a>
                             </div>
                             
                             <!-- Audio Information -->
                             <div class="wp-tts-audio-info" style="background: #f8f9fa; border: 1px solid #e2e4e7; border-radius: 4px; padding: 12px; margin-top: 10px; font-size: 13px;">
-                                <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1d2327;"><?php _e('Audio Details', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></h4>
+                                <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #1d2327;"><?php _e('Audio Details', 'wp-tts-sesolibre'); ?></h4>
                                 <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center;">
                                     <?php if ($provider): ?>
-                                    <strong style="color: #646970;"><?php _e('Provider:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Provider:', 'wp-tts-sesolibre'); ?></strong>
                                     <span style="color: #1d2327;">
                                         <?php echo esc_html(ucfirst(str_replace('_', ' ', $provider))); ?>
                                         <span style="background: #007cba; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: 500; margin-left: 6px;">
@@ -261,7 +261,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     <?php endif; ?>
                                     
                                     <?php if ($voice_id): ?>
-                                    <strong style="color: #646970;"><?php _e('Voice:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Voice:', 'wp-tts-sesolibre'); ?></strong>
                                     <span style="color: #1d2327;"><?php echo esc_html($voice_id); ?></span>
                                     <?php endif; ?>
                                     
@@ -279,14 +279,14 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     }
                                     if ($generated_at): 
                                     ?>
-                                    <strong style="color: #646970;"><?php _e('Generated:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('Generated:', 'wp-tts-sesolibre'); ?></strong>
                                     <span style="color: #1d2327;">
                                         <?php 
                                         $timestamp = strtotime($generated_at);
                                         echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp)); 
                                         ?>
                                         <span style="color: #646970; font-size: 11px;">
-                                            (<?php echo esc_html(human_time_diff($timestamp, current_time('timestamp'))); ?> <?php _e('ago', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>)
+                                            (<?php echo esc_html(human_time_diff($timestamp, current_time('timestamp'))); ?> <?php _e('ago', 'wp-tts-sesolibre'); ?>)
                                         </span>
                                     </span>
                                     <?php endif; ?>
@@ -302,7 +302,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                                     }
                                     if ($file_size): 
                                     ?>
-                                    <strong style="color: #646970;"><?php _e('File Size:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong>
+                                    <strong style="color: #646970;"><?php _e('File Size:', 'wp-tts-sesolibre'); ?></strong>
                                     <span style="color: #1d2327;"><?php echo esc_html($file_size); ?></span>
                                     <?php endif; ?>
                                 </div>
@@ -310,22 +310,22 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                             
                             <audio controls style="width: 100%; margin-top: 10px;">
                                 <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-                                <?php _e('Your browser does not support the audio element.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Your browser does not support the audio element.', 'wp-tts-sesolibre'); ?>
                             </audio>
                         <?php elseif ($status === 'processing'): ?>
                             <div class="wp-tts-status wp-tts-status-processing">
                                 <span class="dashicons dashicons-update wp-tts-spin"></span>
-                                <?php _e('Generating audio...', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Generating audio...', 'wp-tts-sesolibre'); ?>
                             </div>
                         <?php elseif ($status === 'failed'): ?>
                             <div class="wp-tts-status wp-tts-status-error">
                                 <span class="dashicons dashicons-warning"></span>
-                                <?php _e('Audio generation failed', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Audio generation failed', 'wp-tts-sesolibre'); ?>
                             </div>
                         <?php else: ?>
                             <div class="wp-tts-status wp-tts-status-pending">
                                 <span class="dashicons dashicons-clock"></span>
-                                <?php _e('Audio not generated yet', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Audio not generated yet', 'wp-tts-sesolibre'); ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -333,23 +333,23 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                     <div class="wp-tts-actions" style="margin-top: 15px;">
                         <button type="button" id="tts_edit_text" class="button button-secondary" style="margin-bottom: 10px;">
                             <span class="dashicons dashicons-edit"></span>
-                            <?php _e('Edit Text Before Generate', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                            <?php _e('Edit Text Before Generate', 'wp-tts-sesolibre'); ?>
                         </button>
                         <br>
                         <button type="button" id="tts_generate_now" class="button button-primary" 
                                 <?php echo $status === 'processing' ? 'disabled' : ''; ?>>
                             <span class="dashicons dashicons-controls-play"></span>
-                            <?php _e('Generate Audio Now', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                            <?php _e('Generate Audio Now', 'wp-tts-sesolibre'); ?>
                         </button>
                         
                         <?php if ($audio_url): ?>
                             <button type="button" id="tts_regenerate" class="button button-secondary">
                                 <span class="dashicons dashicons-update"></span>
-                                <?php _e('Regenerate', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Regenerate', 'wp-tts-sesolibre'); ?>
                             </button>
                             <button type="button" id="tts_delete_audio" class="button button-secondary" style="color: #d63638;">
                                 <span class="dashicons dashicons-trash"></span>
-                                <?php _e('Delete Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                                <?php _e('Delete Audio', 'wp-tts-sesolibre'); ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -358,7 +358,7 @@ if (empty($enabled_providers) && !empty($debug_enabled)) {
                         <div class="wp-tts-progress-bar">
                             <div class="wp-tts-progress-fill" style="width: 0%;"></div>
                         </div>
-                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></p>
+                        <p class="wp-tts-progress-text"><?php _e('Preparing...', 'wp-tts-sesolibre'); ?></p>
                     </div>
         </div>
     </div>
@@ -826,7 +826,7 @@ jQuery(document).ready(function($) {
                     nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
                 },
                 success: function(response) {
-                    console.log('TTS enabled state saved:', response);
+                    // Debug removed
                     
                     // If enabling TTS for the first time, load default assets
                     if (isEnabled && response.success && response.data && response.data.load_defaults) {
@@ -834,7 +834,7 @@ jQuery(document).ready(function($) {
                     }
                 },
                 error: function() {
-                    console.log('Failed to save TTS enabled state');
+                    // Debug removed
                 }
             });
         }
@@ -856,12 +856,12 @@ jQuery(document).ready(function($) {
                 },
                 success: function(response) {
                     if (response.success) {
-                        console.log('Default assets loaded, reloading page');
+                        // Debug removed
                         location.reload();
                     }
                 },
                 error: function() {
-                    console.log('Failed to load default assets');
+                    // Debug removed
                 }
             });
         }
@@ -873,7 +873,7 @@ jQuery(document).ready(function($) {
         const currentVoiceId = '<?php echo esc_js($voice_id); ?>';
         
         if (provider) {
-            console.log('Initializing voices for preselected provider:', provider);
+            // Debug removed
             const $voiceSelect = $('#tts_voice_id');
             $voiceSelect.html('<option value=""><?php _e("Loading voices...", "TTS SesoLibre"); ?></option>');
             
@@ -893,7 +893,7 @@ jQuery(document).ready(function($) {
                             options += `<option value="${voice.id}"${selected}>${voice.name} (${voice.language})</option>`;
                         });
                         $voiceSelect.html(options);
-                        console.log('Voices loaded, preselected voice:', currentVoiceId);
+                        // Debug removed
                     } else {
                         $voiceSelect.html('<option value=""><?php _e("Error loading voices", "TTS SesoLibre"); ?></option>');
                     }
@@ -926,10 +926,10 @@ jQuery(document).ready(function($) {
                     nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
                 },
                 success: function(response) {
-                    console.log('TTS provider saved:', response);
+                    // Debug removed
                 },
                 error: function() {
-                    console.log('Failed to save TTS provider');
+                    // Debug removed
                 }
             });
         }
@@ -984,10 +984,10 @@ jQuery(document).ready(function($) {
                     nonce: '<?php echo wp_create_nonce("wp_tts_auto_save"); ?>'
                 },
                 success: function(response) {
-                    console.log('TTS voice saved:', response);
+                    // Debug removed
                 },
                 error: function() {
-                    console.log('Failed to save TTS voice');
+                    // Debug removed
                 }
             });
         }
@@ -995,13 +995,13 @@ jQuery(document).ready(function($) {
     
     // Generate audio
     $('#tts_generate_now, #tts_regenerate').on('click', function() {
-        console.log('TTS DEBUG: Generate Audio Now button clicked');
+        // Debug removed
         const postId = $('#post_ID').val();
         
-        console.log('TTS DEBUG: Post ID:', postId);
+        // Debug removed
         
         if (!postId) {
-            console.log('TTS DEBUG: No post ID, showing alert');
+            // Debug removed
             alert('<?php _e("Please save the post first", "TTS de Wordpress"); ?>');
             return;
         }
@@ -1020,7 +1020,7 @@ jQuery(document).ready(function($) {
             $('.wp-tts-progress-fill').css('width', progress + '%');
         }, 500);
         
-        console.log('TTS DEBUG: Starting Generate Audio AJAX request');
+        // Debug removed
         
         $.ajax({
             url: ajaxurl,
@@ -1031,30 +1031,30 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce("wp_tts_generate_audio"); ?>'
             },
             success: function(response) {
-                console.log('TTS DEBUG: Generate Audio AJAX success response:', response);
+                // Debug removed
                 clearInterval(progressInterval);
                 $('.wp-tts-progress-fill').css('width', '100%');
                 
                 if (response.success) {
-                    console.log('TTS DEBUG: Audio generation successful, scheduling page reload');
+                    // Debug removed
                     setTimeout(function() {
-                        console.log('TTS DEBUG: Executing page reload');
+                        // Debug removed
                         location.reload(); // Reload to show updated status
                     }, 1000);
                 } else {
-                    console.log('TTS DEBUG: Audio generation failed:', response.data.message);
+                    // Debug removed
                     alert(response.data.message || '<?php _e("Generation failed", "TTS de Wordpress"); ?>');
                     $('#tts_generation_progress').hide();
                 }
             },
             error: function(xhr, status, error) {
-                console.log('TTS DEBUG: Generate Audio AJAX error:', xhr, status, error);
+                // Debug removed
                 clearInterval(progressInterval);
                 alert('<?php _e("Generation failed", "TTS de Wordpress"); ?>');
                 $('#tts_generation_progress').hide();
             },
             complete: function() {
-                console.log('TTS DEBUG: Generate Audio AJAX complete');
+                // Debug removed
                 $button.prop('disabled', false).text(originalText);
             }
         });
@@ -1277,12 +1277,12 @@ jQuery(document).ready(function($) {
         const postId = $('#post_ID').val();
         
         if (!postId) {
-            alert('<?php _e("Please save the post first", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            alert('<?php _e("Please save the post first", "wp-tts-sesolibre"); ?>');
             return;
         }
         
         // Show loading
-        $(this).prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Loading...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        $(this).prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Loading...", "wp-tts-sesolibre"); ?>');
         
         // Extract content via AJAX
         $.ajax({
@@ -1298,14 +1298,14 @@ jQuery(document).ready(function($) {
                     originalPostText = response.data.text;
                     showTextEditorModal(response.data);
                 } else {
-                    alert(response.data.message || '<?php _e("Error extracting content", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                    alert(response.data.message || '<?php _e("Error extracting content", "wp-tts-sesolibre"); ?>');
                 }
             },
             error: function() {
-                alert('<?php _e("Error connecting to server", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                alert('<?php _e("Error connecting to server", "wp-tts-sesolibre"); ?>');
             },
             complete: function() {
-                $('#tts_edit_text').prop('disabled', false).html('<span class="dashicons dashicons-edit"></span> <?php _e("Edit Text Before Generate", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                $('#tts_edit_text').prop('disabled', false).html('<span class="dashicons dashicons-edit"></span> <?php _e("Edit Text Before Generate", "wp-tts-sesolibre"); ?>');
             }
         });
     });
@@ -1317,41 +1317,41 @@ jQuery(document).ready(function($) {
             <div id="tts-editor-modal" class="tts-modal-backdrop">
                 <div class="tts-modal-container">
                     <div class="tts-modal-header">
-                        <h2><?php _e("Edit Text for TTS Generation", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></h2>
+                        <h2><?php _e("Edit Text for TTS Generation", "wp-tts-sesolibre"); ?></h2>
                         <span class="tts-modal-close">&times;</span>
                     </div>
                     <div class="tts-modal-body">
                         <div class="tts-editor-info">
-                            <strong><?php _e("Post:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></strong> ${data.post_title}
+                            <strong><?php _e("Post:", "wp-tts-sesolibre"); ?></strong> ${data.post_title}
                             <div class="tts-validation-message ${data.validation.valid ? 'tts-valid' : 'tts-invalid'}">
                                 ${data.validation.valid ? '✓' : '⚠'} ${data.validation.message}
                             </div>
                         </div>
                         <div class="tts-editor-toolbar">
                             <button type="button" id="tts-clean-text" class="button button-small">
-                                <span class="dashicons dashicons-admin-tools"></span> <?php _e("Clean Text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                                <span class="dashicons dashicons-admin-tools"></span> <?php _e("Clean Text", "wp-tts-sesolibre"); ?>
                             </button>
                             <button type="button" id="tts-reset-text" class="button button-small">
-                                <span class="dashicons dashicons-undo"></span> <?php _e("Reset to Original", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                                <span class="dashicons dashicons-undo"></span> <?php _e("Reset to Original", "wp-tts-sesolibre"); ?>
                             </button>
                         </div>
                         <textarea id="tts-editor-textarea" rows="15" class="large-text">${data.text}</textarea>
                         <div class="tts-editor-stats">
-                            <span id="tts-char-count">${data.character_count}</span> <?php _e("characters", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span id="tts-char-count">${data.character_count}</span> <?php _e("characters", "wp-tts-sesolibre"); ?>
                             <span style="margin: 0 10px;">|</span>
-                            <span id="tts-word-count">${data.word_count}</span> <?php _e("words", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span id="tts-word-count">${data.word_count}</span> <?php _e("words", "wp-tts-sesolibre"); ?>
                             <span style="margin: 0 10px;">|</span>
-                            <span id="tts-cost-estimate">$${((data.character_count / 1000000) * 15).toFixed(4)}</span> <?php _e("estimated cost", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span id="tts-cost-estimate">$${((data.character_count / 1000000) * 15).toFixed(4)}</span> <?php _e("estimated cost", "wp-tts-sesolibre"); ?>
                         </div>
                     </div>
                     <div class="tts-modal-footer">
                         <button type="button" id="tts-save-and-generate" class="button button-primary">
-                            <span class="dashicons dashicons-controls-play"></span> <?php _e("Save & Generate Audio", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span class="dashicons dashicons-controls-play"></span> <?php _e("Save & Generate Audio", "wp-tts-sesolibre"); ?>
                         </button>
                         <button type="button" id="tts-save-only" class="button button-secondary">
-                            <span class="dashicons dashicons-saved"></span> <?php _e("Save Only", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>
+                            <span class="dashicons dashicons-saved"></span> <?php _e("Save Only", "wp-tts-sesolibre"); ?>
                         </button>
-                        <button type="button" class="button tts-modal-close"><?php _e("Cancel", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?></button>
+                        <button type="button" class="button tts-modal-close"><?php _e("Cancel", "wp-tts-sesolibre"); ?></button>
                     </div>
                 </div>
             </div>
@@ -1400,7 +1400,7 @@ jQuery(document).ready(function($) {
     
     // Reset text
     $(document).on('click', '#tts-reset-text', function() {
-        if (originalPostText && confirm('<?php _e("Are you sure you want to reset to the original text? All changes will be lost.", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>')) {
+        if (originalPostText && confirm('<?php _e("Are you sure you want to reset to the original text? All changes will be lost.", "wp-tts-sesolibre"); ?>')) {
             $('#tts-editor-textarea').val(originalPostText);
             updateEditorStats();
         }
@@ -1408,24 +1408,24 @@ jQuery(document).ready(function($) {
     
     // Save only
     $(document).on('click', '#tts-save-only', function() {
-        console.log('TTS DEBUG: Save Only button clicked');
+        // Debug removed
         const postId = $('#post_ID').val();
         const text = $('#tts-editor-textarea').val().trim();
         
-        console.log('TTS DEBUG: Post ID:', postId);
-        console.log('TTS DEBUG: Text length:', text.length);
+        // Debug removed
+        // Debug removed
         
         if (!text) {
-            console.log('TTS DEBUG: Text is empty, showing alert');
-            alert('<?php _e("Text cannot be empty", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            // Debug removed
+            alert('<?php _e("Text cannot be empty", "wp-tts-sesolibre"); ?>');
             return;
         }
         
         const $button = $(this);
         const originalText = $button.html();
-        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving...", "wp-tts-sesolibre"); ?>');
         
-        console.log('TTS DEBUG: Starting AJAX request to save text');
+        // Debug removed
         
         $.ajax({
             url: ajaxurl,
@@ -1437,30 +1437,30 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
             },
             success: function(response) {
-                console.log('TTS DEBUG: Save Only AJAX success response:', response);
+                // Debug removed
                 if (response.success) {
                     const charCount = response.data.character_count || 0;
                     const wordCount = response.data.word_count || 0;
-                    let message = '<?php _e("Text saved successfully!", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
-                    message += '\n<?php _e("Characters:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + charCount;
-                    message += '\n<?php _e("Words:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + wordCount;
-                    message += '\n\n<?php _e("You can now use the Generate Audio button to create TTS from your edited text.", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
-                    console.log('TTS DEBUG: Showing success alert:', message);
+                    let message = '<?php _e("Text saved successfully!", "wp-tts-sesolibre"); ?>';
+                    message += '\n<?php _e("Characters:", "wp-tts-sesolibre"); ?> ' + charCount;
+                    message += '\n<?php _e("Words:", "wp-tts-sesolibre"); ?> ' + wordCount;
+                    message += '\n\n<?php _e("You can now use the Generate Audio button to create TTS from your edited text.", "wp-tts-sesolibre"); ?>';
+                    // Debug removed
                     alert(message);
-                    console.log('TTS DEBUG: Removing modal');
+                    // Debug removed
                     $('#tts-editor-modal').remove();
                 } else {
-                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
-                    console.log('TTS DEBUG: Save failed:', errorMsg);
-                    alert('<?php _e("Save failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>\n\n' + errorMsg);
+                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "wp-tts-sesolibre"); ?>';
+                    // Debug removed
+                    alert('<?php _e("Save failed:", "wp-tts-sesolibre"); ?>\n\n' + errorMsg);
                 }
             },
             error: function(xhr, status, error) {
-                console.log('TTS DEBUG: Save Only AJAX error:', xhr, status, error);
-                alert('<?php _e("Error connecting to server:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + error);
+                // Debug removed
+                alert('<?php _e("Error connecting to server:", "wp-tts-sesolibre"); ?> ' + error);
             },
             complete: function() {
-                console.log('TTS DEBUG: Save Only AJAX complete, restoring button');
+                // Debug removed
                 $button.prop('disabled', false).html(originalText);
             }
         });
@@ -1468,28 +1468,28 @@ jQuery(document).ready(function($) {
     
     // Save and generate
     $(document).on('click', '#tts-save-and-generate', function() {
-        console.log('TTS DEBUG: Save and Generate button clicked');
+        // Debug removed
         const postId = $('#post_ID').val();
         const text = $('#tts-editor-textarea').val().trim();
         const provider = $('#tts_voice_provider').val();
         const voice = $('#tts_voice_id').val();
         
-        console.log('TTS DEBUG: Post ID:', postId);
-        console.log('TTS DEBUG: Text length:', text.length);
-        console.log('TTS DEBUG: Provider:', provider);
-        console.log('TTS DEBUG: Voice:', voice);
+        // Debug removed
+        // Debug removed
+        // Debug removed
+        // Debug removed
         
         if (!text) {
-            console.log('TTS DEBUG: Text is empty, showing alert');
-            alert('<?php _e("Text cannot be empty", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+            // Debug removed
+            alert('<?php _e("Text cannot be empty", "wp-tts-sesolibre"); ?>');
             return;
         }
         
         const $button = $(this);
         const originalText = $button.html();
-        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving & Generating...", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+        $button.prop('disabled', true).html('<span class="dashicons dashicons-update wp-tts-spin"></span> <?php _e("Saving & Generating...", "wp-tts-sesolibre"); ?>');
         
-        console.log('TTS DEBUG: Starting save text AJAX request');
+        // Debug removed
         
         // First save the text
         $.ajax({
@@ -1502,9 +1502,9 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
             },
             success: function(response) {
-                console.log('TTS DEBUG: Save text AJAX success response:', response);
+                // Debug removed
                 if (response.success) {
-                    console.log('TTS DEBUG: Text saved successfully, starting audio generation');
+                    // Debug removed
                     // Then generate audio
                     $.ajax({
                         url: ajaxurl,
@@ -1517,51 +1517,51 @@ jQuery(document).ready(function($) {
                             nonce: '<?php echo wp_create_nonce("wp_tts_admin"); ?>'
                         },
                         success: function(genResponse) {
-                            console.log('TTS DEBUG: Generate audio AJAX success response:', genResponse);
+                            // Debug removed
                             if (genResponse.success) {
                                 // Show detailed success message
                                 const audioUrl = genResponse.data.audio_url || '';
-                                let message = '<?php _e("Audio generated successfully!", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
+                                let message = '<?php _e("Audio generated successfully!", "wp-tts-sesolibre"); ?>';
                                 if (audioUrl) {
-                                    message += '\n<?php _e("Audio URL:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + audioUrl;
+                                    message += '\n<?php _e("Audio URL:", "wp-tts-sesolibre"); ?> ' + audioUrl;
                                 }
-                                console.log('TTS DEBUG: Showing success alert:', message);
+                                // Debug removed
                                 alert(message);
                                 
-                                console.log('TTS DEBUG: Removing modal');
+                                // Debug removed
                                 $('#tts-editor-modal').remove();
                                 
-                                console.log('TTS DEBUG: Scheduling page reload in 500ms');
+                                // Debug removed
                                 // Force reload after short delay to ensure modal is closed
                                 setTimeout(function() {
-                                    console.log('TTS DEBUG: Executing page reload');
+                                    // Debug removed
                                     window.location.reload();
                                 }, 500);
                             } else {
-                                const errorMsg = genResponse.data?.message || genResponse.message || '<?php _e("Error generating audio", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
-                                console.log('TTS DEBUG: Audio generation failed:', errorMsg);
-                                alert('<?php _e("Generation failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + errorMsg);
+                                const errorMsg = genResponse.data?.message || genResponse.message || '<?php _e("Error generating audio", "wp-tts-sesolibre"); ?>';
+                                // Debug removed
+                                alert('<?php _e("Generation failed:", "wp-tts-sesolibre"); ?> ' + errorMsg);
                             }
                         },
                         error: function(xhr, status, error) {
-                            console.log('TTS DEBUG: Generate audio AJAX error:', xhr, status, error);
-                            alert('<?php _e("Error generating audio:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?> ' + error);
+                            // Debug removed
+                            alert('<?php _e("Error generating audio:", "wp-tts-sesolibre"); ?> ' + error);
                         },
                         complete: function() {
-                            console.log('TTS DEBUG: Generate audio AJAX complete');
+                            // Debug removed
                             $button.prop('disabled', false).html(originalText);
                         }
                     });
                 } else {
-                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>';
-                    console.log('TTS DEBUG: Text save failed:', response);
-                    alert('<?php _e("Save failed:", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>\n\n' + errorMsg);
+                    const errorMsg = response.data?.message || response.message || '<?php _e("Error saving text", "wp-tts-sesolibre"); ?>';
+                    // Debug removed
+                    alert('<?php _e("Save failed:", "wp-tts-sesolibre"); ?>\n\n' + errorMsg);
                     $button.prop('disabled', false).html(originalText);
                 }
             },
             error: function(xhr, status, error) {
-                console.log('TTS DEBUG: Save text AJAX error:', xhr, status, error);
-                alert('<?php _e("Error saving text", "TTS-SesoLibre-v1.6.7-shortcode-docs"); ?>');
+                // Debug removed
+                alert('<?php _e("Error saving text", "wp-tts-sesolibre"); ?>');
                 $button.prop('disabled', false).html(originalText);
             }
         });

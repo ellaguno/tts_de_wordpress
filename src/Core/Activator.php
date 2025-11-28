@@ -49,14 +49,14 @@ class Activator {
 		// Check WordPress version
 		if ( version_compare( $wp_version, '5.0', '<' ) ) {
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere WordPress 5.0 o superior.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere WordPress 5.0 o superior.', 'wp-tts-sesolibre' )
 			);
 		}
 
 		// Check PHP version
 		if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere PHP 7.4 o superior.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere PHP 7.4 o superior.', 'wp-tts-sesolibre' )
 			);
 		}
 
@@ -66,7 +66,7 @@ class Activator {
 			if ( ! extension_loaded( $extension ) ) {
 				throw new \Exception(
 					sprintf(
-						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'wp-tts-sesolibre' ),
 						$extension
 					)
 				);
@@ -77,7 +77,7 @@ class Activator {
 		$upload_dir = wp_upload_dir();
 		if ( ! is_writable( $upload_dir['basedir'] ) ) {
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'wp-tts-sesolibre' )
 			);
 		}
 	}
@@ -351,9 +351,9 @@ class Activator {
 		$admin_email = get_option( 'admin_email' );
 
 		if ( $admin_email ) {
-			$subject = __( 'Plugin TTS de WordPress Activado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+			$subject = __( 'Plugin TTS de WordPress Activado', 'wp-tts-sesolibre' );
 			$message = sprintf(
-				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'wp-tts-sesolibre' ),
 				get_bloginfo( 'name' )
 			);
 

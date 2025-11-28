@@ -120,9 +120,6 @@ class VoiceValidator {
 			return $voice;
 		}
 
-		// Log the invalid voice
-		error_log( "[VoiceValidator] Invalid voice '{$voice}' for provider '{$provider}', using default" );
-
 		// Return default voice for provider
 		return self::getDefaultVoice( $provider );
 	}

@@ -105,7 +105,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Error al subir el archivo "%1$s" al almacenamiento %2$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Error al subir el archivo "%1$s" al almacenamiento %2$s', 'wp-tts-sesolibre' ),
 			$filename,
 			$provider
 		);
@@ -140,7 +140,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Error al eliminar el archivo "%1$s" del almacenamiento %2$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Error al eliminar el archivo "%1$s" del almacenamiento %2$s', 'wp-tts-sesolibre' ),
 			$fileUrl,
 			$provider
 		);
@@ -173,7 +173,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Falló la autenticación para el almacenamiento %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Falló la autenticación para el almacenamiento %s', 'wp-tts-sesolibre' ),
 			$provider
 		);
 
@@ -205,7 +205,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Cuota de almacenamiento superada para %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Cuota de almacenamiento superada para %s', 'wp-tts-sesolibre' ),
 			$provider
 		);
 
@@ -233,7 +233,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Archivo "%1$s" no encontrado en el almacenamiento %2$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Archivo "%1$s" no encontrado en el almacenamiento %2$s', 'wp-tts-sesolibre' ),
 			$filename,
 			$provider
 		);
@@ -266,7 +266,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'El archivo "%1$s" es demasiado grande (%2$s). El tamaño máximo para %3$s es %4$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'El archivo "%1$s" es demasiado grande (%2$s). El tamaño máximo para %3$s es %4$s', 'wp-tts-sesolibre' ),
 			$filename,
 			size_format( $fileSize ),
 			$provider,
@@ -303,7 +303,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
-			__( 'Error de red durante la operación %1$s con el almacenamiento %2$s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			__( 'Error de red durante la operación %1$s con el almacenamiento %2$s', 'wp-tts-sesolibre' ),
 			$operation,
 			$provider
 		);

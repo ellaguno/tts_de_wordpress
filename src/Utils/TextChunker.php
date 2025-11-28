@@ -35,8 +35,6 @@ class TextChunker {
 			return [ $text ];
 		}
 
-		error_log( "[TextChunker] Text length " . strlen( $text ) . " exceeds {$provider} limit {$limit}, chunking..." );
-
 		$chunks = [];
 		$sentences = self::splitIntoSentences( $text );
 		$current_chunk = '';
@@ -81,8 +79,6 @@ class TextChunker {
 		if ( ! empty( $current_chunk ) ) {
 			$chunks[] = trim( $current_chunk );
 		}
-
-		error_log( "[TextChunker] Split into " . count( $chunks ) . " chunks for {$provider}" );
 
 		return $chunks;
 	}

@@ -114,16 +114,16 @@ class TTSException extends \Exception {
 	 */
 	public function getUserMessage(): string {
 		$userMessages = array(
-			'INVALID_TEXT'         => __( 'El contenido del texto es inválido o está vacío.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'PROVIDER_ERROR'       => __( 'Hubo un error con el servicio TTS. Por favor, inténtelo de nuevo.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'QUOTA_EXCEEDED'       => __( 'Se ha superado la cuota del servicio TTS. Por favor, inténtelo más tarde.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'INVALID_VOICE'        => __( 'La voz seleccionada no está disponible.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'NETWORK_ERROR'        => __( 'Error de conexión de red. Por favor, verifique su conexión a internet.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'AUTHENTICATION_ERROR' => __( 'Falló la autenticación. Por favor, verifique sus credenciales de API.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'RATE_LIMIT_EXCEEDED'  => __( 'Límite de tasa superado. Por favor, espere antes de intentar de nuevo.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'UNSUPPORTED_FORMAT'   => __( 'El formato de audio solicitado no es compatible.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'TEXT_TOO_LONG'        => __( 'El texto es demasiado largo para procesarse.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'CONFIGURATION_ERROR'  => __( 'Error de configuración del plugin. Por favor, verifique su configuración.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'INVALID_TEXT'         => __( 'El contenido del texto es inválido o está vacío.', 'wp-tts-sesolibre' ),
+			'PROVIDER_ERROR'       => __( 'Hubo un error con el servicio TTS. Por favor, inténtelo de nuevo.', 'wp-tts-sesolibre' ),
+			'QUOTA_EXCEEDED'       => __( 'Se ha superado la cuota del servicio TTS. Por favor, inténtelo más tarde.', 'wp-tts-sesolibre' ),
+			'INVALID_VOICE'        => __( 'La voz seleccionada no está disponible.', 'wp-tts-sesolibre' ),
+			'NETWORK_ERROR'        => __( 'Error de conexión de red. Por favor, verifique su conexión a internet.', 'wp-tts-sesolibre' ),
+			'AUTHENTICATION_ERROR' => __( 'Falló la autenticación. Por favor, verifique sus credenciales de API.', 'wp-tts-sesolibre' ),
+			'RATE_LIMIT_EXCEEDED'  => __( 'Límite de tasa superado. Por favor, espere antes de intentar de nuevo.', 'wp-tts-sesolibre' ),
+			'UNSUPPORTED_FORMAT'   => __( 'El formato de audio solicitado no es compatible.', 'wp-tts-sesolibre' ),
+			'TEXT_TOO_LONG'        => __( 'El texto es demasiado largo para procesarse.', 'wp-tts-sesolibre' ),
+			'CONFIGURATION_ERROR'  => __( 'Error de configuración del plugin. Por favor, verifique su configuración.', 'wp-tts-sesolibre' ),
 		);
 
 		return $userMessages[ $this->getErrorType() ] ?? $this->getMessage();

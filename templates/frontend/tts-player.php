@@ -133,7 +133,7 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
      data-show-background-volume="<?php echo esc_attr($show_background_volume ? 'true' : 'false'); ?>">
      
     <div class="tts-branding">
-        <?php _e('Reproductor SesoLibre', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?> 
+        <?php _e('Reproductor SesoLibre', 'wp-tts-sesolibre'); ?> 
     </div> 
     
     <div class="tts-controls">
@@ -144,7 +144,7 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
         <?php endif; ?>
         
         <div class="tts-main-controls">
-            <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+            <button class="tts-play-pause" style="border-radius: 50%;" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'wp-tts-sesolibre'); ?>">
                 ▶
             </button>
             
@@ -158,7 +158,7 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
             
             <?php if ($player_config['show_speed_control'] ?? true): ?>
             <div class="tts-speed-control">
-                <button class="tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                <button class="tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'wp-tts-sesolibre'); ?>">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.94,2.55 2,6.81 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.09,17.93L17.97,16.54C16.64,18.34 14.47,19.5 12,19.5M8,8V16L16,12L8,8Z"></path>
                     </svg>
@@ -180,27 +180,27 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
                 <?php if ($show_voice_volume): ?>
                 <div class="tts-volume-control">
                     <label for="tts-voice-volume-<?php echo $post_id; ?>">
-                        <?php _e('Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        <?php _e('Voz', 'wp-tts-sesolibre'); ?>
                     </label>
                     <input type="range" 
                            id="tts-voice-volume-<?php echo $post_id; ?>"
                            class="tts-volume-slider tts-voice-slider" 
                            min="0" max="1" step="0.1" value="1"
-                           aria-label="<?php esc_attr_e('Volumen de Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Voz', 'wp-tts-sesolibre'); ?>">
                 </div>
                 <?php endif; ?>
                 
                 <?php if ($show_background_volume && !empty($background_url)): ?>
                 <div class="tts-volume-control">
                     <label for="tts-background-volume-<?php echo $post_id; ?>">
-                        <?php _e('Música', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                        <?php _e('Música', 'wp-tts-sesolibre'); ?>
                     </label>
                     <input type="range" 
                            id="tts-background-volume-<?php echo $post_id; ?>"
                            class="tts-volume-slider tts-background-slider" 
                            min="0" max="1" step="0.1" 
                            value="<?php echo esc_attr($background_volume); ?>"
-                           aria-label="<?php esc_attr_e('Volumen de Música de Fondo', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Música de Fondo', 'wp-tts-sesolibre'); ?>">
                 </div>
                 <?php endif; ?>
 
@@ -216,13 +216,13 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
     <div class="tts-info-bar">
         <?php if ($show_tts_service && !empty($provider_display)): ?>
             <span class="tts-info-item tts-service">
-                <strong><?php _e('Servicio:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($provider_display); ?>
+                <strong><?php _e('Servicio:', 'wp-tts-sesolibre'); ?></strong> <?php echo esc_html($provider_display); ?>
             </span>
         <?php endif; ?>
         
         <?php if ($show_voice_name && !empty($voice_id)): ?>
             <span class="tts-info-item tts-voice">
-                <strong><?php _e('Voz:', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></strong> <?php echo esc_html($voice_id); ?>
+                <strong><?php _e('Voz:', 'wp-tts-sesolibre'); ?></strong> <?php echo esc_html($voice_id); ?>
             </span>
         <?php endif; ?>
         
@@ -230,7 +230,7 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
             <span class="tts-info-item tts-download">
                 <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-link">
                     <span class="tts-headphones">🎧</span>
-                    <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                    <?php _e('Descargar', 'wp-tts-sesolibre'); ?>
                 </a>
             </span>
         <?php endif; ?>
@@ -243,6 +243,6 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
 
 <?php if ($use_custom_audio): ?>
 <p class="tts-custom-audio-notice" style="font-size: 12px; color: #666; margin-top: 10px; font-style: italic;">
-    <?php _e('Reproduciendo archivo de audio personalizado', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+    <?php _e('Reproduciendo archivo de audio personalizado', 'wp-tts-sesolibre'); ?>
 </p>
 <?php endif; ?>

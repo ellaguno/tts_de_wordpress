@@ -272,7 +272,6 @@ class ConfigurationManager {
 		
 		// Ensure storage is an array
 		if ( ! is_array( $storage ) ) {
-			error_log( "[ConfigurationManager] getEnabledStorageProviders() storage is not array: " . gettype( $storage ) );
 			return array();
 		}
 		
@@ -297,7 +296,6 @@ class ConfigurationManager {
 		
 		// Ensure we always return an array
 		if ( ! is_array( $defaults ) ) {
-			error_log( "[ConfigurationManager] getDefaults() returned non-array: " . gettype( $defaults ) );
 			return $this->defaults['defaults'];
 		}
 		
@@ -413,28 +411,28 @@ class ConfigurationManager {
 		switch ( $provider ) {
 			case 'azure':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave API es requerida', 'wp-tts-sesolibre' );
 				}
 				if ( empty( $config['region'] ) ) {
-					$errors[] = __( 'La región es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La región es requerida', 'wp-tts-sesolibre' );
 				}
 				break;
 
 			case 'google':
 				if ( empty( $config['credentials_json'] ) ) {
-					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'wp-tts-sesolibre' );
 				}
 				break;
 
 			case 'polly':
 				if ( empty( $config['access_key'] ) || empty( $config['secret_key'] ) ) {
-					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'wp-tts-sesolibre' );
 				}
 				break;
 
 			case 'elevenlabs':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave API es requerida', 'wp-tts-sesolibre' );
 				}
 				break;
 		}
@@ -454,14 +452,14 @@ class ConfigurationManager {
 		if ( isset( $defaults['voice_speed'] ) ) {
 			$speed = floatval( $defaults['voice_speed'] );
 			if ( $speed < 0.25 || $speed > 4.0 ) {
-				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'wp-tts-sesolibre' );
 			}
 		}
 
 		if ( isset( $defaults['voice_pitch'] ) ) {
 			$pitch = intval( $defaults['voice_pitch'] );
 			if ( $pitch < -20 || $pitch > 20 ) {
-				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'wp-tts-sesolibre' );
 			}
 		}
 

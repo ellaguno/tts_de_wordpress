@@ -40,11 +40,6 @@ class TTSSesoLibrePlayer {
         
         // Default playback rate
         this.playbackRate = 1.0;
-        
-        console.log('TTS SesoLibre Player initialized:', {
-            audioUrls: this.audioUrls,
-            config: this.config
-        });
     }
     
     initializeElements() {
@@ -509,16 +504,13 @@ class TTSSesoLibrePlayer {
 
 // Auto-initialization
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Looking for TTS SesoLibre players...');
-    
     const players = document.querySelectorAll('.tts-sesolibre-player');
-    console.log(`Found ${players.length} TTS players`);
-    
+
     players.forEach(playerElement => {
         try {
             new TTSSesoLibrePlayer(playerElement);
         } catch (error) {
-            console.error('Error initializing TTS player:', error);
+            // Silent fail - player initialization error
         }
     });
 });

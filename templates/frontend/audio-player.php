@@ -66,15 +66,15 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
             controls 
             preload="none"
             crossorigin="anonymous"
-            aria-label="<?php echo esc_attr(sprintf(__('Versión en audio de: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), $post_title)); ?>"
+            aria-label="<?php echo esc_attr(sprintf(__('Versión en audio de: %s', 'wp-tts-sesolibre'), $post_title)); ?>"
             class="wp-tts-audio-element">
             <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-            <p><?php _e('Tu navegador no soporta el elemento de audio.', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></p>
+            <p><?php _e('Tu navegador no soporta el elemento de audio.', 'wp-tts-sesolibre'); ?></p>
         </audio>
         
         <?php if ($player_config['show_speed_control'] ?? true): ?>
         <div class="wp-tts-speed-control">
-            <button class="wp-tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+            <button class="wp-tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'wp-tts-sesolibre'); ?>">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.94,2.55 2,6.81 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.09,17.93L17.97,16.54C16.64,18.34 14.47,19.5 12,19.5M8,8V16L16,12L8,8Z"></path>
                 </svg>
@@ -92,17 +92,17 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
     </div>
     
     <div class="wp-tts-player-meta">
-        <span class="wp-tts-label"><?php _e('Escucha el artículo', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></span>
+        <span class="wp-tts-label"><?php _e('Escucha el artículo', 'wp-tts-sesolibre'); ?></span>
         <?php if ($voice_id || $provider): ?>
             <span class="wp-tts-voice-info">
                 <?php 
                 if ($voice_id) {
-                    echo sprintf(__('Voz: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), esc_html($voice_id));
+                    echo sprintf(__('Voz: %s', 'wp-tts-sesolibre'), esc_html($voice_id));
                     if ($provider) {
                         echo ' (' . esc_html(ucfirst(str_replace('_', ' ', $provider))) . ')';
                     }
                 } else if ($provider) {
-                    echo sprintf(__('Proveedor: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
+                    echo sprintf(__('Proveedor: %s', 'wp-tts-sesolibre'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
                 }
                 ?>
             </span>
@@ -110,7 +110,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <span class="wp-tts-download">
         <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
             <span class="wp-tts-headphones">🎧</span>
-            <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+            <?php _e('Descargar', 'wp-tts-sesolibre'); ?>
             </a>
         </span>
     </div>
@@ -125,12 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Track audio events for analytics (optional)
         audioElement.addEventListener('play', function() {
             // You can add analytics tracking here
-            console.log('TTS Audio started playing');
+            // Debug removed
         });
         
         audioElement.addEventListener('ended', function() {
             // You can add analytics tracking here
-            console.log('TTS Audio finished playing');
+            // Debug removed
         });
         
         // Add loading state
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         audioElement.addEventListener('error', function() {
             audioPlayer.classList.add('wp-tts-error');
             const errorMsg = document.createElement('p');
-            errorMsg.textContent = '<?php echo esc_js(__('Error cargando el audio. Por favor intenta descargar el archivo.', 'TTS-SesoLibre-v1.6.7-shortcode-docs')); ?>';
+            errorMsg.textContent = '<?php echo esc_js(__('Error cargando el audio. Por favor intenta descargar el archivo.', 'wp-tts-sesolibre')); ?>';
             errorMsg.style.color = '#d63638';
             errorMsg.style.fontSize = '12px';
             errorMsg.style.marginTop = '8px';

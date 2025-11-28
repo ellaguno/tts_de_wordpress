@@ -69,6 +69,53 @@ class TTSService {
 	}
 	
 	/**
+	 * Check rate limiting for audio generation
+	 *
+	 * @param int $user_id User ID (0 for anonymous).
+	 * @return bool|array True if allowed, array with error info if rate limited.
+	 */
+	private function checkRateLimit( int $user_id = 0 ): bool|array {
+		$user_id = $user_id ?: get_current_user_id();
+		$rate_key = 'wp_tts_rate_' . $user_id;
+		$rate_data = get_transient( $rate_key );
+
+		// Rate limit configuration
+		$max_requests = apply_filters( 'wp_tts_rate_limit_max', 10 ); // 10 requests
+		$time_window = apply_filters( 'wp_tts_rate_limit_window', 60 ); // per 60 seconds
+
+		if ( false === $rate_data ) {
+			// First request
+			set_transient( $rate_key, [ 'count' => 1, 'start' => time() ], $time_window );
+			return true;
+		}
+
+		$count = $rate_data['count'] ?? 0;
+		$start = $rate_data['start'] ?? time();
+
+		// Check if we're still in the same time window
+		if ( ( time() - $start ) < $time_window ) {
+			if ( $count >= $max_requests ) {
+				$remaining = $time_window - ( time() - $start );
+				return [
+					'limited' => true,
+					'message' => sprintf(
+						__( 'Límite de solicitudes excedido. Por favor espera %d segundos.', 'wp-tts-sesolibre' ),
+						$remaining
+					),
+					'retry_after' => $remaining
+				];
+			}
+			// Increment count
+			set_transient( $rate_key, [ 'count' => $count + 1, 'start' => $start ], $time_window - ( time() - $start ) );
+		} else {
+			// Time window expired, reset
+			set_transient( $rate_key, [ 'count' => 1, 'start' => time() ], $time_window );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Generate audio from text
 	 *
 	 * @param string $text    Text to convert.
@@ -77,9 +124,20 @@ class TTSService {
 	 */
 	public function generateAudio( string $text, array $options = [] ): ?array {
 		try {
-			$this->logger->info( 'Starting TTS generation (Round Robin DISABLED)', [ 'text_length' => strlen( $text ) ] );
-			$this->logger->debug( '[generateAudio] Initial options received', $options );
-			
+			// Check rate limiting first
+			$rate_check = $this->checkRateLimit();
+			if ( is_array( $rate_check ) && isset( $rate_check['limited'] ) && $rate_check['limited'] ) {
+				$this->logger->warning( 'Rate limit exceeded for user', [ 'user_id' => get_current_user_id() ] );
+				return [
+					'success' => false,
+					'message' => $rate_check['message'],
+					'error_code' => 'RATE_LIMITED',
+					'retry_after' => $rate_check['retry_after']
+				];
+			}
+
+			$this->logger->info( 'Starting TTS generation', [ 'text_length' => strlen( $text ) ] );
+
 			// Check cache first
 			$textHash = $this->cache->generateTextHash( $text, $options );
 			$cached_url = $this->cache->getCachedAudioUrl( $textHash );
@@ -130,7 +188,7 @@ class TTSService {
 				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
 				return [
 					'success' => false,
-					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'wp-tts-sesolibre' ),
 					'error_code' => 'NO_PROVIDERS_CONFIGURED',
 					'available_providers' => [
 						'openai' => 'OpenAI TTS',
@@ -270,7 +328,7 @@ class TTSService {
 								return [
 									'success' => false,
 									'message' => sprintf( 
-										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'wp-tts-sesolibre' ),
 										$storage_error->getMessage(),
 										$fallback_error->getMessage()
 									),
@@ -323,7 +381,7 @@ class TTSService {
 				return [
 					'success' => false,
 					'message' => sprintf( 
-						__( 'La generación TTS falló con %s: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'La generación TTS falló con %s: %s', 'wp-tts-sesolibre' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -338,7 +396,7 @@ class TTSService {
 			return [
 				'success' => false,
 				'message' => sprintf( 
-					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'wp-tts-sesolibre' ),
 					$current_provider_name
 				),
 				'error_code' => 'GENERATION_FAILED',
