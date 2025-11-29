@@ -321,7 +321,9 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Text Editor for TTS
+    // Text Editor for TTS - store original text for reset functionality
+    var editorOriginalText = '';
+
     $('#extract_content').on('click', function() {
         const postId = $('#editor_post_id').val();
         const button = $(this);
@@ -343,9 +345,23 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success && response.data.content) {
-                    $('#editor_text').val(response.data.content);
+                    const content = response.data.content;
+                    editorOriginalText = content;
+                    $('#editor_text').val(content).trigger('input');
                     $('#editor_text_row, #editor_controls_row').show();
-                    $('#editor_post_title').text(response.data.title || 'Post #' + postId);
+                    $('#editor_post_title').text(response.data.title || response.data.post_title || 'Post #' + postId);
+
+                    // Show validation message if available
+                    if (response.data.validation) {
+                        const $message = $('#editor_validation_message');
+                        if (response.data.validation.valid) {
+                            $message.removeClass('notice-error').addClass('notice-success')
+                                   .html('<p>' + response.data.validation.message + '</p>').show();
+                        } else {
+                            $message.removeClass('notice-success').addClass('notice-error')
+                                   .html('<p>' + response.data.validation.message + '</p>').show();
+                        }
+                    }
                 } else {
                     alert('Error: ' + (response.data.message || 'No se pudo extraer el contenido'));
                 }
@@ -361,10 +377,10 @@ jQuery(document).ready(function($) {
 
     $('#save_edited_text').on('click', function() {
         const postId = $('#editor_post_id').val();
-        const content = $('#editor_text').val();
+        const text = $('#editor_text').val();
         const button = $(this);
 
-        if (!postId || !content.trim()) {
+        if (!postId || !text.trim()) {
             alert('ID de post y contenido son requeridos');
             return;
         }
@@ -377,7 +393,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'tts_save_edited_text',
                 post_id: postId,
-                content: content,
+                text: text,
                 nonce: wpTtsAdmin.nonce
             },
             success: function(response) {
@@ -398,11 +414,18 @@ jQuery(document).ready(function($) {
 
     $('#generate_from_edited').on('click', function() {
         const postId = $('#editor_post_id').val();
-        const content = $('#editor_text').val();
+        const text = $('#editor_text').val();
+        const provider = $('#editor_provider').val();
+        const voice = $('#editor_voice').val();
         const button = $(this);
 
-        if (!postId || !content.trim()) {
+        if (!postId || !text.trim()) {
             alert('ID de post y contenido son requeridos');
+            return;
+        }
+
+        if (!provider) {
+            alert('Por favor selecciona un proveedor');
             return;
         }
 
@@ -414,12 +437,22 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'tts_generate_from_edited',
                 post_id: postId,
-                content: content,
+                provider: provider,
+                voice: voice,
                 nonce: wpTtsAdmin.nonce
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Audio TTS generado exitosamente para el post #' + postId);
+                    if (response.data.audio_url) {
+                        $('#editor_audio_source').attr('src', response.data.audio_url);
+                        $('#editor_download_link').attr('href', response.data.audio_url);
+                        $('#editor_result_row').show();
+                        const audioElement = $('#editor_result audio')[0];
+                        if (audioElement) {
+                            audioElement.load();
+                        }
+                    }
+                    alert(response.data.message || 'Audio TTS generado exitosamente para el post #' + postId);
                 } else {
                     alert('Error: ' + (response.data.message || 'Error generando TTS'));
                 }
@@ -489,6 +522,27 @@ jQuery(document).ready(function($) {
         $('#editor_character_count').text(charCount);
         $('#editor_word_count').text(wordCount);
         $('#editor_estimated_cost').text('$' + estimatedCost);
+    });
+
+    // Clean text functionality - removes extra whitespace
+    $('#editor_clean_text').on('click', function() {
+        let text = $('#editor_text').val();
+        // Remove multiple spaces
+        text = text.replace(/\s+/g, ' ');
+        // Remove empty brackets
+        text = text.replace(/\[\s*\]/g, '');
+        // Remove empty parentheses
+        text = text.replace(/\(\s*\)/g, '');
+        // Trim whitespace
+        text = text.trim();
+        $('#editor_text').val(text).trigger('input');
+    });
+
+    // Reset text functionality - restores original extracted text
+    $('#editor_reset_text').on('click', function() {
+        if (editorOriginalText && confirm('¿Estás seguro de que quieres restaurar el texto original? Se perderán todas las ediciones.')) {
+            $('#editor_text').val(editorOriginalText).trigger('input');
+        }
     });
 
     // Test provider connection button
