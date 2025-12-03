@@ -71,11 +71,35 @@ class TTSService {
 	/**
 	 * Check rate limiting for audio generation
 	 *
-	 * @param int $user_id User ID (0 for anonymous).
+	 * @param int  $user_id User ID (0 for anonymous).
+	 * @param bool $is_auto_generate Whether this is an auto-generation request.
 	 * @return bool|array True if allowed, array with error info if rate limited.
 	 */
-	private function checkRateLimit( int $user_id = 0 ): bool|array {
+	private function checkRateLimit( int $user_id = 0, bool $is_auto_generate = false ): bool|array {
+		// Bypass rate limiting for auto-generation (system-initiated)
+		// Auto-generation runs in cron/shutdown context where there's no user
+		// and we don't want to rate-limit automated processes
+		if ( $is_auto_generate ) {
+			$this->logger->info( 'Rate limit bypassed for auto-generation' );
+			return true;
+		}
+
+		// For cron/background contexts with no user, use a separate rate limit
+		// with higher limits to avoid blocking legitimate background processes
 		$user_id = $user_id ?: get_current_user_id();
+
+		// If user_id is 0 (cron/background), check if we're in a known background context
+		if ( $user_id === 0 ) {
+			// Check if this is a WordPress cron or CLI context
+			$is_cron = defined( 'DOING_CRON' ) && DOING_CRON;
+			$is_cli = defined( 'WP_CLI' ) && WP_CLI;
+
+			if ( $is_cron || $is_cli ) {
+				$this->logger->info( 'Rate limit bypassed for cron/CLI context' );
+				return true;
+			}
+		}
+
 		$rate_key = 'wp_tts_rate_' . $user_id;
 		$rate_data = get_transient( $rate_key );
 
@@ -99,7 +123,8 @@ class TTSService {
 				return [
 					'limited' => true,
 					'message' => sprintf(
-						__( 'Límite de solicitudes excedido. Por favor espera %d segundos.', 'wp-tts-sesolibre' ),
+						/* translators: %d: number of seconds to wait */
+						__( 'Límite de solicitudes excedido. Por favor espera %d segundos.', 'tts-sesolibre' ),
 						$remaining
 					),
 					'retry_after' => $remaining
@@ -124,8 +149,9 @@ class TTSService {
 	 */
 	public function generateAudio( string $text, array $options = [] ): ?array {
 		try {
-			// Check rate limiting first
-			$rate_check = $this->checkRateLimit();
+			// Check rate limiting first (bypass for auto-generation)
+			$is_auto_generate = ! empty( $options['is_auto_generate'] );
+			$rate_check = $this->checkRateLimit( 0, $is_auto_generate );
 			if ( is_array( $rate_check ) && isset( $rate_check['limited'] ) && $rate_check['limited'] ) {
 				$this->logger->warning( 'Rate limit exceeded for user', [ 'user_id' => get_current_user_id() ] );
 				return [
@@ -170,9 +196,26 @@ class TTSService {
 
 			// 2. If no provider from options, use the DEFAULT provider (NO Round Robin)
 			if ( ! $provider_instance ) {
-				$config = get_option( 'wp_tts_config', [] );
-				$default_provider = $config['default_provider'] ?? 'google';
-				
+				// Get default provider from ConfigurationManager (consistent location)
+				$defaults_config = get_option( 'wp_tts_default_settings', [] );
+				$default_provider = $defaults_config['default_provider'] ?? 'google';
+
+				// Validate that the default provider is actually configured
+				if ( ! $this->validateProvider( $default_provider ) ) {
+					$this->logger->warning( '[generateAudio] Default provider not configured, finding first available', [
+						'default_provider' => $default_provider
+					] );
+					// Find first configured provider
+					$all_providers = [ 'google', 'openai', 'elevenlabs', 'amazon_polly', 'azure_tts' ];
+					foreach ( $all_providers as $provider_name ) {
+						if ( $this->validateProvider( $provider_name ) ) {
+							$default_provider = $provider_name;
+							$this->logger->info( '[generateAudio] Found configured provider', [ 'provider' => $default_provider ] );
+							break;
+						}
+					}
+				}
+
 				$this->logger->info( '[generateAudio] No provider specified, using default provider', [ 'default_provider' => $default_provider ] );
 				$instance = $this->getProviderInstance( $default_provider );
 				if ( $instance ) {
@@ -188,7 +231,7 @@ class TTSService {
 				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
 				return [
 					'success' => false,
-					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'wp-tts-sesolibre' ),
+					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'tts-sesolibre' ),
 					'error_code' => 'NO_PROVIDERS_CONFIGURED',
 					'available_providers' => [
 						'openai' => 'OpenAI TTS',
@@ -327,8 +370,9 @@ class TTSService {
 								// Return error if both storage methods fail
 								return [
 									'success' => false,
-									'message' => sprintf( 
-										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'wp-tts-sesolibre' ),
+									'message' => sprintf(
+										/* translators: %1$s: primary storage error message, %2$s: fallback storage error message */
+										__( 'TTS generation succeeded but both primary (%1$s) and fallback (%2$s) storage failed', 'tts-sesolibre' ),
 										$storage_error->getMessage(),
 										$fallback_error->getMessage()
 									),
@@ -371,7 +415,7 @@ class TTSService {
 			} catch ( \Exception $e ) {
 				$this->logger->error( '[generateAudio] Exception during provider generation.', [
 					'provider_at_exception' => $current_provider_name,
-					'error' => $e->getMessage(),
+					'error' => esc_html( $e->getMessage() ),
 					'exception_class' => get_class($e),
 					'trace' => $e->getTraceAsString()
 				] );
@@ -380,8 +424,9 @@ class TTSService {
 				
 				return [
 					'success' => false,
-					'message' => sprintf( 
-						__( 'La generación TTS falló con %s: %s', 'wp-tts-sesolibre' ),
+					'message' => sprintf(
+						/* translators: %1$s: provider name, %2$s: error message */
+						__( 'TTS generation failed with %1$s: %2$s', 'tts-sesolibre' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -395,8 +440,9 @@ class TTSService {
 			
 			return [
 				'success' => false,
-				'message' => sprintf( 
-					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'wp-tts-sesolibre' ),
+				'message' => sprintf(
+					/* translators: %s: TTS provider name */
+					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'tts-sesolibre' ),
 					$current_provider_name
 				),
 				'error_code' => 'GENERATION_FAILED',
@@ -405,7 +451,7 @@ class TTSService {
 			
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception in generateAudio', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'trace' => $e->getTraceAsString()
 			] );
 			throw $e;
@@ -439,7 +485,7 @@ class TTSService {
 			} catch ( \Exception $e ) {
 				$this->logger->error( '[getAvailableVoices] Failed to get voices from provider API', [
 					'provider' => $provider,
-					'error' => $e->getMessage()
+					'error' => esc_html( $e->getMessage() )
 				] );
 			}
 		} else {
@@ -526,16 +572,109 @@ class TTSService {
 	}
 	
 	/**
-	 * Test provider connection
+	 * Test provider connection by generating a small test audio
 	 *
 	 * @param string $provider Provider name.
-	 * @return bool True if connection successful.
+	 * @return array Test result with success status, message, and details
 	 */
-	public function testProvider( string $provider ): bool {
+	public function testProvider( string $provider ): array {
 		$this->logger->info( 'Testing provider connection', [ 'provider' => $provider ] );
-		
-		// Mock implementation - always return true for now
-		return true;
+
+		$result = [
+			'success' => false,
+			'message' => '',
+			'provider' => $provider,
+			'details' => []
+		];
+
+		// First check if provider has valid configuration
+		if ( ! $this->validateProvider( $provider ) ) {
+			$result['message'] = __( 'El proveedor no está configurado correctamente. Verifica las credenciales.', 'tts-sesolibre' );
+			$result['details']['validation'] = 'failed';
+			return $result;
+		}
+
+		try {
+			// Get provider instance
+			$provider_instance = $this->getProviderInstance( $provider );
+
+			if ( ! $provider_instance ) {
+				$result['message'] = __( 'No se pudo crear la instancia del proveedor.', 'tts-sesolibre' );
+				$result['details']['instance'] = 'failed';
+				return $result;
+			}
+
+			// Generate a very short test audio
+			$test_text = 'Prueba de conexión.';
+			$start_time = microtime( true );
+
+			$audio_result = $provider_instance->generateSpeech( $test_text, [
+				'voice' => $this->getDefaultVoiceForProvider( $provider ),
+				'format' => 'mp3'
+			] );
+
+			$end_time = microtime( true );
+			$generation_time = round( ( $end_time - $start_time ) * 1000 );
+
+			if ( $audio_result && ! empty( $audio_result['audio_data'] ) ) {
+				$result['success'] = true;
+				$result['message'] = sprintf(
+					/* translators: %d: number of milliseconds */
+					__( 'Conexión exitosa. Audio de prueba generado en %d ms.', 'tts-sesolibre' ),
+					$generation_time
+				);
+				$result['details'] = [
+					'generation_time_ms' => $generation_time,
+					'audio_size_bytes' => strlen( $audio_result['audio_data'] ),
+					'format' => $audio_result['format'] ?? 'mp3'
+				];
+			} else {
+				$result['message'] = __( 'El proveedor respondió pero no generó audio válido.', 'tts-sesolibre' );
+				$result['details']['response'] = 'empty_audio';
+			}
+
+		} catch ( \Exception $e ) {
+			$result['message'] = sprintf(
+				/* translators: %s: error message */
+				__( 'Error al probar el proveedor: %s', 'tts-sesolibre' ),
+				$e->getMessage()
+			);
+			$result['details']['error'] = $e->getMessage();
+			$result['details']['error_type'] = get_class( $e );
+
+			$this->logger->error( 'Provider test failed', [
+				'provider' => $provider,
+				'error' => esc_html( $e->getMessage() )
+			] );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get default voice for a provider
+	 *
+	 * @param string $provider Provider name
+	 * @return string Default voice ID
+	 */
+	private function getDefaultVoiceForProvider( string $provider ): string {
+		$config = get_option( 'wp_tts_config', [] );
+		$provider_config = $config['providers'][ $provider ] ?? [];
+
+		if ( ! empty( $provider_config['default_voice'] ) ) {
+			return $provider_config['default_voice'];
+		}
+
+		// Fallback defaults for each provider
+		$defaults = [
+			'google' => 'es-US-Neural2-A',
+			'openai' => 'alloy',
+			'elevenlabs' => 'pNInz6obpgDQGcFmaJgB', // Adam - most stable default voice
+			'amazon_polly' => 'Mia',
+			'azure_tts' => 'es-MX-DaliaNeural'
+		];
+
+		return $defaults[ $provider ] ?? '';
 	}
 	
 	/**
@@ -567,13 +706,17 @@ class TTSService {
 	/**
 	 * Generate audio for a WordPress post
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int  $post_id Post ID.
+	 * @param bool $is_auto_generate Whether this is an auto-generation request.
 	 * @return object Audio result object.
 	 * @throws \Exception If generation fails.
 	 */
-	public function generateAudioForPost( int $post_id ) {
+	public function generateAudioForPost( int $post_id, bool $is_auto_generate = false ) {
 		try {
-			$this->logger->info( 'Starting audio generation for post', [ 'post_id' => $post_id ] );
+			$this->logger->info( 'Starting audio generation for post', [
+				'post_id' => $post_id,
+				'is_auto_generate' => $is_auto_generate
+			] );
 			
 			$post = get_post( $post_id );
 			if ( ! $post ) {
@@ -729,7 +872,7 @@ class TTSService {
 			} catch ( \Exception $e ) {
 				$this->logger->error( 'Error getting TTS settings, using fallback', [
 					'post_id' => $post_id,
-					'error' => $e->getMessage()
+					'error' => esc_html( $e->getMessage() )
 				] );
 				
 				// Fallback to old system
@@ -754,8 +897,9 @@ class TTSService {
 				'provider' => $provider_from_meta, // Pass the potentially empty provider to generateAudio
 				'voice' => $voice,
 				'post_id' => $post_id,
+				'is_auto_generate' => $is_auto_generate, // Pass auto-generate flag to bypass rate limiting
 			];
-			
+
 			$result = $this->generateAudio( $full_text, $options );
 			
 			if ( ! $result || ! $result['success'] ) {
@@ -870,7 +1014,7 @@ class TTSService {
 			} catch ( \Exception $e ) {
 				$this->logger->error( 'Error saving TTS metadata, falling back to old system', [
 					'post_id' => $post_id,
-					'error' => $e->getMessage(),
+					'error' => esc_html( $e->getMessage() ),
 					'trace' => $e->getTraceAsString()
 				] );
 				
@@ -901,7 +1045,7 @@ class TTSService {
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception in generateAudioForPost', [
 				'post_id' => $post_id,
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'trace' => $e->getTraceAsString()
 			] );
 			
@@ -962,6 +1106,7 @@ class TTSService {
 		
 		if ( ! $result || ! $result['success'] ) {
 			$this->logger->error( '[generatePreview] Preview generation failed', [ 'result' => $result ] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new \Exception( 'Failed to generate preview audio: ' . ( $result['message'] ?? 'Unknown error' ) );
 		}
 		
@@ -1096,7 +1241,7 @@ class TTSService {
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Failed to get provider instance', [
 				'provider' => $provider,
-				'error' => $e->getMessage()
+				'error' => esc_html( $e->getMessage() )
 			] );
 			return null;
 		}
@@ -1151,7 +1296,7 @@ class TTSService {
 			
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Failed to generate mock audio', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'provider' => $provider
 			] );
 			return null;
@@ -1330,7 +1475,7 @@ class TTSService {
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception processing intro/outro audio', [
 				'post_id' => $post_id,
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'trace' => $e->getTraceAsString()
 			] );
 			
@@ -1459,7 +1604,7 @@ class TTSService {
 			
 			// Clean up original main audio file to save space
 			if ( file_exists( $main_path ) ) {
-				unlink( $main_path );
+				wp_delete_file( $main_path );
 				$this->logger->info( 'Cleaned up original main audio file', [ 'path' => $main_path ] );
 			}
 			
@@ -1468,7 +1613,7 @@ class TTSService {
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception during audio concatenation', [
 				'post_id' => $post_id,
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'trace' => $e->getTraceAsString()
 			] );
 			return null;

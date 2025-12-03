@@ -33,6 +33,7 @@ class Deactivator {
 		// Flush rewrite rules
 		flush_rewrite_rules();
 
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( 'WP TTS Plugin deactivated successfully' );
 	}
 
@@ -84,9 +85,10 @@ class Deactivator {
 		global $wpdb;
 
 		// Clear plugin transients
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query needed for transient cleanup
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_wp_tts_%' 
+			"DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE '_transient_wp_tts_%'
              OR option_name LIKE '_transient_timeout_wp_tts_%'"
 		);
 
@@ -113,9 +115,10 @@ class Deactivator {
 		$files = glob( $dir . '/*' );
 		foreach ( $files as $file ) {
 			if ( is_file( $file ) ) {
-				unlink( $file );
+				wp_delete_file( $file );
 			} elseif ( is_dir( $file ) ) {
 				self::deleteDirectoryContents( $file );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- Direct rmdir needed for directory cleanup
 				rmdir( $file );
 			}
 		}
@@ -137,7 +140,7 @@ class Deactivator {
 
 		foreach ( $files as $file ) {
 			if ( is_file( $file ) && filemtime( $file ) < $cutoff_time ) {
-				unlink( $file );
+				wp_delete_file( $file );
 			}
 		}
 	}
@@ -190,14 +193,16 @@ class Deactivator {
 		}
 
 		// Remove post meta (optional)
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query needed for meta cleanup
 		$wpdb->query(
-			"DELETE FROM {$wpdb->postmeta} 
+			"DELETE FROM {$wpdb->postmeta}
              WHERE meta_key LIKE '_tts_%'"
 		);
 
 		// Drop custom tables if they exist
 		$table_name = $wpdb->prefix . 'tts_analytics';
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Direct query needed for table drop during uninstall, table name is safe as it uses wpdb prefix
+		$wpdb->query( "DROP TABLE IF EXISTS " . esc_sql( $table_name ) );
 	}
 
 	/**
@@ -214,9 +219,10 @@ class Deactivator {
 		$admin_email = get_option( 'admin_email' );
 
 		if ( $admin_email ) {
-			$subject = __( 'Plugin TTS de WordPress Desactivado', 'wp-tts-sesolibre' );
+			$subject = __( 'Plugin TTS de WordPress Desactivado', 'tts-sesolibre' );
 			$message = sprintf(
-				__( 'El Plugin TTS de WordPress ha sido desactivado en %1$s el %2$s.', 'wp-tts-sesolibre' ),
+				/* translators: %1$s: site name, %2$s: date and time */
+				__( 'El Plugin TTS de WordPress ha sido desactivado en %1$s el %2$s.', 'tts-sesolibre' ),
 				get_bloginfo( 'name' ),
 				current_time( 'mysql' )
 			);
@@ -242,6 +248,7 @@ class Deactivator {
 
 		// Log to file if debug is enabled
 		if ( WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( 'WP TTS Plugin Deactivation: ' . json_encode( $log_data ) );
 		}
 	}
@@ -343,6 +350,7 @@ class Deactivator {
 			$tts_dir    = $upload_dir['basedir'] . '/tts-audio';
 			if ( is_dir( $tts_dir ) ) {
 				self::deleteDirectoryContents( $tts_dir );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- Direct rmdir needed for directory cleanup
 				rmdir( $tts_dir );
 			}
 		}
@@ -377,8 +385,9 @@ class Deactivator {
 	private static function getTotalTTSPosts(): int {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query needed for statistics
 		return (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->postmeta} 
+			"SELECT COUNT(*) FROM {$wpdb->postmeta}
              WHERE meta_key = '_tts_enabled' AND meta_value = '1'"
 		);
 	}
@@ -391,8 +400,9 @@ class Deactivator {
 	private static function getTotalAudioGenerated(): int {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query needed for statistics
 		return (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$wpdb->postmeta} 
+			"SELECT COUNT(*) FROM {$wpdb->postmeta}
              WHERE meta_key = '_tts_audio_url' AND meta_value != ''"
 		);
 	}

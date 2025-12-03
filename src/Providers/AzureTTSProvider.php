@@ -127,10 +127,11 @@ class AzureTTSProvider implements TTSProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Azure TTS: Speech generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'voice_id' => $voice_id ?? 'unknown'
 			] );
 			
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'Azure TTS generation failed: ' . $e->getMessage() );
 		}
 	}
@@ -448,6 +449,7 @@ class AzureTTSProvider implements TTSProviderInterface {
 			$audio_data = $this->makeTTSRequest( $ssml, $access_token );
 
 			if ( ! $audio_data ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 				throw new ProviderException( "Azure TTS: Failed to generate audio for chunk " . ($index + 1) );
 			}
 
@@ -572,7 +574,7 @@ class AzureTTSProvider implements TTSProviderInterface {
 			return ! empty( $access_token );
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Azure TTS: Connection test failed', [
-				'error' => $e->getMessage()
+				'error' => esc_html( $e->getMessage() )
 			] );
 			return false;
 		}

@@ -1,0 +1,1257 @@
+
+ARCHIVO: templates/admin/meta-box.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+49 	96 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+60 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+67 	105 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+73 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+75 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+77 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+81 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+85 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+92 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+99 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+107 	92 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+111 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+115 	84 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+125 	50 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+126 	104 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+153 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+154 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+155 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+156 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+184 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+196 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+203 	112 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+204 	163 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+206 	169 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+213 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+225 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+226 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+226 	146 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+227 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+227 	156 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+228 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+228 	145 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+229 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+229 	152 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+230 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+238 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+245 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+247 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+253 	131 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+256 	99 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+266 	96 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+284 	100 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+291 	150 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+307 	100 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+315 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+320 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+325 	77 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+330 	77 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+338 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+344 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+350 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+354 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+363 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+880 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+892 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+900 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+904 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+940 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+944 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+956 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+962 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+966 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1007 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1048 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1055 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1067 	126 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1075 	139 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1089 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1093 	58 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1114 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1116 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1135 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1282 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1287 	138 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1303 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1307 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1310 	160 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1322 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1327 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1334 	118 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1337 	118 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1342 	117 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1344 	107 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1346 	155 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1351 	127 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1354 	107 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1356 	105 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1405 	141 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1422 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1428 	137 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1446 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1447 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1448 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1449 	136 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1455 	123 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1457 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1462 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1486 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1492 	150 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1526 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1528 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1543 	146 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1545 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1550 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1558 	123 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1560 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1566 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got "tts-sesolibre".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: templates/frontend/audio-player.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+73 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+76 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+81 	113 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+99 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+105 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+111 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+119 	43 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+155 	126 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: templates/frontend/tts-player.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+138 	51 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+149 	136 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+163 	114 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+185 	49 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+191 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+198 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+205 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+221 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+227 	50 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+235 	51 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+248 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: templates/frontend/enhanced-sesolibre-player.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+140 	108 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+175 	114 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+202 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+216 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+240 	47 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+250 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+261 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Admin/AdminInterface.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+79 	38 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+80 	38 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+87 	37 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+88 	37 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+106 	36 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+114 	40 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+122 	44 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+130 	49 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+139 	41 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+148 	41 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+157 	45 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+166 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+174 	50 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+182 	43 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+190 	47 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+198 	45 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+207 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+215 	48 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+223 	46 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+231 	48 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+240 	44 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+248 	48 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+257 	54 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+265 	40 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+273 	44 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+282 	38 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+289 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+297 	51 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+351 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+352 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+361 	96 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+377 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+425 	50 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+426 	51 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+427 	48 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+428 	56 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+429 	44 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+430 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+448 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+449 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+455 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+458 	150 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+464 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+467 	133 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+472 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+475 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+488 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+489 	100 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+494 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+495 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+496 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+497 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+498 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+509 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+510 	96 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+513 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+517 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+520 	112 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+529 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+533 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+536 	99 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+541 	60 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+544 	114 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+549 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+552 	89 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+557 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+560 	110 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+565 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+568 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+573 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+576 	124 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+581 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+584 	124 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+593 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+597 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+600 	98 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+605 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+608 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+613 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+616 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+621 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+624 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+629 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+632 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+641 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+645 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+647 	160 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+694 	45 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1020 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1026 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1040 	60 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1046 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1060 	60 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1066 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1080 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1086 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1092 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1106 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1112 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1118 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1124 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1137 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1154 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1159 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1160 	128 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1166 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1167 	106 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1170 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1173 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1181 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1184 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1189 	93 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1191 	139 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1198 	111 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1203 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1213 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1214 	118 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1217 	89 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1220 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1228 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1231 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1236 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1238 	141 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1240 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1242 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1250 	104 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1256 	134 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1261 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1264 	128 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1274 	58 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1275 	223 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1281 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1283 	108 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1285 	103 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1287 	137 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1293 	93 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1298 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1301 	100 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1307 	169 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1309 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1311 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1313 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1322 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1326 	104 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1331 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1336 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1344 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1349 	104 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1361 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1366 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1369 	100 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1380 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1386 	146 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1392 	134 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1401 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1410 	131 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1415 	130 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1442 	129 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1448 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1450 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1451 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1488 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1495 	92 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1509 	56 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1513 	108 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1529 	60 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1533 	112 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1549 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1553 	117 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1568 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1571 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1573 	113 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1587 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1589 	115 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1609 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1615 	101 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1645 	109 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1675 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1680 	153 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1700 	117 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1710 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1720 	122 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1729 	140 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1739 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1750 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1769 	77 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1780 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1841 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1844 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1846 	127 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1890 	58 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1896 	107 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1931 	106 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1958 	113 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1981 	107 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2006 	111 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2016 	123 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2026 	108 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2039 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2053 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2064 	85 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2083 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2088 	198 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2093 	209 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2108 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2123 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2131 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2143 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2171 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2187 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2195 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2207 	54 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2224 	58 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2238 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2246 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2259 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2270 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2274 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2279 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2293 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2301 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2315 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2333 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2337 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2342 	55 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2353 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2354 	187 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2357 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2361 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2364 	168 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2369 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2372 	142 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2377 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2380 	161 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2393 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2417 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2424 	122 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2425 	150 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2452 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2459 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2460 	155 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2465 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2495 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2502 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2503 	150 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2516 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2530 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2538 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2562 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2570 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2575 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2733 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2746 	54 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2754 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2780 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2785 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2790 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2801 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2802 	130 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2808 	73 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2811 	129 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2817 	87 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2820 	124 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2826 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2829 	115 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2830 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2831 	52 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2837 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2840 	129 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2846 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2849 	151 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2864 	129 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2865 	161 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2866 	133 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2867 	185 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2879 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2890 	139 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2891 	139 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2892 	122 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2906 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2913 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2934 	56 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2941 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2951 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2958 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2966 	60 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2974 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2983 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2984 	107 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2989 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2992 	115 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+2998 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3001 	110 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3007 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3010 	108 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3016 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3019 	99 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3025 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3028 	102 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3034 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3037 	195 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3046 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3047 	155 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3050 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3050 	120 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3052 	121 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3053 	132 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3054 	146 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3055 	153 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3056 	165 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3057 	135 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3061 	51 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3062 	135 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3073 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3074 	140 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3086 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3090 	115 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3092 	162 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3098 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3101 	203 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3107 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3110 	123 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3116 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3120 	115 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3122 	138 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3130 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3131 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3132 	92 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3133 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3134 	103 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3151 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3163 	110 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3403 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3411 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3443 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3449 	86 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3463 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3473 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3480 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3490 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3499 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3516 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3543 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3544 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3560 	77 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3565 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3580 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3590 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3597 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3607 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3616 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3637 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3638 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3654 	86 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3668 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3678 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3685 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3697 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3707 	62 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3714 	92 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3721 	97 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3731 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3738 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3743 	78 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3757 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3767 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3774 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3788 	59 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3798 	106 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3817 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3822 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3828 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+3885 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Exceptions/StorageException.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+109 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+145 	80 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+179 	69 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+212 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+241 	75 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+275 	101 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+313 	86 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Exceptions/TTSException.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+117 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+118 	112 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+119 	120 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+120 	86 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+121 	117 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+122 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+123 	117 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+124 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+125 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+126 	120 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/Activator.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+54 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+62 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+73 	25 	ERROR 	WordPress.WP.I18n.MissingTranslatorsComment 	A function call to __() with texts containing placeholders was found, but was not accompanied by a "translators:" comment on the line above to clarify the meaning of the placeholders.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+73 	92 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+86 	119 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+360 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+363 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/ConfigurationManager.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+513 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+516 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+522 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+528 	97 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+534 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+554 	84 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+561 	77 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/Deactivator.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+222 	67 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+225 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/Plugin.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+256 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+412 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+421 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+444 	72 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+453 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+464 	61 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+480 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+493 	64 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+494 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+500 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+516 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+554 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+613 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+627 	63 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+852 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+853 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1080 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1090 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1105 	79 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1111 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1116 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1121 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1136 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1146 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1164 	71 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1169 	82 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1174 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1179 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1194 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1205 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1221 	65 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1227 	76 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1232 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1237 	68 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1252 	66 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1261 	53 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1287 	88 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1292 	95 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1297 	74 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1302 	91 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+1307 	83 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Services/TTSService.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+127 	94 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+234 	158 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+375 	132 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+429 	70 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+445 	132 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+592 	116 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+602 	90 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+623 	81 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+632 	97 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+639 	57 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: wp-tts-plugin.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+94 	133 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+105 	129 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+106 	125 	ERROR 	WordPress.WP.I18n.TextDomainMismatch 	Mismatched text domain. Expected 'tts_de_wordpress' but got 'tts-sesolibre'.
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: wp-tts-plugin.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+0 	0 	WARNING 	textdomain_mismatch 	La cabecera "Text Domain" del archivo del plugin no coincide con el slug. Se ha encontrado "tts-sesolibre", se esperaba "tts_de_wordpress".
+Saber más (abre en una nueva pestaña) 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/Plugin.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+960 	43 	WARNING 	WordPress.PHP.DevelopmentFunctions.error_log_print_r 	print_r() found. Debug code should not normally be used in production. 	Ver en editor de código (abre en una nueva pestaña)
+961 	39 	WARNING 	WordPress.PHP.DevelopmentFunctions.error_log_print_r 	print_r() found. Debug code should not normally be used in production. 	Ver en editor de código (abre en una nueva pestaña)
+1419 	7 	WARNING 	Squiz.PHP.DiscouragedFunctions.Discouraged 	The use of function set_time_limit() is discouraged 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Admin/AdminInterface.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+1432 	13 	WARNING 	WordPress.DB.SlowDBQuery.slow_db_query_meta_query 	Detected usage of meta_query, possible slow query. 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Core/Activator.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+203 	17 	WARNING 	WordPress.DB.SlowDBQuery.slow_db_query_meta_query 	Detected usage of meta_query, possible slow query. 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: src/Utils/TTSMetaManager.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+436 	13 	WARNING 	WordPress.DB.SlowDBQuery.slow_db_query_meta_key 	Detected usage of meta_key, possible slow query. 	Ver en editor de código (abre en una nueva pestaña)
+
+ARCHIVO: wp-tts-plugin.php
+Línea 	Columna 	Tipo 	Código 	Mensaje 	Enlace para editarlo
+0 	0 	WARNING 	trademarked_term 	El slug del plugin incluye un término restringido. Tu slug del plugin - «tts_de_wordpress» - contiene el término restringido «wordpress» que no se puede usar en absoluto en el slug de tu plugin. 	Ver en editor de código (abre en una nueva pestaña)
+
+Gracias por crear con WordPress.	
+
+Versión 6.9
+

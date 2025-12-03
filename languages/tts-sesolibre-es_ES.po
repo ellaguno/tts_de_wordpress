@@ -1,0 +1,369 @@
+# Spanish (Spain) translation for TTS SesoLibre
+# Copyright (C) 2024 Eduardo Llaguno
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: TTS SesoLibre 1.9.0\n"
+"Report-Msgid-Bugs-To: https://github.com/ellaguno/tts_de_wordpress/issues\n"
+"POT-Creation-Date: 2024-12-03 00:00+0000\n"
+"PO-Revision-Date: 2024-12-03 12:00+0000\n"
+"Last-Translator: Eduardo Llaguno <info@sesolibre.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: tts-de-wordpress\n"
+
+msgid "Settings"
+msgstr "Configuración"
+
+msgid "Documentation"
+msgstr "Documentación"
+
+msgid "Support"
+msgstr "Soporte"
+
+msgid "You do not have sufficient permissions to access this page."
+msgstr "No tienes permisos suficientes para acceder a esta página."
+
+msgid "TTS SesoLibre Settings"
+msgstr "Configuración de TTS SesoLibre"
+
+msgid "Security verification failed"
+msgstr "Falló la verificación de seguridad"
+
+msgid "Invalid post ID"
+msgstr "ID de entrada inválido"
+
+msgid "Audio generated successfully"
+msgstr "Audio generado exitosamente"
+
+msgid "Audio generation failed: Invalid result returned"
+msgstr "Falló la generación de audio: Resultado inválido devuelto"
+
+msgid "Audio generation failed"
+msgstr "Falló la generación de audio"
+
+msgid "Provider configuration is valid"
+msgstr "La configuración del proveedor es válida"
+
+msgid "Provider configuration is invalid"
+msgstr "La configuración del proveedor es inválida"
+
+msgid "Provider validation failed"
+msgstr "Falló la validación del proveedor"
+
+msgid "Audio deleted successfully"
+msgstr "Audio eliminado exitosamente"
+
+msgid "Audio deletion failed"
+msgstr "Falló la eliminación del audio"
+
+msgid "TTS generation succeeded but both primary (%1$s) and fallback (%2$s) storage failed"
+msgstr "La generación TTS fue exitosa pero falló el almacenamiento principal (%1$s) y el de respaldo (%2$s)"
+
+msgid "TTS generation failed with %1$s: %2$s"
+msgstr "La generación TTS falló con %1$s: %2$s"
+
+msgid "Loading voices..."
+msgstr "Cargando voces..."
+
+msgid "Use default voice"
+msgstr "Usar voz predeterminada"
+
+msgid "Error loading voices"
+msgstr "Error al cargar voces"
+
+msgid "Please save the post first"
+msgstr "Por favor guarda la entrada primero"
+
+msgid "Generation failed"
+msgstr "Falló la generación"
+
+msgid "Are you sure you want to delete the generated audio? This action cannot be undone."
+msgstr "¿Estás seguro de que deseas eliminar el audio generado? Esta acción no se puede deshacer."
+
+msgid "Deleting..."
+msgstr "Eliminando..."
+
+msgid "Delete failed"
+msgstr "Falló la eliminación"
+
+msgid "Select Audio File"
+msgstr "Seleccionar archivo de audio"
+
+msgid "Use this audio"
+msgstr "Usar este audio"
+
+msgid "Your browser does not support the audio element."
+msgstr "Tu navegador no soporta el elemento de audio."
+
+msgid "Loading..."
+msgstr "Cargando..."
+
+msgid "Error extracting content"
+msgstr "Error al extraer contenido"
+
+msgid "Error connecting to server"
+msgstr "Error al conectar con el servidor"
+
+msgid "Edit Text Before Generate"
+msgstr "Editar texto antes de generar"
+
+msgid "Edit Text for TTS Generation"
+msgstr "Editar texto para generación TTS"
+
+msgid "Post:"
+msgstr "Entrada:"
+
+msgid "Clean Text"
+msgstr "Limpiar texto"
+
+msgid "Reset to Original"
+msgstr "Restaurar al original"
+
+msgid "characters"
+msgstr "caracteres"
+
+msgid "words"
+msgstr "palabras"
+
+msgid "estimated cost"
+msgstr "costo estimado"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Are you sure you want to reset to the original post content? All edits will be lost."
+msgstr "¿Estás seguro de que deseas restaurar al contenido original? Se perderán todas las ediciones."
+
+msgid "Listen to article"
+msgstr "Escuchar artículo"
+
+msgid "Play"
+msgstr "Reproducir"
+
+msgid "Pause"
+msgstr "Pausar"
+
+msgid "Play/Pause"
+msgstr "Reproducir/Pausar"
+
+msgid "Speed control"
+msgstr "Control de velocidad"
+
+msgid "Voice"
+msgstr "Voz"
+
+msgid "Music"
+msgstr "Música"
+
+msgid "Voice Volume"
+msgstr "Volumen de voz"
+
+msgid "Background Music Volume"
+msgstr "Volumen de música de fondo"
+
+msgid "Provider:"
+msgstr "Proveedor:"
+
+msgid "Download"
+msgstr "Descargar"
+
+msgid "Playing custom audio file"
+msgstr "Reproduciendo archivo de audio personalizado"
+
+msgid "Loading audio..."
+msgstr "Cargando audio..."
+
+msgid "SesoLibre Player"
+msgstr "Reproductor SesoLibre"
+
+msgid "Default Settings"
+msgstr "Configuración predeterminada"
+
+msgid "TTS Providers"
+msgstr "Proveedores TTS"
+
+msgid "Storage Settings"
+msgstr "Configuración de almacenamiento"
+
+msgid "Player Settings"
+msgstr "Configuración del reproductor"
+
+msgid "Auto Generate"
+msgstr "Auto generación"
+
+msgid "Audio Library"
+msgstr "Biblioteca de audio"
+
+msgid "Tools"
+msgstr "Herramientas"
+
+msgid "Google Default Voice"
+msgstr "Voz predeterminada de Google"
+
+msgid "OpenAI Default Voice"
+msgstr "Voz predeterminada de OpenAI"
+
+msgid "ElevenLabs Default Voice"
+msgstr "Voz predeterminada de ElevenLabs"
+
+msgid "Amazon Polly Default Voice"
+msgstr "Voz predeterminada de Amazon Polly"
+
+msgid "Azure TTS Default Voice"
+msgstr "Voz predeterminada de Azure TTS"
+
+msgid "Default Voice"
+msgstr "Voz predeterminada"
+
+msgid "Voice Preview"
+msgstr "Vista previa de voz"
+
+msgid "Select Voice"
+msgstr "Seleccionar voz"
+
+msgid "Select a provider"
+msgstr "Selecciona un proveedor"
+
+msgid "Select a provider first"
+msgstr "Selecciona primero un proveedor"
+
+msgid "Use default provider"
+msgstr "Usar proveedor predeterminado"
+
+msgid "Configure the default TTS provider and general settings."
+msgstr "Configura el proveedor TTS predeterminado y la configuración general."
+
+msgid "Select the default TTS provider when no specific provider is selected for a post."
+msgstr "Selecciona el proveedor TTS predeterminado cuando no se elige un proveedor específico para una entrada."
+
+msgid "Configure your TTS providers with API keys and default voices."
+msgstr "Configura tus proveedores TTS con claves API y voces predeterminadas."
+
+msgid "No TTS providers configured and active. Go to TTS Settings to configure at least one provider."
+msgstr "No hay proveedores TTS configurados y activos. Ve a Configuración TTS para configurar al menos un proveedor."
+
+msgid "Test different voices and providers before using them in your posts."
+msgstr "Prueba diferentes voces y proveedores antes de usarlos en tus entradas."
+
+msgid "Include link to article"
+msgstr "Incluir enlace al artículo"
+
+msgid "Include a link to the original article in the episode description."
+msgstr "Incluye un enlace al artículo original en la descripción del episodio."
+
+msgid "Download Audio"
+msgstr "Descargar audio"
+
+msgid "Test audio generated successfully."
+msgstr "Audio de prueba generado exitosamente."
+
+msgid "Test audio generation failed. TTSService did not return success or audio URL."
+msgstr "Falló la generación del audio de prueba. TTSService no retornó éxito o URL de audio."
+
+msgid "Invalid provider."
+msgstr "Proveedor inválido."
+
+msgid "Invalid provider"
+msgstr "Proveedor inválido"
+
+msgid "Preview generated successfully"
+msgstr "Vista previa generada exitosamente"
+
+msgid "Preview generation failed - No audio URL returned"
+msgstr "Falló la generación de vista previa - No se retornó URL de audio"
+
+msgid "Preview generation failed"
+msgstr "Falló la generación de vista previa"
+
+msgid "Invalid parameters."
+msgstr "Parámetros inválidos."
+
+msgid "Audio %s updated successfully."
+msgstr "Audio %s actualizado exitosamente."
+
+msgid "Failed to save audio asset."
+msgstr "Falló al guardar recurso de audio."
+
+msgid "Background volume updated successfully."
+msgstr "Volumen de fondo actualizado exitosamente."
+
+msgid "Failed to save background volume."
+msgstr "Falló al guardar volumen de fondo."
+
+msgid "Error testing provider: %s"
+msgstr "Error al probar el proveedor: %s"
+
+msgid "The default TTS provider configured in the Defaults tab"
+msgstr "El proveedor TTS predeterminado configurado en la pestaña Predeterminados"
+
+msgid "The default voice of the selected provider"
+msgstr "La voz predeterminada del proveedor seleccionado"
+
+msgid "Please go to Settings > TTS Settings to configure at least one provider"
+msgstr "Por favor ve a Configuración > Configuración TTS para configurar al menos un proveedor"
+
+msgid "Only those with valid credentials will be shown as configured"
+msgstr "Solo se mostrarán como configurados los que tengan credenciales válidas"
+
+msgid "Configure your TTS providers below."
+msgstr "Configura tus proveedores TTS abajo."
+
+msgid "Enable TTS"
+msgstr "Habilitar TTS"
+
+msgid "Enable text-to-speech conversion for this post"
+msgstr "Habilitar conversión texto a voz para esta entrada"
+
+msgid "TTS Provider"
+msgstr "Proveedor TTS"
+
+msgid "No TTS providers are currently enabled. Please go to"
+msgstr "No hay proveedores TTS habilitados actualmente. Por favor ve a"
+
+msgid "TTS Settings"
+msgstr "Configuración TTS"
+
+msgid "to enable at least one provider."
+msgstr "para habilitar al menos un proveedor."
+
+msgid "No providers enabled"
+msgstr "Sin proveedores habilitados"
+
+msgid "Generate Audio"
+msgstr "Generar audio"
+
+msgid "Delete Audio"
+msgstr "Eliminar audio"
+
+msgid "Test Connection"
+msgstr "Probar conexión"
+
+msgid "Enable"
+msgstr "Habilitar"
+
+msgid "Disable"
+msgstr "Deshabilitar"
+
+msgid "Audio ready"
+msgstr "Audio listo"
+
+msgid "No audio generated"
+msgstr "Sin audio generado"
+
+msgid "Processing..."
+msgstr "Procesando..."
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Success"
+msgstr "Éxito"

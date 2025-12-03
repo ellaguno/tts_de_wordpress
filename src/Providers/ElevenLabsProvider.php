@@ -93,20 +93,36 @@ class ElevenLabsProvider implements TTSProviderInterface {
 	 * @throws ProviderException If generation fails.
 	 */
 	public function generateSpeech( string $text, array $options = [] ): array {
+		// Always log for debugging
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[WP_TTS ElevenLabs] generateSpeech called with text length: ' . strlen( $text ) );
+
 		if ( ! $this->isConfigured() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS ElevenLabs] ERROR: Provider not configured - API key missing' );
 			$this->logger->error( 'ElevenLabs provider is not configured. API key is missing.' );
 			throw new ProviderException( 'ElevenLabs provider is not properly configured (API key missing)' );
 		}
-		
+
 		$api_key = $this->config['api_key'];
+
+		// Validate API key format (ElevenLabs keys are typically 32 characters)
+		if ( strlen( $api_key ) < 20 ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS ElevenLabs] ERROR: API key appears to be invalid (too short)' );
+			throw new ProviderException( 'ElevenLabs API key appears to be invalid' );
+		}
+
 		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'pNInz6obpgDQGcFmaJgB'); // Default to Adam voice if nothing else is set
 		$model_id = $options['model_id'] ?? $this->config['default_model'] ?? 'eleven_multilingual_v2'; // Or 'eleven_monolingual_v1' etc.
 		$output_format = 'mp3_44100_128'; // ElevenLabs specific format for mp3
-		
+
 		// Stability and Similarity Boost are common ElevenLabs parameters
-		$stability = $options['stability'] ?? $this->config['stability'] ?? 0.75;
+		$stability = $options['stability'] ?? $this->config['stability'] ?? 0.5;
 		$similarity_boost = $options['similarity_boost'] ?? $this->config['similarity_boost'] ?? 0.75;
 
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[WP_TTS ElevenLabs] Using voice_id: ' . $voice_id . ', model: ' . $model_id );
 
 		$this->logger->info( 'Starting ElevenLabs TTS generation', [
 			'text_length' => strlen( $text ),
@@ -114,6 +130,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			'model_id' => $model_id,
 			'stability' => $stability,
 			'similarity_boost' => $similarity_boost,
+			'api_key_length' => strlen( $api_key ),
 		] );
 		
 		try {
@@ -143,6 +160,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 
 			if ( is_wp_error( $response ) ) {
 				$this->logger->error( 'ElevenLabs API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 				throw new ProviderException( 'ElevenLabs API request failed: ' . $response->get_error_message() );
 			}
 
@@ -151,12 +169,42 @@ class ElevenLabsProvider implements TTSProviderInterface {
 
 			if ( $response_code !== 200 ) {
 				$error_details = json_decode( $response_body, true );
-				$error_message = $error_details['detail']['message'] ?? $error_details['detail'] ?? $response_body;
+
+				// Parse different error formats from ElevenLabs
+				$error_message = 'Unknown error';
+				if ( isset( $error_details['detail']['message'] ) ) {
+					$error_message = $error_details['detail']['message'];
+				} elseif ( isset( $error_details['detail'] ) && is_string( $error_details['detail'] ) ) {
+					$error_message = $error_details['detail'];
+				} elseif ( isset( $error_details['message'] ) ) {
+					$error_message = $error_details['message'];
+				} elseif ( isset( $error_details['error'] ) ) {
+					$error_message = $error_details['error'];
+				} else {
+					$error_message = substr( $response_body, 0, 200 );
+				}
+
+				// Specific error handling
+				if ( $response_code === 401 ) {
+					$error_message = 'Invalid API key. Please check your ElevenLabs API key in settings.';
+				} elseif ( $response_code === 403 ) {
+					$error_message = 'Access forbidden. Your API key may not have permission for this operation.';
+				} elseif ( $response_code === 422 ) {
+					$error_message = 'Invalid voice ID or request parameters. Voice ID: ' . $voice_id;
+				} elseif ( $response_code === 429 ) {
+					$error_message = 'Rate limit exceeded or quota exhausted. Please try again later.';
+				}
+
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[WP_TTS ElevenLabs] API Error: ' . $response_code . ' - ' . $error_message );
+
 				$this->logger->error( 'ElevenLabs API returned an error', [
 					'response_code' => $response_code,
 					'error_message' => $error_message,
-					'response_body' => $response_body,
+					'response_body' => substr( $response_body, 0, 500 ),
+					'voice_id' => $voice_id,
 				] );
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 				throw new ProviderException( "ElevenLabs API error ({$response_code}): {$error_message}" );
 			}
 			
@@ -176,29 +224,34 @@ class ElevenLabsProvider implements TTSProviderInterface {
 				throw new ProviderException( 'Failed to save audio file' );
 			}
 
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS ElevenLabs] SUCCESS - Audio generated, size: ' . strlen( $audio_data ) . ' bytes' );
+
 			$this->logger->info( 'ElevenLabs TTS generation completed', [
-				'file_path' => $file_path,
-				'file_size' => filesize( $file_path ),
+				'audio_data_size' => strlen( $audio_data ),
+				'voice_id' => $voice_id,
 			] );
 
+			// Return raw audio data - TTSService will handle storage
 			return [
 				'success' => true,
-				'audio_url' => $file_url,
-				'file_path' => $file_path,
+				'audio_data' => $audio_data,
 				'provider' => $this->name,
 				'voice' => $voice_id,
-				'format' => $output_format,
+				'format' => 'mp3',
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
 					'model_id' => $model_id,
 					'characters' => strlen( $text ),
+					'data_size' => strlen( $audio_data ),
 				],
 			];
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'ElevenLabs TTS generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'ElevenLabs TTS generation failed: ' . $e->getMessage() );
 		}
 	}
@@ -283,7 +336,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			return $voices;
 
 		} catch ( \Exception $e ) {
-			$this->logger->warning( 'Exception while fetching ElevenLabs voices', [ 'error' => $e->getMessage() ] );
+			$this->logger->warning( 'Exception while fetching ElevenLabs voices', [ 'error' => esc_html( $e->getMessage() ) ] );
 			return [];
 		}
 	}

@@ -161,6 +161,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 
 			if ( is_wp_error( $response ) ) {
 				$this->logger->error( 'OpenAI API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 				throw new ProviderException( 'OpenAI API request failed: ' . $response->get_error_message() );
 			}
 
@@ -175,6 +176,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 					'error_message' => $error_message,
 					'response_body' => $response_body,
 				] );
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 				throw new ProviderException( "OpenAI API error ({$response_code}): {$error_message}" );
 			}
 			
@@ -204,8 +206,9 @@ class OpenAITTSProvider implements TTSProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'OpenAI TTS generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'OpenAI TTS generation failed: ' . $e->getMessage() );
 		}
 	}

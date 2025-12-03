@@ -136,19 +136,44 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			throw new ProviderException( 'Google Cloud SDK for PHP not found. Run "composer require google/cloud-text-to-speech".' );
 		}
 		
-		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-ES-Standard-A');
-		
+		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-US-Neural2-A');
+
 		// Validate Google voice ID - get all available voices and check if provided voice exists
 		$all_voices = $this->getAvailableVoices();
 		$valid_voice_ids = array_column($all_voices, 'id');
-		
+
 		if (!in_array($voice_id, $valid_voice_ids)) {
-			$this->logger->warning('Invalid Google TTS voice ID provided, using default', [
+			// Try to find a fallback voice based on the language prefix
+			$language_prefix = substr($voice_id, 0, 5); // e.g., 'es-US', 'es-MX', 'es-ES'
+			$fallback_voice = null;
+
+			// Look for a Neural2-A voice in the same language first
+			foreach ($valid_voice_ids as $valid_id) {
+				if (strpos($valid_id, $language_prefix) === 0 && strpos($valid_id, 'Neural2-A') !== false) {
+					$fallback_voice = $valid_id;
+					break;
+				}
+			}
+
+			// If no Neural2-A, try any voice in the same language
+			if (!$fallback_voice) {
+				foreach ($valid_voice_ids as $valid_id) {
+					if (strpos($valid_id, $language_prefix) === 0) {
+						$fallback_voice = $valid_id;
+						break;
+					}
+				}
+			}
+
+			// Final fallback to es-US-Neural2-A
+			$fallback_voice = $fallback_voice ?? 'es-US-Neural2-A';
+
+			$this->logger->warning('Invalid Google TTS voice ID provided, using fallback', [
 				'provided_voice' => $voice_id,
-				'valid_voices' => $valid_voice_ids,
-				'using_default' => 'es-ES-Standard-A'
+				'fallback_voice' => $fallback_voice,
+				'language_prefix' => $language_prefix
 			]);
-			$voice_id = $this->config['default_voice'] ?? 'es-ES-Standard-A';
+			$voice_id = $fallback_voice;
 		}
 		
 		// Google voice names are like 'es-ES-Standard-A'. We need language code and name separately.
@@ -230,8 +255,9 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Google Cloud TTS generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'Google Cloud TTS generation failed: ' . $e->getMessage() );
 		}
 	}
@@ -243,32 +269,79 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
-		// Standard voices (free tier) for common languages
+		// Google Cloud TTS voices - includes Standard, Wavenet, and Neural2
 		$voices = [
-			// Spanish (Spain) - Standard voices available
+			// Spanish (Spain) - All voice types
 			'es-ES' => [
-				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-D', 'name' => 'Standard D (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-E', 'name' => 'Standard E (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-F', 'name' => 'Standard F (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-G', 'name' => 'Standard G (Spanish Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-H', 'name' => 'Standard H (Spanish Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				// Standard voices
+				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-ES-Standard-D', 'name' => 'Standard D (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				// Wavenet voices
+				[ 'id' => 'es-ES-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-ES-Wavenet-C', 'name' => 'Wavenet C (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-ES-Wavenet-D', 'name' => 'Wavenet D (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
+				// Neural2 voices
+				[ 'id' => 'es-ES-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-ES-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				[ 'id' => 'es-ES-Neural2-C', 'name' => 'Neural2 C (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-ES-Neural2-D', 'name' => 'Neural2 D (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-ES-Neural2-E', 'name' => 'Neural2 E (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-ES-Neural2-F', 'name' => 'Neural2 F (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				// Polyglot voices
+				[ 'id' => 'es-ES-Polyglot-1', 'name' => 'Polyglot 1 (Male)', 'gender' => 'Male', 'type' => 'Polyglot' ],
+				// Studio voices
+				[ 'id' => 'es-ES-Studio-C', 'name' => 'Studio C (Female)', 'gender' => 'Female', 'type' => 'Studio' ],
+				[ 'id' => 'es-ES-Studio-F', 'name' => 'Studio F (Male)', 'gender' => 'Male', 'type' => 'Studio' ],
 			],
-			// Spanish (Mexico) - Note: No Standard voices available for es-MX, using es-ES as fallback
+			// Spanish (Mexico) - Neural2 and Wavenet available
 			'es-MX' => [
-				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Spanish Female) - Fallback', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Spanish Male) - Fallback', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Spanish Female) - Fallback', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-E', 'name' => 'Standard E (Spanish Male) - Fallback', 'gender' => 'Male', 'type' => 'Standard' ],
+				// Standard voices (limited for es-MX)
+				[ 'id' => 'es-MX-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-MX-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-MX-Standard-C', 'name' => 'Standard C (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				// Wavenet voices
+				[ 'id' => 'es-MX-Wavenet-A', 'name' => 'Wavenet A (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-MX-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-MX-Wavenet-C', 'name' => 'Wavenet C (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				// Neural2 voices
+				[ 'id' => 'es-MX-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-MX-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				[ 'id' => 'es-MX-Neural2-C', 'name' => 'Neural2 C (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
 			],
-			// English (US) - Standard voices available
+			// Spanish (US) - Neural2 voices
+			'es-US' => [
+				// Standard voices
+				[ 'id' => 'es-US-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-US-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-US-Standard-C', 'name' => 'Standard C (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				// Wavenet voices
+				[ 'id' => 'es-US-Wavenet-A', 'name' => 'Wavenet A (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-US-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				[ 'id' => 'es-US-Wavenet-C', 'name' => 'Wavenet C (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
+				// Neural2 voices
+				[ 'id' => 'es-US-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'es-US-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				[ 'id' => 'es-US-Neural2-C', 'name' => 'Neural2 C (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				// Studio voices
+				[ 'id' => 'es-US-Studio-B', 'name' => 'Studio B (Male)', 'gender' => 'Male', 'type' => 'Studio' ],
+			],
+			// English (US) - All voice types
 			'en-US' => [
-				[ 'id' => 'en-US-Standard-A', 'name' => 'Standard A (English US Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-B', 'name' => 'Standard B (English US Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-C', 'name' => 'Standard C (English US Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-D', 'name' => 'Standard D (English US Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				// Standard voices
+				[ 'id' => 'en-US-Standard-A', 'name' => 'Standard A (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-C', 'name' => 'Standard C (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-D', 'name' => 'Standard D (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-E', 'name' => 'Standard E (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'en-US-Standard-F', 'name' => 'Standard F (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				// Neural2 voices
+				[ 'id' => 'en-US-Neural2-A', 'name' => 'Neural2 A (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				[ 'id' => 'en-US-Neural2-C', 'name' => 'Neural2 C (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'en-US-Neural2-D', 'name' => 'Neural2 D (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
+				[ 'id' => 'en-US-Neural2-E', 'name' => 'Neural2 E (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
+				[ 'id' => 'en-US-Neural2-F', 'name' => 'Neural2 F (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 			],
 		];
 

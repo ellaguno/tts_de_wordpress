@@ -55,6 +55,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		if ( class_exists( 'WP_TTS\\Utils\\Logger' ) ) {
 			$this->logger = new Logger();
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log, WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			// Fallback to error_log if Logger not available
 			$this->logger = null;
 		}
@@ -106,10 +107,10 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		try {
 			$result = $this->uploadFile( $temp_file, $filename, $metadata );
-			unlink( $temp_file ); // Clean up temp file
+			wp_delete_file( $temp_file ); // Clean up temp file
 			return $result;
 		} catch ( \Exception $e ) {
-			unlink( $temp_file ); // Clean up temp file on error
+			wp_delete_file( $temp_file ); // Clean up temp file on error
 			throw $e;
 		}
 	}
@@ -129,6 +130,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		}
 
 		if ( ! file_exists( $file_path ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( 'File does not exist: ' . $file_path );
 		}
 
@@ -203,15 +205,16 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 					'title' => $response['title'] ?? $upload_data['title'],
 					'duration' => $response['duration'] ?? 0,
 					'file_size' => $response['file_size'] ?? filesize( $file_path ),
-					'uploaded_at' => date( 'Y-m-d H:i:s' ),
+					'uploaded_at' => gmdate( 'Y-m-d H:i:s' ),
 				],
 			];
 
 		} catch ( \Exception $e ) {
 			$this->log( 'error', 'Buzzsprout file upload failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'file_path' => $file_path,
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( 'Buzzsprout upload failed: ' . $e->getMessage() );
 		}
 	}
@@ -234,6 +237,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		// Fallback to system temp directory
 		$temp_dir = sys_get_temp_dir();
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Need to check temp directory
 		if ( ! $temp_dir || ! is_writable( $temp_dir ) ) {
 			// Try WordPress uploads temp if system temp not available
 			$upload_dir = function_exists( 'wp_upload_dir' ) ? wp_upload_dir() : null;
@@ -244,8 +248,10 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 						wp_mkdir_p( $temp_dir );
 					} else {
 						// Fallback to native PHP
+						// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_mkdir -- Fallback when wp_mkdir_p not available
 						if ( ! mkdir( $temp_dir, 0755, true ) ) {
-							throw new \Exception( 'Cannot create temporary directory: ' . $temp_dir );
+							// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message for debugging
+							throw new \Exception( 'Cannot create temporary directory: ' . esc_html( $temp_dir ) );
 						}
 					}
 				}
@@ -260,6 +266,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		
 		// Test if we can write to the temp file
 		if ( file_put_contents( $temp_file, '' ) === false ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new \Exception( 'Cannot create temporary file for Buzzsprout upload: ' . $temp_file );
 		}
 
@@ -330,9 +337,10 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->log( 'error', 'Buzzsprout file deletion failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 				'file_url' => $file_url,
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( 'Buzzsprout deletion failed: ' . $e->getMessage() );
 		}
 	}
@@ -401,7 +409,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->log( 'error', 'Failed to list Buzzsprout files', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
 			return [];
 		}
@@ -423,6 +431,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			$response = $this->getPodcastInfo();
 			return isset( $response['id'] );
 		} catch ( \Exception $e ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( 'Buzzsprout connection test failed: ' . $e->getMessage() );
 		}
 	}
@@ -456,7 +465,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			return [
 				'provider' => $this->name,
 				'configured' => true,
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			];
 		}
 	}
@@ -477,6 +486,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'podcast_id' => $this->credentials['podcast_id']
 		] );
 
+		// phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_getinfo, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- cURL required for multipart file upload with CURLFile
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, $this->api_base_url . '/' . $this->credentials['podcast_id'] . '/episodes.json' );
 		curl_setopt( $ch, CURLOPT_POST, true );
@@ -492,12 +502,12 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'private' => $upload_data['private'] ? 'true' : 'false',
 			'audio_file' => new \CURLFile( $file_path, 'audio/mpeg', $filename )
 		];
-		
+
 		// Add artwork if provided
 		if ( ! empty( $upload_data['artwork_url'] ) ) {
 			$post_fields['artwork_url'] = $upload_data['artwork_url'];
 		}
-		
+
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, 120 ); // 2 minutes timeout for upload
 		curl_setopt( $ch, CURLOPT_VERBOSE, false );
@@ -507,6 +517,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		$curl_error = curl_error( $ch );
 		$upload_info = curl_getinfo( $ch );
 		curl_close( $ch );
+		// phpcs:enable
 
 		$this->log( 'info', 'BuzzSprout: API response received', [
 			'http_code' => $http_code,
@@ -515,6 +526,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		] );
 
 		if ( ! empty( $curl_error ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( 'BuzzSprout cURL error: ' . $curl_error );
 		}
 
@@ -537,8 +549,10 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			if ( $error_data ) {
 				$error_msg .= ' - ' . json_encode( $error_data );
 			}
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( $error_msg );
 		} else {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new StorageException( "BuzzSprout: HTTP error $http_code - $response" );
 		}
 	}
@@ -568,7 +582,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'audio_url' => 'https://www.buzzsprout.com/episodes/' . $episode_id . '.mp3',
 			'duration' => 120,
 			'file_size' => 1024000,
-			'published_at' => date( 'Y-m-d\TH:i:s\Z' ),
+			'published_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
 		];
 	}
 
@@ -830,6 +844,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			$this->logger->{$level}( $message, $context );
 		} else {
 			$context_str = empty( $context ) ? '' : ' ' . json_encode( $context );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( "[BuzzSprout {$level}] {$message}{$context_str}" );
 		}
 	}

@@ -310,16 +310,6 @@ class TTSMetaManager {
 	}
 
 	/**
-	 * Delete TTS data for a post
-	 *
-	 * @param int $post_id Post ID
-	 * @return bool Success
-	 */
-	public static function deleteTTSData( int $post_id ): bool {
-		return delete_post_meta( $post_id, self::META_KEY );
-	}
-
-	/**
 	 * Validate and sanitize TTS data
 	 *
 	 * @param array $data Raw data
@@ -404,14 +394,14 @@ class TTSMetaManager {
 
 		if ( ! empty( $old_data['generated_at'] ) ) {
 			$timestamp = is_numeric( $old_data['generated_at'] ) ?
-				date( 'Y-m-d H:i:s', $old_data['generated_at'] ) :
+				gmdate( 'Y-m-d H:i:s', $old_data['generated_at'] ) :
 				$old_data['generated_at'];
 			$new_data['audio']['generated_at'] = $timestamp;
 		}
 
 		if ( ! empty( $old_data['last_generated'] ) ) {
 			$timestamp = is_numeric( $old_data['last_generated'] ) ?
-				date( 'Y-m-d H:i:s', $old_data['last_generated'] ) :
+				gmdate( 'Y-m-d H:i:s', $old_data['last_generated'] ) :
 				$old_data['last_generated'];
 			$new_data['generation']['last_attempt'] = $timestamp;
 		}
@@ -443,6 +433,7 @@ class TTSMetaManager {
 	public static function getPostsWithTTS( array $args = [] ): array {
 		$default_args = [
 			'post_type' => [ 'post', 'page' ],
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required to find posts with TTS data
 			'meta_key' => self::META_KEY,
 			'fields' => 'ids',
 			'posts_per_page' => -1
@@ -464,6 +455,7 @@ class TTSMetaManager {
 
 		$meta_key = self::META_KEY;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct query needed for TTS statistics
 		$results = $wpdb->get_results( $wpdb->prepare( "
 			SELECT meta_value
 			FROM {$wpdb->postmeta}
@@ -518,5 +510,113 @@ class TTSMetaManager {
 		}
 
 		return $stats;
+	}
+
+	/**
+	 * Clean up failed generation data
+	 * Called when audio generation fails to leave DB in a clean state
+	 *
+	 * @param int $post_id Post ID
+	 * @param string $error_message Error message to record
+	 * @return bool Success
+	 */
+	public static function cleanupFailedGeneration( int $post_id, string $error_message = '' ): bool {
+		$data = self::getTTSData( $post_id );
+
+		// Reset audio section to pending state
+		$data['audio'] = [
+			'url' => '',
+			'generated_at' => null,
+			'status' => 'failed',
+			'duration' => 0,
+			'file_size' => 0,
+			'format' => 'mp3'
+		];
+
+		// Record the failure
+		$data['generation']['last_attempt'] = current_time( 'mysql' );
+		$data['generation']['last_error'] = $error_message;
+		$data['generation']['attempts_count'] = ( $data['generation']['attempts_count'] ?? 0 ) + 1;
+
+		// Clear any cached data
+		$data['generation']['cache_key'] = '';
+
+		$data['updated_at'] = current_time( 'mysql' );
+
+		return self::saveTTSData( $post_id, $data );
+	}
+
+	/**
+	 * Reset all TTS data for a post (complete cleanup)
+	 * Used when deleting audio to ensure complete cleanup
+	 *
+	 * @param int $post_id Post ID
+	 * @param bool $keep_enabled Whether to keep the TTS enabled setting
+	 * @return bool Success
+	 */
+	public static function resetTTSData( int $post_id, bool $keep_enabled = false ): bool {
+		$current_data = self::getTTSData( $post_id );
+		$was_enabled = $current_data['enabled'] ?? false;
+
+		// Get default data
+		$new_data = self::getDefaultData();
+
+		// Optionally preserve enabled state
+		if ( $keep_enabled && $was_enabled ) {
+			$new_data['enabled'] = true;
+		}
+
+		// Preserve voice config if it was set
+		if ( ! empty( $current_data['voice']['provider'] ) ) {
+			$new_data['voice'] = $current_data['voice'];
+		}
+
+		$new_data['updated_at'] = current_time( 'mysql' );
+
+		return self::saveTTSData( $post_id, $new_data );
+	}
+
+	/**
+	 * Delete all TTS data for a post (complete removal)
+	 *
+	 * @param int $post_id Post ID
+	 * @return bool Success
+	 */
+	public static function deleteTTSData( int $post_id ): bool {
+		// Delete the unified meta key
+		$result = delete_post_meta( $post_id, self::META_KEY );
+
+		// Also clean up any old format meta keys
+		delete_post_meta( $post_id, '_tts_enabled' );
+		delete_post_meta( $post_id, '_tts_audio_url' );
+		delete_post_meta( $post_id, '_tts_voice_provider' );
+		delete_post_meta( $post_id, '_tts_voice_id' );
+		delete_post_meta( $post_id, '_tts_custom_text' );
+		delete_post_meta( $post_id, '_tts_generated_at' );
+		delete_post_meta( $post_id, '_tts_generation_status' );
+		delete_post_meta( $post_id, '_tts_last_generated' );
+		delete_post_meta( $post_id, '_tts_custom_audio' );
+
+		return $result;
+	}
+
+	/**
+	 * Clear audio cache for a post
+	 *
+	 * @param int $post_id Post ID
+	 * @return bool Success
+	 */
+	public static function clearAudioCache( int $post_id ): bool {
+		$data = self::getTTSData( $post_id );
+
+		// Clear cache key
+		$data['generation']['cache_key'] = '';
+
+		// Mark content as modified to force regeneration
+		$data['content']['content_modified'] = true;
+
+		$data['updated_at'] = current_time( 'mysql' );
+
+		return self::saveTTSData( $post_id, $data );
 	}
 }

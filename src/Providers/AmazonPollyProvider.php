@@ -186,8 +186,9 @@ class AmazonPollyProvider implements TTSProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Amazon Polly TTS generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'Amazon Polly generation failed: ' . $e->getMessage() );
 		}
 	}
@@ -240,6 +241,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 				$result = $pollyClient->synthesizeSpeech( $request_args );
 				
 				if ( ! isset( $result['AudioStream'] ) ) {
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 					throw new ProviderException( "Amazon Polly: Invalid response for chunk " . ($index + 1) . ": No AudioStream" );
 				}
 				
@@ -273,8 +275,9 @@ class AmazonPollyProvider implements TTSProviderInterface {
 
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Amazon Polly chunked TTS generation failed', [
-				'error' => $e->getMessage(),
+				'error' => esc_html( $e->getMessage() ),
 			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'Amazon Polly chunked generation failed: ' . $e->getMessage() );
 		}
 	}
@@ -563,6 +566,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			$response = $this->makePollyRequest( 'describe-voices', [] );
 			return isset( $response['Voices'] );
 		} catch ( \Exception $e ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'Amazon Polly connection test failed: ' . $e->getMessage() );
 		}
 	}
@@ -623,13 +627,16 @@ class AmazonPollyProvider implements TTSProviderInterface {
 				'aws_error_message' => $e->getAwsErrorMessage(),
 				'message' => $e->getMessage(),
 			]);
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( "Amazon Polly API request for {$action} failed: " . $e->getAwsErrorMessage() );
 		} catch ( \Exception $e ) {
 			$this->logger->error( "[AmazonPollyProvider::makePollyRequest] Generic Exception for Polly action {$action}", [ 'message' => $e->getMessage() ]);
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( "Amazon Polly request for {$action} failed: " . $e->getMessage() );
 		}
 		
 		$this->logger->warn('[AmazonPollyProvider::makePollyRequest] Unknown or unhandled Polly action.', ['action' => $action]);
+		// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		throw new ProviderException( 'Unknown or unhandled Polly action in makePollyRequest: ' . $action );
 	}
 

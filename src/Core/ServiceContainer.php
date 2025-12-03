@@ -64,6 +64,7 @@ class ServiceContainer {
 
 		// Check if service is defined
 		if ( ! isset( $this->services[ $name ] ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new \InvalidArgumentException( "Service '{$name}' is not defined" );
 		}
 
@@ -77,6 +78,7 @@ class ServiceContainer {
 		} elseif ( is_string( $definition ) && class_exists( $definition ) ) {
 			$instance = new $definition();
 		} else {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new \InvalidArgumentException( "Invalid service definition for '{$name}'" );
 		}
 
@@ -172,6 +174,7 @@ class ServiceContainer {
 		$reflection = new \ReflectionClass( $className );
 
 		if ( ! $reflection->isInstantiable() ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new \InvalidArgumentException( "Class '{$className}' is not instantiable" );
 		}
 
@@ -191,8 +194,9 @@ class ServiceContainer {
 				if ( $parameter->isDefaultValueAvailable() ) {
 					$dependencies[] = $parameter->getDefaultValue();
 				} else {
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message for developers only
 					throw new \InvalidArgumentException(
-						"Cannot resolve parameter '{$parameter->getName()}' for class '{$className}'"
+						"Cannot resolve parameter '" . esc_html( $parameter->getName() ) . "' for class '" . esc_html( $className ) . "'"
 					);
 				}
 				continue;
@@ -209,8 +213,9 @@ class ServiceContainer {
 			} elseif ( $parameter->isDefaultValueAvailable() ) {
 				$dependencies[] = $parameter->getDefaultValue();
 			} else {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message for developers only
 				throw new \InvalidArgumentException(
-					"Cannot resolve dependency '{$typeName}' for class '{$className}'"
+					"Cannot resolve dependency '" . esc_html( $typeName ) . "' for class '" . esc_html( $className ) . "'"
 				);
 			}
 		}
@@ -250,8 +255,9 @@ class ServiceContainer {
 				if ( $parameter->isDefaultValueAvailable() ) {
 					$dependencies[] = $parameter->getDefaultValue();
 				} else {
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message for developers only
 					throw new \InvalidArgumentException(
-						"Cannot resolve parameter '{$name}' for method '{$method}'"
+						"Cannot resolve parameter '" . esc_html( $name ) . "' for method '" . esc_html( $method ) . "'"
 					);
 				}
 				continue;
@@ -266,8 +272,9 @@ class ServiceContainer {
 			} elseif ( $parameter->isDefaultValueAvailable() ) {
 				$dependencies[] = $parameter->getDefaultValue();
 			} else {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message for developers only
 				throw new \InvalidArgumentException(
-					"Cannot resolve dependency '{$typeName}' for method '{$method}'"
+					"Cannot resolve dependency '" . esc_html( $typeName ) . "' for method '" . esc_html( $method ) . "'"
 				);
 			}
 		}

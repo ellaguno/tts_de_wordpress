@@ -35,6 +35,7 @@ class Activator {
 		flush_rewrite_rules();
 
 		// Log activation
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( 'WP TTS Plugin activated successfully' );
 	}
 
@@ -48,15 +49,17 @@ class Activator {
 
 		// Check WordPress version
 		if ( version_compare( $wp_version, '5.0', '<' ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is safe
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere WordPress 5.0 o superior.', 'wp-tts-sesolibre' )
+				esc_html__( 'El Plugin TTS de WordPress requiere WordPress 5.0 o superior.', 'tts-sesolibre' )
 			);
 		}
 
 		// Check PHP version
 		if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is safe
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere PHP 7.4 o superior.', 'wp-tts-sesolibre' )
+				esc_html__( 'El Plugin TTS de WordPress requiere PHP 7.4 o superior.', 'tts-sesolibre' )
 			);
 		}
 
@@ -65,19 +68,22 @@ class Activator {
 		foreach ( $required_extensions as $extension ) {
 			if ( ! extension_loaded( $extension ) ) {
 				throw new \Exception(
-					sprintf(
-						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'wp-tts-sesolibre' ),
+					esc_html( sprintf(
+						/* translators: %s: PHP extension name */
+						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'tts-sesolibre' ),
 						$extension
-					)
+					) )
 				);
 			}
 		}
 
 		// Check file permissions
 		$upload_dir = wp_upload_dir();
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable -- Need to check write permissions during activation
 		if ( ! is_writable( $upload_dir['basedir'] ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception message is safe
 			throw new \Exception(
-				__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'wp-tts-sesolibre' )
+				esc_html__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'tts-sesolibre' )
 			);
 		}
 	}
@@ -194,6 +200,7 @@ class Activator {
 				'post_type'   => array( 'post', 'page' ),
 				'post_status' => 'publish',
 				'numberposts' => -1,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required to find posts without TTS meta during activation
 				'meta_query'  => array(
 					array(
 						'key'     => '_tts_enabled',
@@ -351,9 +358,10 @@ class Activator {
 		$admin_email = get_option( 'admin_email' );
 
 		if ( $admin_email ) {
-			$subject = __( 'Plugin TTS de WordPress Activado', 'wp-tts-sesolibre' );
+			$subject = __( 'Plugin TTS de WordPress Activado', 'tts-sesolibre' );
 			$message = sprintf(
-				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'wp-tts-sesolibre' ),
+				/* translators: %s: site name */
+				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'tts-sesolibre' ),
 				get_bloginfo( 'name' )
 			);
 
@@ -379,6 +387,7 @@ class Activator {
 
 		// Log to file if debug is enabled
 		if ( WP_DEBUG_LOG ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( 'WP TTS Plugin Activation: ' . json_encode( $log_data ) );
 		}
 	}

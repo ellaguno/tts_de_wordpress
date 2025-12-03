@@ -4,6 +4,8 @@
  * Clean, minimalist audio player with waveform visualization
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template variables are local scope
+
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
@@ -43,30 +45,30 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
 <style>
 /* Minimal Player Custom Colors */
-#<?php echo $player_id; ?> {
+#<?php echo esc_attr( $player_id ); ?> {
     background: <?php echo esc_html($background_color); ?>;
     color: <?php echo esc_html($text_color); ?>;
 }
 
-#<?php echo $player_id; ?> .wp-tts-minimal-play-btn {
+#<?php echo esc_attr( $player_id ); ?> .wp-tts-minimal-play-btn {
     background: <?php echo esc_html($play_icon_color); ?>;
 }
 
-#<?php echo $player_id; ?> .wp-tts-minimal-play-btn:hover {
+#<?php echo esc_attr( $player_id ); ?> .wp-tts-minimal-play-btn:hover {
     background: <?php echo esc_html($pause_icon_color); ?>;
 }
 
-#<?php echo $player_id; ?> .progress-filled {
+#<?php echo esc_attr( $player_id ); ?> .progress-filled {
     background: <?php echo esc_html($progress_color); ?>;
 }
 
-#<?php echo $player_id; ?> .waveform-bar.active,
-#<?php echo $player_id; ?> .waveform-bar.playing {
+#<?php echo esc_attr( $player_id ); ?> .waveform-bar.active,
+#<?php echo esc_attr( $player_id ); ?> .waveform-bar.playing {
     background: <?php echo esc_html($progress_color); ?>;
 }
 </style>
 
-<div class="wp-tts-minimal-player-container" id="<?php echo $player_id; ?>">
+<div class="wp-tts-minimal-player-container" id="<?php echo esc_attr( $player_id ); ?>">
     <div class="wp-tts-minimal-player">
         <!-- Play/Pause Button -->
         <button class="wp-tts-minimal-play-btn" type="button" aria-label="Play/Pause">
@@ -186,7 +188,7 @@ $text_color = $config->get('player.player_text_color', '#333333');
             </div>
             <?php if ($download_link): ?>
             <div class="setting-item">
-                <a href="<?php echo $download_link; ?>" download class="download-link">
+                <a href="<?php echo esc_url( $download_link ); ?>" download class="download-link">
                     <span class="headphones-icon">🎧</span>
                     Descargar audio
                 </a>
@@ -194,8 +196,8 @@ $text_color = $config->get('player.player_text_color', '#333333');
             <?php endif; ?>
             <div class="setting-item">
                 <div class="audio-info">
-                    <div class="service-info"><?php echo $service_name; ?></div>
-                    <div class="voice-info"><?php echo $voice_name; ?></div>
+                    <div class="service-info"><?php echo esc_html( $service_name ); ?></div>
+                    <div class="voice-info"><?php echo esc_html( $voice_name ); ?></div>
                 </div>
             </div>
         </div>
@@ -203,8 +205,8 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
     <!-- Hidden Audio Element -->
     <audio class="wp-tts-audio" preload="none" crossorigin="anonymous">
-        <source src="<?php echo $audio_url; ?>" type="audio/mpeg">
-        <source src="<?php echo $audio_url; ?>" type="audio/ogg">
+        <source src="<?php echo esc_url( $audio_url ); ?>" type="audio/mpeg">
+        <source src="<?php echo esc_url( $audio_url ); ?>" type="audio/ogg">
         Tu navegador no soporta el elemento de audio.
     </audio>
 
@@ -222,7 +224,7 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const playerId = '<?php echo $player_id; ?>';
+    const playerId = '<?php echo esc_attr( $player_id ); ?>';
     const playerContainer = document.getElementById(playerId);
     
     if (playerContainer && !playerContainer.classList.contains('initialized')) {

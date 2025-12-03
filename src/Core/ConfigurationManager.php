@@ -21,6 +21,7 @@ class ConfigurationManager {
 	private const OPTION_AUDIO_LIBRARY = 'wp_tts_audio_library';
 	private const OPTION_ANALYTICS     = 'wp_tts_analytics_settings';
 	private const OPTION_PLAYER        = 'wp_tts_player_settings';
+	private const OPTION_AUTO_GENERATE = 'wp_tts_auto_generate_settings';
 
 	/**
 	 * Default configuration values
@@ -92,7 +93,7 @@ class ConfigurationManager {
 			),
 		),
 		'defaults'      => array(
-			'default_provider'      => 'azure',
+			'default_provider'      => 'google',
 			'default_storage'       => 'local',
 			'auto_generate'         => false,
 			'voice_speed'           => 1.0,
@@ -134,6 +135,13 @@ class ConfigurationManager {
 			'show_download_link'        => true,
 			'show_article_title'        => true,
 		),
+		'auto_generate' => array(
+			'enabled'            => false,
+			'categories'         => array(), // Array de IDs de categorías
+			'post_types'         => array( 'post' ), // Tipos de post soportados
+			'on_publish_only'    => true, // Solo al publicar (no al actualizar)
+			'use_default_config' => true, // Usar configuración por defecto
+		),
 	);
 
 	/**
@@ -163,7 +171,7 @@ class ConfigurationManager {
 				array(
 					'current_provider' => $this->defaults['defaults']['default_provider'],
 					'usage_count'      => array(),
-					'last_reset'       => date( 'Y-m-01' ), // First day of current month
+					'last_reset'       => gmdate( 'Y-m-01' ), // First day of current month
 					'failed_providers' => array(),
 				)
 			),
@@ -171,6 +179,7 @@ class ConfigurationManager {
 			'audio_library' => $this->getOption( self::OPTION_AUDIO_LIBRARY, $this->defaults['audio_library'] ),
 			'analytics'     => $this->getOption( self::OPTION_ANALYTICS, $this->defaults['analytics'] ),
 			'player'        => $this->getOption( self::OPTION_PLAYER, $this->defaults['player'] ),
+			'auto_generate' => $this->getOption( self::OPTION_AUTO_GENERATE, $this->defaults['auto_generate'] ),
 		);
 	}
 
@@ -350,6 +359,96 @@ class ConfigurationManager {
 	}
 
 	/**
+	 * Get auto-generate settings
+	 *
+	 * @return array Auto-generate settings
+	 */
+	public function getAutoGenerateSettings(): array {
+		$settings = $this->get( 'auto_generate', $this->defaults['auto_generate'] );
+
+		// Ensure we always return an array
+		if ( ! is_array( $settings ) ) {
+			return $this->defaults['auto_generate'];
+		}
+
+		return array_merge( $this->defaults['auto_generate'], $settings );
+	}
+
+	/**
+	 * Update auto-generate settings
+	 *
+	 * @param array $settings New auto-generate settings
+	 */
+	public function updateAutoGenerateSettings( array $settings ): void {
+		$current = $this->getAutoGenerateSettings();
+		$updated = array_merge( $current, $settings );
+		$this->set( 'auto_generate', $updated );
+	}
+
+	/**
+	 * Check if a post should have auto-generated audio based on its categories
+	 *
+	 * @param int $post_id Post ID to check
+	 * @return bool Whether auto-generation should occur
+	 */
+	public function shouldAutoGenerateForPost( int $post_id ): bool {
+		$settings = $this->getAutoGenerateSettings();
+
+		$logger = $this->getLogger();
+		$logger->info( 'Checking auto-generate for post', [
+			'post_id' => $post_id,
+			'settings' => $settings
+		] );
+
+		// Check if auto-generate is enabled
+		if ( empty( $settings['enabled'] ) ) {
+			$logger->info( 'Auto-generate disabled' );
+			return false;
+		}
+
+		// Check if post type is supported
+		$post_type = get_post_type( $post_id );
+		$supported_types = $settings['post_types'] ?? [ 'post' ];
+		if ( ! in_array( $post_type, $supported_types, true ) ) {
+			$logger->info( 'Post type not supported', [
+				'post_type' => $post_type,
+				'supported' => $supported_types
+			] );
+			return false;
+		}
+
+		// If no categories are configured, don't auto-generate
+		$configured_categories = $settings['categories'] ?? [];
+		if ( empty( $configured_categories ) ) {
+			$logger->info( 'No categories configured for auto-generate' );
+			return false;
+		}
+
+		// Get post categories (as integers)
+		$post_categories = wp_get_post_categories( $post_id, array( 'fields' => 'ids' ) );
+
+		// Ensure both arrays contain integers for proper comparison
+		$post_categories = array_map( 'intval', $post_categories );
+		$configured_categories = array_map( 'intval', $configured_categories );
+
+		$logger->info( 'Comparing categories', [
+			'post_categories' => $post_categories,
+			'configured_categories' => $configured_categories
+		] );
+
+		// Check if any post category matches configured categories
+		$matching_categories = array_intersect( $post_categories, $configured_categories );
+
+		$should_generate = ! empty( $matching_categories );
+		$logger->info( 'Auto-generate decision', [
+			'matching' => $matching_categories,
+			'should_generate' => $should_generate
+		] );
+
+		return $should_generate;
+	}
+
+	/**
 	 * Add audio file to library
 	 *
 	 * @param string $type File type (intro, background, outro)
@@ -411,28 +510,28 @@ class ConfigurationManager {
 		switch ( $provider ) {
 			case 'azure':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'wp-tts-sesolibre' );
+					$errors[] = __( 'La clave API es requerida', 'tts-sesolibre' );
 				}
 				if ( empty( $config['region'] ) ) {
-					$errors[] = __( 'La región es requerida', 'wp-tts-sesolibre' );
+					$errors[] = __( 'La región es requerida', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'google':
 				if ( empty( $config['credentials_json'] ) ) {
-					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'wp-tts-sesolibre' );
+					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'polly':
 				if ( empty( $config['access_key'] ) || empty( $config['secret_key'] ) ) {
-					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'wp-tts-sesolibre' );
+					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'elevenlabs':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'wp-tts-sesolibre' );
+					$errors[] = __( 'La clave API es requerida', 'tts-sesolibre' );
 				}
 				break;
 		}
@@ -452,14 +551,14 @@ class ConfigurationManager {
 		if ( isset( $defaults['voice_speed'] ) ) {
 			$speed = floatval( $defaults['voice_speed'] );
 			if ( $speed < 0.25 || $speed > 4.0 ) {
-				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'wp-tts-sesolibre' );
+				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'tts-sesolibre' );
 			}
 		}
 
 		if ( isset( $defaults['voice_pitch'] ) ) {
 			$pitch = intval( $defaults['voice_pitch'] );
 			if ( $pitch < -20 || $pitch > 20 ) {
-				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'wp-tts-sesolibre' );
+				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'tts-sesolibre' );
 			}
 		}
 
@@ -478,6 +577,7 @@ class ConfigurationManager {
 		update_option( self::OPTION_AUDIO_LIBRARY, $this->config['audio_library'] );
 		update_option( self::OPTION_ANALYTICS, $this->config['analytics'] );
 		update_option( self::OPTION_PLAYER, $this->config['player'] );
+		update_option( self::OPTION_AUTO_GENERATE, $this->config['auto_generate'] );
 	}
 
 	/**

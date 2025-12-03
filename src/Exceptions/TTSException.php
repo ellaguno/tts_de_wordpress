@@ -114,16 +114,16 @@ class TTSException extends \Exception {
 	 */
 	public function getUserMessage(): string {
 		$userMessages = array(
-			'INVALID_TEXT'         => __( 'El contenido del texto es inválido o está vacío.', 'wp-tts-sesolibre' ),
-			'PROVIDER_ERROR'       => __( 'Hubo un error con el servicio TTS. Por favor, inténtelo de nuevo.', 'wp-tts-sesolibre' ),
-			'QUOTA_EXCEEDED'       => __( 'Se ha superado la cuota del servicio TTS. Por favor, inténtelo más tarde.', 'wp-tts-sesolibre' ),
-			'INVALID_VOICE'        => __( 'La voz seleccionada no está disponible.', 'wp-tts-sesolibre' ),
-			'NETWORK_ERROR'        => __( 'Error de conexión de red. Por favor, verifique su conexión a internet.', 'wp-tts-sesolibre' ),
-			'AUTHENTICATION_ERROR' => __( 'Falló la autenticación. Por favor, verifique sus credenciales de API.', 'wp-tts-sesolibre' ),
-			'RATE_LIMIT_EXCEEDED'  => __( 'Límite de tasa superado. Por favor, espere antes de intentar de nuevo.', 'wp-tts-sesolibre' ),
-			'UNSUPPORTED_FORMAT'   => __( 'El formato de audio solicitado no es compatible.', 'wp-tts-sesolibre' ),
-			'TEXT_TOO_LONG'        => __( 'El texto es demasiado largo para procesarse.', 'wp-tts-sesolibre' ),
-			'CONFIGURATION_ERROR'  => __( 'Error de configuración del plugin. Por favor, verifique su configuración.', 'wp-tts-sesolibre' ),
+			'INVALID_TEXT'         => __( 'El contenido del texto es inválido o está vacío.', 'tts-sesolibre' ),
+			'PROVIDER_ERROR'       => __( 'Hubo un error con el servicio TTS. Por favor, inténtelo de nuevo.', 'tts-sesolibre' ),
+			'QUOTA_EXCEEDED'       => __( 'Se ha superado la cuota del servicio TTS. Por favor, inténtelo más tarde.', 'tts-sesolibre' ),
+			'INVALID_VOICE'        => __( 'La voz seleccionada no está disponible.', 'tts-sesolibre' ),
+			'NETWORK_ERROR'        => __( 'Error de conexión de red. Por favor, verifique su conexión a internet.', 'tts-sesolibre' ),
+			'AUTHENTICATION_ERROR' => __( 'Falló la autenticación. Por favor, verifique sus credenciales de API.', 'tts-sesolibre' ),
+			'RATE_LIMIT_EXCEEDED'  => __( 'Límite de tasa superado. Por favor, espere antes de intentar de nuevo.', 'tts-sesolibre' ),
+			'UNSUPPORTED_FORMAT'   => __( 'El formato de audio solicitado no es compatible.', 'tts-sesolibre' ),
+			'TEXT_TOO_LONG'        => __( 'El texto es demasiado largo para procesarse.', 'tts-sesolibre' ),
+			'CONFIGURATION_ERROR'  => __( 'Error de configuración del plugin. Por favor, verifique su configuración.', 'tts-sesolibre' ),
 		);
 
 		return $userMessages[ $this->getErrorType() ] ?? $this->getMessage();

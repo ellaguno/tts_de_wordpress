@@ -1,137 +1,127 @@
-# WordPress TTS Plugin
+=== TTS SesoLibre ===
+Contributors: sesolibre
+Tags: tts, text-to-speech, audio, accessibility, podcast
+Requires at least: 5.0
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 1.9.1
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Un plugin avanzado de Text-to-Speech (TTS) para WordPress que soporta múltiples proveedores de TTS y almacenamiento en la nube.
+An advanced Text-to-Speech (TTS) plugin for WordPress supporting multiple TTS providers and cloud storage.
 
-## Características
+== Description ==
 
-- **Múltiples Proveedores TTS**: Amazon Polly, Azure TTS, Google Cloud TTS, OpenAI TTS, ElevenLabs
-- **Almacenamiento en la Nube**: Buzzsprout para hosting de archivos de audio
-- **Sistema Round-Robin**: Distribución automática de carga entre proveedores
-- **Cache Inteligente**: Sistema de cache para optimizar rendimiento
-- **Interfaz de Administración**: Panel de control completo en WordPress
-- **Modo Mock**: Funcionalidad de prueba sin necesidad de credenciales API
+TTS SesoLibre is a powerful Text-to-Speech plugin that converts your WordPress content to audio using multiple TTS providers.
 
-## Instalación
+**Key Features:**
 
-1. Descarga el plugin desde este repositorio
-2. Sube el archivo ZIP a tu WordPress en `Plugins > Añadir nuevo > Subir plugin`
-3. Activa el plugin desde el panel de administración
-4. Configura los proveedores TTS en `Configuración > TTS Settings`
+* **Multiple TTS Providers**: Amazon Polly, Azure TTS, Google Cloud TTS, OpenAI TTS, ElevenLabs
+* **Cloud Storage**: Buzzsprout integration for audio file hosting
+* **Round-Robin System**: Automatic load distribution between providers
+* **Smart Cache**: Caching system to optimize performance
+* **Admin Interface**: Complete control panel in WordPress
+* **Mock Mode**: Testing functionality without API credentials
 
-## Configuración
+== Installation ==
 
-### Proveedores TTS Soportados
+1. Download the plugin from this repository
+2. Upload the ZIP file to your WordPress in `Plugins > Add New > Upload Plugin`
+3. Activate the plugin from the admin panel
+4. Configure TTS providers in `Settings > TTS Settings`
 
-#### Amazon Polly
-- AWS Access Key ID
-- AWS Secret Access Key
-- Región AWS
-- Selección de voz
+== Configuration ==
 
-#### Azure TTS
-- Subscription Key
-- Región del servicio
-- Selección de voz
+= Supported TTS Providers =
 
-#### Google Cloud TTS
-- Service Account JSON
-- Selección de voz
+**Amazon Polly**
+* AWS Access Key ID
+* AWS Secret Access Key
+* AWS Region
+* Voice selection
 
-#### OpenAI TTS
-- API Key
-- Modelo de voz
-- Selección de voz
+**Azure TTS**
+* Subscription Key
+* Service Region
+* Voice selection
 
-#### ElevenLabs
-- API Key
-- Selección de voz
+**Google Cloud TTS**
+* Service Account JSON
+* Voice selection
 
-### Almacenamiento
+**OpenAI TTS**
+* API Key
+* Voice model
+* Voice selection
 
-#### Buzzsprout
-- API Token
-- Podcast ID
+**ElevenLabs**
+* API Key
+* Voice selection
 
-## Uso
+= Storage =
 
-### Generación Automática
-El plugin puede generar automáticamente archivos de audio TTS para:
-- Entradas de blog
-- Páginas
-- Contenido personalizado
+**Buzzsprout**
+* API Token
+* Podcast ID
 
-### Shortcodes
-```php
-[tts_audio text="Tu texto aquí"]
-```
+== Usage ==
 
-### API Programática
-```php
-$tts_service = wp_tts_get_service();
-$audio_url = $tts_service->generateSpeech('Tu texto aquí');
-```
+= Automatic Generation =
+The plugin can automatically generate TTS audio files for:
+* Blog posts
+* Pages
+* Custom content
 
-## Arquitectura
+= Shortcodes =
+`[tts_audio text="Your text here"]`
 
-### Estructura del Proyecto
-```
-src/
-├── Admin/              # Interfaz de administración
-├── Core/               # Núcleo del plugin
-├── Exceptions/         # Manejo de excepciones
-├── Interfaces/         # Interfaces del sistema
-├── Providers/          # Proveedores TTS y almacenamiento
-├── Services/           # Servicios principales
-└── Utils/              # Utilidades
-```
+= Programmatic API =
+`$tts_service = wp_tts_get_service();`
+`$audio_url = $tts_service->generateSpeech('Your text here');`
 
-### Componentes Principales
+== Frequently Asked Questions ==
 
-- **TTSService**: Servicio principal de TTS
-- **RoundRobinManager**: Gestión de proveedores
-- **CacheService**: Sistema de cache
-- **AdminInterface**: Panel de administración
-- **SecurityManager**: Gestión de seguridad
+= What TTS providers are supported? =
 
-## Desarrollo
+The plugin supports Amazon Polly, Azure TTS, Google Cloud TTS, OpenAI TTS, and ElevenLabs.
 
-### Requisitos
-- PHP 7.4+
-- WordPress 5.0+
-- Composer
+= Do I need API credentials? =
 
-### Instalación para Desarrollo
-```bash
-git clone https://github.com/ellaguno/tts_de_wordpress.git
-cd tts_de_wordpress
-composer install
-```
+Yes, you need API credentials from at least one TTS provider. However, the plugin includes a mock mode for testing without credentials.
 
-### Testing
-El plugin incluye modo mock para testing sin credenciales API reales.
+= Can I use multiple providers? =
 
-## Contribución
+Yes, the plugin includes a round-robin system to distribute load between multiple configured providers.
 
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-caracteristica`)
-3. Commit tus cambios (`git commit -am 'Añade nueva característica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Crea un Pull Request
+== Changelog ==
 
-## Licencia
+= 1.9.0 =
+* Changed plugin slug to sesolibre
+* Fixed all WordPress Plugin Check errors
+* Improved security and code quality
 
-Este proyecto está licenciado bajo la Licencia GPL v2 o posterior.
+= 1.7.0 =
+* Fixed Tools page and improved statistics
+* Code cleanup and security improvements
 
-## Soporte
+= 1.6.9 =
+* Code cleanup, security and improvements
 
-Para soporte y reportes de bugs, por favor abre un issue en este repositorio.
+= 1.0.0 =
+* Initial implementation with support for 5 TTS providers
+* Round-robin system
+* Complete admin interface
+* Mock mode for testing
+* Cache system
+* Buzzsprout integration
 
-## Changelog
+== Upgrade Notice ==
 
-### v1.0.0
-- Implementación inicial con soporte para 5 proveedores TTS
-- Sistema round-robin
-- Interfaz de administración completa
-- Modo mock para testing
-- Sistema de cache
-- Integración con Buzzsprout
+= 1.9.0 =
+This version changes the plugin slug to sesolibre and fixes all WordPress Plugin Check errors. Upgrade recommended.
+
+== Screenshots ==
+
+1. Admin settings page
+2. TTS meta box in post editor
+3. Audio player on frontend
