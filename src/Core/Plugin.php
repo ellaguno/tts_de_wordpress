@@ -1398,6 +1398,7 @@ class Plugin {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( '[WP_TTS] Using Action Scheduler for post ' . $post->ID );
 			as_schedule_single_action( time(), 'wp_tts_auto_generate_audio', [ $post->ID ], 'tts-sesolibre' );
+			// Don't schedule any backup - Action Scheduler handles retries
 		} else {
 			// Method 2: Use shutdown hook for immediate execution
 			// This runs after the response is sent to the browser
@@ -1424,15 +1425,26 @@ class Plugin {
 				error_log( '[WP_TTS] Executing in shutdown hook for post ' . $post_id );
 				$this->handleAutoGenerateAudio( $post_id );
 
-				// Clear the transient after successful execution
-				delete_transient( 'wp_tts_auto_gen_' . $post_id );
+				// Mark that shutdown was executed - do NOT clear the transient here
+				// The transient is cleared in handleAutoGenerateAudio
+				// This prevents the wp_cron backup from running
+				set_transient( 'wp_tts_shutdown_executed_' . $post_id, true, 300 );
+
+				// Cancel the wp_cron backup since shutdown executed successfully
+				$timestamp = wp_next_scheduled( 'wp_tts_auto_generate_audio', [ $post_id ] );
+				if ( $timestamp ) {
+					wp_unschedule_event( $timestamp, 'wp_tts_auto_generate_audio', [ $post_id ] );
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					error_log( '[WP_TTS] Cancelled wp_cron backup for post ' . $post_id . ' after shutdown success' );
+				}
 			}, 100 ); // Priority 100 to run late
 
-			// Method 3: Also schedule wp_cron as backup (in case shutdown fails)
+			// Method 3: Schedule wp_cron as backup (only runs if shutdown fails)
+			// The backup will check if audio already exists before generating
 			if ( ! wp_next_scheduled( 'wp_tts_auto_generate_audio', [ $post->ID ] ) ) {
-				wp_schedule_single_event( time() + 60, 'wp_tts_auto_generate_audio', [ $post->ID ] );
+				wp_schedule_single_event( time() + 120, 'wp_tts_auto_generate_audio', [ $post->ID ] );
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				error_log( '[WP_TTS] Scheduled wp_cron backup for post ' . $post->ID );
+				error_log( '[WP_TTS] Scheduled wp_cron backup for post ' . $post->ID . ' (runs in 2 minutes if shutdown fails)' );
 			}
 		}
 	}
@@ -1489,6 +1501,40 @@ class Plugin {
 			]
 		] );
 
+		// Check if audio already exists for this post (prevents duplicate uploads)
+		$existing_audio_url = '';
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			$existing_audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+		} else {
+			$existing_audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		}
+
+		if ( ! empty( $existing_audio_url ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS AUTO-GEN] SKIPPED for post_id: ' . $post_id . ' - Audio already exists: ' . $existing_audio_url );
+			$this->container->get( 'logger' )->info( 'Auto-generate skipped - audio already exists', [
+				'post_id' => $post_id,
+				'existing_audio_url' => $existing_audio_url
+			] );
+			// Clear transient since we're not going to generate
+			delete_transient( 'wp_tts_auto_gen_' . $post_id );
+			return;
+		}
+
+		// Check processing lock to prevent concurrent generation attempts
+		$processing_key = 'wp_tts_processing_' . $post_id;
+		if ( get_transient( $processing_key ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS AUTO-GEN] SKIPPED for post_id: ' . $post_id . ' - Already being processed' );
+			$this->container->get( 'logger' )->info( 'Auto-generate skipped - already being processed', [
+				'post_id' => $post_id
+			] );
+			return;
+		}
+
+		// Set processing lock (10 minutes - should be enough for any audio generation)
+		set_transient( $processing_key, true, 600 );
+
 		try {
 			// First, enable TTS for this post and set default configuration
 			$this->setupPostForAutoGeneration( $post_id );
@@ -1521,7 +1567,9 @@ class Plugin {
 				'trace' => $e->getTraceAsString()
 			] );
 		} finally {
-			// Always clear the transient lock after processing (success or failure)
+			// Clear the processing lock
+			delete_transient( $processing_key );
+			// Clear the auto-gen transient lock
 			delete_transient( 'wp_tts_auto_gen_' . $post_id );
 		}
 	}
