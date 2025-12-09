@@ -57,36 +57,56 @@ class TTSSesoLibrePlayer {
             speedMenu: this.element.querySelector('.tts-speed-menu')
         };
     }
-    
+
+    isExternalUrl(url) {
+        if (!url) return false;
+        try {
+            const audioUrl = new URL(url, window.location.origin);
+            return audioUrl.hostname !== window.location.hostname ||
+                   url.includes('buzzsprout.com');
+        } catch (e) {
+            return false;
+        }
+    }
+
     setupAudioElements() {
         // Main audio (TTS)
         if (this.audioUrls.main) {
             this.audioElements.main = new Audio(this.audioUrls.main);
-            this.audioElements.main.crossOrigin = 'anonymous';
+            // Don't set crossOrigin for external URLs to avoid CORS issues
+            if (!this.isExternalUrl(this.audioUrls.main)) {
+                this.audioElements.main.crossOrigin = 'anonymous';
+            }
             this.audioElements.main.preload = 'metadata';
             this.setupMainAudioEvents();
         }
-        
+
         // Background music (looped)
         if (this.audioUrls.background) {
             this.audioElements.background = new Audio(this.audioUrls.background);
-            this.audioElements.background.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.audioUrls.background)) {
+                this.audioElements.background.crossOrigin = 'anonymous';
+            }
             this.audioElements.background.loop = true;
             this.audioElements.background.volume = this.config.backgroundVolume;
             this.audioElements.background.preload = 'metadata';
         }
-        
+
         // Intro audio
         if (this.audioUrls.intro) {
             this.audioElements.intro = new Audio(this.audioUrls.intro);
-            this.audioElements.intro.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.audioUrls.intro)) {
+                this.audioElements.intro.crossOrigin = 'anonymous';
+            }
             this.audioElements.intro.preload = 'metadata';
         }
-        
+
         // Outro audio
         if (this.audioUrls.outro) {
             this.audioElements.outro = new Audio(this.audioUrls.outro);
-            this.audioElements.outro.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.audioUrls.outro)) {
+                this.audioElements.outro.crossOrigin = 'anonymous';
+            }
             this.audioElements.outro.preload = 'metadata';
         }
     }
