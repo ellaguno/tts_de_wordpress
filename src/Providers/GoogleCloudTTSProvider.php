@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * Google Cloud TTS Provider
@@ -98,23 +99,8 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			throw new ProviderException( 'Google Cloud TTS provider is not properly configured (credentials missing or invalid)' );
 		}
 
-		$credentials_path = $this->config['credentials_path'];
-		// Attempt to use the uploaded file if the configured path is empty or default-looking
-		if (empty($credentials_path) || strpos($credentials_path, 'google-credentials.json') !== false) {
-			$upload_dir = wp_upload_dir();
-			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
-			if (file_exists($default_path)) {
-				$credentials_path = $default_path;
-				$this->logger->info('Using default credentials path for Google TTS.', ['path' => $credentials_path]);
-			}
-		} else {
-			// Convert relative paths to absolute paths
-			if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
-				// This is a relative path, convert to absolute
-				$credentials_path = ABSPATH . $credentials_path;
-				$this->logger->info('Converted relative to absolute path for Google TTS.', ['path' => $credentials_path]);
-			}
-		}
+		$credentials_path = $this->getCredentialsPath();
+		$this->logger->info( 'Using credentials path for Google TTS.', [ 'path' => $credentials_path ] );
 
 
 		// Verificar diferentes rutas de clase
@@ -196,8 +182,14 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			'language_code' => $language_code,
 			'speaking_rate' => $speaking_rate,
 			'pitch' => $pitch,
+			'needs_chunking' => TextChunker::needsChunking( $text, 'google' ),
 		] );
-		
+
+		// Check if text needs chunking (Google has 5000 character limit)
+		if ( TextChunker::needsChunking( $text, 'google' ) ) {
+			return $this->generateChunkedSpeech( $text, $voice_id, $language_code, $speaking_rate, $pitch, $output_format_enum, $output_format_ext, $credentials_path, $client_class );
+		}
+
 		try {
 			$client = new $client_class( [
 				'credentials' => $credentials_path,
@@ -263,85 +255,293 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	}
 
 	/**
-	 * Get available voices
+	 * Generate speech for chunked text
+	 *
+	 * @param string $text Text to convert (will be chunked)
+	 * @param string $voice_id Voice ID
+	 * @param string $language_code Language code
+	 * @param float $speaking_rate Speaking rate
+	 * @param float $pitch Pitch adjustment
+	 * @param int $output_format_enum Audio encoding enum
+	 * @param string $output_format_ext File extension
+	 * @param string $credentials_path Path to credentials file
+	 * @param string $client_class Client class name
+	 * @return array Result array with combined audio
+	 * @throws ProviderException If generation fails
+	 */
+	private function generateChunkedSpeech( string $text, string $voice_id, string $language_code, float $speaking_rate, float $pitch, int $output_format_enum, string $output_format_ext, string $credentials_path, string $client_class ): array {
+		$chunks = TextChunker::chunkText( $text, 'google' );
+		$audio_chunks = [];
+
+		$this->logger->info( 'Google Cloud TTS: Generating chunked speech', [
+			'total_chunks' => count( $chunks ),
+			'voice_id' => $voice_id,
+			'language_code' => $language_code,
+		] );
+
+		try {
+			$client = new $client_class( [
+				'credentials' => $credentials_path,
+			] );
+
+			foreach ( $chunks as $index => $chunk ) {
+				$this->logger->debug( 'Google Cloud TTS: Processing chunk ' . ( $index + 1 ) . '/' . count( $chunks ), [
+					'chunk_length' => strlen( $chunk ),
+				] );
+
+				$synthesis_input = ( new \Google\Cloud\TextToSpeech\V1\SynthesisInput() )
+					->setText( $chunk );
+
+				$voice_selection_params = ( new \Google\Cloud\TextToSpeech\V1\VoiceSelectionParams() )
+					->setLanguageCode( $language_code )
+					->setName( $voice_id );
+
+				$audio_config = ( new \Google\Cloud\TextToSpeech\V1\AudioConfig() )
+					->setAudioEncoding( $output_format_enum )
+					->setSpeakingRate( $speaking_rate )
+					->setPitch( $pitch );
+
+				$request = new \Google\Cloud\TextToSpeech\V1\SynthesizeSpeechRequest();
+				$request->setInput( $synthesis_input );
+				$request->setVoice( $voice_selection_params );
+				$request->setAudioConfig( $audio_config );
+
+				$response = $client->synthesizeSpeech( $request );
+				$audio_content = $response->getAudioContent();
+				$audio_chunks[] = $audio_content;
+
+				// Small delay between chunks to avoid rate limiting
+				if ( $index < count( $chunks ) - 1 ) {
+					usleep( 200000 ); // 0.2 second delay
+				}
+			}
+
+			$client->close();
+
+			// Combine all audio chunks
+			$combined_audio = $this->combineAudioChunks( $audio_chunks );
+
+			$this->logger->info( 'Google Cloud TTS: Chunked speech generation completed', [
+				'total_chunks' => count( $chunks ),
+				'combined_audio_size' => strlen( $combined_audio ),
+				'voice_id' => $voice_id,
+			] );
+
+			return [
+				'success' => true,
+				'audio_data' => $combined_audio,
+				'provider' => $this->name,
+				'voice' => $voice_id,
+				'format' => $output_format_ext,
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'characters' => strlen( $text ),
+					'data_size' => strlen( $combined_audio ),
+					'chunks_processed' => count( $chunks ),
+				],
+			];
+
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'Google Cloud TTS chunked generation failed', [
+				'error' => esc_html( $e->getMessage() ),
+			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new ProviderException( 'Google Cloud TTS chunked generation failed: ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Combine multiple audio chunks into single audio
+	 *
+	 * @param array $audio_chunks Array of audio binary data
+	 * @return string Combined audio data
+	 */
+	private function combineAudioChunks( array $audio_chunks ): string {
+		// For MP3 files, simple concatenation works for most cases
+		return implode( '', $audio_chunks );
+	}
+
+	/**
+	 * Get available voices - fetches from API first, falls back to static list
 	 *
 	 * @param string $language Language code (optional).
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
+		// Try to get voices from API first
+		$api_voices = $this->fetchVoicesFromAPI( $language );
+		if ( ! empty( $api_voices ) ) {
+			return $api_voices;
+		}
+
+		// Fallback to static list if API fails
+		return $this->getStaticVoiceList( $language );
+	}
+
+	/**
+	 * Fetch voices from Google Cloud TTS API
+	 *
+	 * @param string $language Language code to filter (optional).
+	 * @return array Array of voices or empty array on failure.
+	 */
+	private function fetchVoicesFromAPI( string $language = '' ): array {
+		if ( ! $this->isConfigured() ) {
+			return [];
+		}
+
+		try {
+			$credentials_path = $this->getCredentialsPath();
+
+			// Find the correct client class
+			$client_class = null;
+			$possible_classes = [
+				'\Google\Cloud\TextToSpeech\V1\TextToSpeechClient',
+				'\Google\Cloud\TextToSpeech\V1\Client\TextToSpeechClient',
+			];
+
+			foreach ( $possible_classes as $class_name ) {
+				if ( class_exists( $class_name ) ) {
+					$client_class = $class_name;
+					break;
+				}
+			}
+
+			if ( ! $client_class ) {
+				return [];
+			}
+
+			$client = new $client_class( [
+				'credentials' => $credentials_path,
+			] );
+
+			// Fetch voices from the API
+			$response = $client->listVoices();
+			$client->close();
+
+			$voices = [];
+			foreach ( $response->getVoices() as $voice ) {
+				$voice_name = $voice->getName();
+				$language_codes = $voice->getLanguageCodes();
+				$ssml_gender = $voice->getSsmlGender();
+
+				// Map gender enum to string
+				$gender = 'Unknown';
+				if ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::MALE ) {
+					$gender = 'Male';
+				} elseif ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::FEMALE ) {
+					$gender = 'Female';
+				} elseif ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::NEUTRAL ) {
+					$gender = 'Neutral';
+				}
+
+				// Determine voice type from name
+				$type = 'Standard';
+				if ( strpos( $voice_name, 'Neural2' ) !== false ) {
+					$type = 'Neural2';
+				} elseif ( strpos( $voice_name, 'Wavenet' ) !== false ) {
+					$type = 'Wavenet';
+				} elseif ( strpos( $voice_name, 'Studio' ) !== false ) {
+					$type = 'Studio';
+				} elseif ( strpos( $voice_name, 'Polyglot' ) !== false ) {
+					$type = 'Polyglot';
+				} elseif ( strpos( $voice_name, 'Journey' ) !== false ) {
+					$type = 'Journey';
+				}
+
+				// Get first language code
+				$lang_code = ! empty( $language_codes ) ? $language_codes[0] : 'unknown';
+
+				// Filter by language if specified
+				if ( ! empty( $language ) && $lang_code !== $language ) {
+					// Check if we want Spanish voices (es-*)
+					if ( strpos( $language, 'es-' ) === 0 && strpos( $lang_code, 'es-' ) !== 0 ) {
+						continue;
+					}
+				}
+
+				// Create display name
+				$display_name = $voice_name;
+				if ( preg_match( '/([A-Z][a-z0-9]+)[-]?([A-Z])?$/', $voice_name, $matches ) ) {
+					$display_name = $matches[1] . ( isset( $matches[2] ) ? ' ' . $matches[2] : '' ) . " ({$gender})";
+				}
+
+				$voices[] = [
+					'id' => $voice_name,
+					'name' => $display_name,
+					'gender' => $gender,
+					'type' => $type,
+					'language' => $lang_code,
+				];
+			}
+
+			$this->logger->info( 'Successfully fetched voices from Google Cloud TTS API', [ 'count' => count( $voices ) ] );
+			return $voices;
+
+		} catch ( \Exception $e ) {
+			$this->logger->warning( 'Failed to fetch voices from Google Cloud TTS API', [ 'error' => $e->getMessage() ] );
+			return [];
+		}
+	}
+
+	/**
+	 * Get the credentials path, resolving defaults if needed
+	 *
+	 * @return string Resolved credentials path.
+	 */
+	private function getCredentialsPath(): string {
+		$credentials_path = $this->config['credentials_path'] ?? '';
+
+		if ( empty( $credentials_path ) || strpos( $credentials_path, 'google-credentials.json' ) !== false ) {
+			$upload_dir = wp_upload_dir();
+			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
+			if ( file_exists( $default_path ) ) {
+				return $default_path;
+			}
+		}
+
+		// Convert relative paths to absolute paths
+		if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
+			$credentials_path = ABSPATH . $credentials_path;
+		}
+
+		return $credentials_path;
+	}
+
+	/**
+	 * Get static voice list as fallback
+	 *
+	 * @param string $language Language code (optional).
+	 * @return array Available voices.
+	 */
+	private function getStaticVoiceList( string $language = 'es-MX' ): array {
 		// Google Cloud TTS voices - includes Standard, Wavenet, and Neural2
 		$voices = [
 			// Spanish (Spain) - All voice types
 			'es-ES' => [
-				// Standard voices
 				[ 'id' => 'es-ES-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
 				[ 'id' => 'es-ES-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-C', 'name' => 'Standard C (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-ES-Standard-D', 'name' => 'Standard D (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				// Wavenet voices
-				[ 'id' => 'es-ES-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-ES-Wavenet-C', 'name' => 'Wavenet C (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-ES-Wavenet-D', 'name' => 'Wavenet D (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				// Neural2 voices
 				[ 'id' => 'es-ES-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 				[ 'id' => 'es-ES-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
 				[ 'id' => 'es-ES-Neural2-C', 'name' => 'Neural2 C (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 				[ 'id' => 'es-ES-Neural2-D', 'name' => 'Neural2 D (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 				[ 'id' => 'es-ES-Neural2-E', 'name' => 'Neural2 E (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 				[ 'id' => 'es-ES-Neural2-F', 'name' => 'Neural2 F (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
-				// Polyglot voices
-				[ 'id' => 'es-ES-Polyglot-1', 'name' => 'Polyglot 1 (Male)', 'gender' => 'Male', 'type' => 'Polyglot' ],
-				// Studio voices
-				[ 'id' => 'es-ES-Studio-C', 'name' => 'Studio C (Female)', 'gender' => 'Female', 'type' => 'Studio' ],
-				[ 'id' => 'es-ES-Studio-F', 'name' => 'Studio F (Male)', 'gender' => 'Male', 'type' => 'Studio' ],
-			],
-			// Spanish (Mexico) - Neural2 and Wavenet available
-			'es-MX' => [
-				// Standard voices (limited for es-MX)
-				[ 'id' => 'es-MX-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-MX-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-MX-Standard-C', 'name' => 'Standard C (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				// Wavenet voices
-				[ 'id' => 'es-MX-Wavenet-A', 'name' => 'Wavenet A (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-MX-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-MX-Wavenet-C', 'name' => 'Wavenet C (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				// Neural2 voices
-				[ 'id' => 'es-MX-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
-				[ 'id' => 'es-MX-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
-				[ 'id' => 'es-MX-Neural2-C', 'name' => 'Neural2 C (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
 			],
 			// Spanish (US) - Neural2 voices
 			'es-US' => [
-				// Standard voices
-				[ 'id' => 'es-US-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'es-US-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'es-US-Standard-C', 'name' => 'Standard C (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				// Wavenet voices
-				[ 'id' => 'es-US-Wavenet-A', 'name' => 'Wavenet A (Female)', 'gender' => 'Female', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-US-Wavenet-B', 'name' => 'Wavenet B (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				[ 'id' => 'es-US-Wavenet-C', 'name' => 'Wavenet C (Male)', 'gender' => 'Male', 'type' => 'Wavenet' ],
-				// Neural2 voices
 				[ 'id' => 'es-US-Neural2-A', 'name' => 'Neural2 A (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 				[ 'id' => 'es-US-Neural2-B', 'name' => 'Neural2 B (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
 				[ 'id' => 'es-US-Neural2-C', 'name' => 'Neural2 C (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
-				// Studio voices
-				[ 'id' => 'es-US-Studio-B', 'name' => 'Studio B (Male)', 'gender' => 'Male', 'type' => 'Studio' ],
+				[ 'id' => 'es-US-Standard-A', 'name' => 'Standard A (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
+				[ 'id' => 'es-US-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
+				[ 'id' => 'es-US-Standard-C', 'name' => 'Standard C (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
 			],
 			// English (US) - All voice types
 			'en-US' => [
-				// Standard voices
 				[ 'id' => 'en-US-Standard-A', 'name' => 'Standard A (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-B', 'name' => 'Standard B (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
 				[ 'id' => 'en-US-Standard-C', 'name' => 'Standard C (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-D', 'name' => 'Standard D (Male)', 'gender' => 'Male', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-E', 'name' => 'Standard E (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				[ 'id' => 'en-US-Standard-F', 'name' => 'Standard F (Female)', 'gender' => 'Female', 'type' => 'Standard' ],
-				// Neural2 voices
 				[ 'id' => 'en-US-Neural2-A', 'name' => 'Neural2 A (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
 				[ 'id' => 'en-US-Neural2-C', 'name' => 'Neural2 C (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
-				[ 'id' => 'en-US-Neural2-D', 'name' => 'Neural2 D (Male)', 'gender' => 'Male', 'type' => 'Neural2' ],
-				[ 'id' => 'en-US-Neural2-E', 'name' => 'Neural2 E (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
-				[ 'id' => 'en-US-Neural2-F', 'name' => 'Neural2 F (Female)', 'gender' => 'Female', 'type' => 'Neural2' ],
 			],
 		];
 

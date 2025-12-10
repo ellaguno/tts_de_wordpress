@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * OpenAI TTS Provider
@@ -114,30 +115,20 @@ class OpenAITTSProvider implements TTSProviderInterface {
 		
 		$model = $options['model'] ?? $this->config['default_model'] ?? 'tts-1'; // Allow model override from config
 		$output_format = $options['output_format'] ?? 'mp3'; // OpenAI supports mp3, opus, aac, flac
-		
-		// Handle OpenAI's 4096 character limit
-		$max_chars = 4000; // Leave some margin
-		if ( strlen( $text ) > $max_chars ) {
-			$this->logger->warning( 'Text too long for OpenAI TTS, truncating', [
-				'original_length' => strlen( $text ),
-				'truncated_to' => $max_chars
-			] );
-			// Truncate at word boundary to avoid cutting words
-			$text = substr( $text, 0, $max_chars );
-			$last_space = strrpos( $text, ' ' );
-			if ( $last_space !== false ) {
-				$text = substr( $text, 0, $last_space );
-			}
-			$text .= '...'; // Indicate truncation
-		}
 
 		$this->logger->info( 'Starting OpenAI TTS generation', [
 			'text_length' => strlen( $text ),
 			'voice' => $voice_id,
 			'model' => $model,
 			'format' => $output_format,
+			'needs_chunking' => TextChunker::needsChunking( $text, 'openai' ),
 		] );
-		
+
+		// Check if text needs chunking (OpenAI has 4096 character limit)
+		if ( TextChunker::needsChunking( $text, 'openai' ) ) {
+			return $this->generateChunkedSpeech( $text, $voice_id, $model, $output_format, $options );
+		}
+
 		try {
 			$api_url = 'https://api.openai.com/v1/audio/speech';
 			$request_body = json_encode( [
@@ -211,6 +202,130 @@ class OpenAITTSProvider implements TTSProviderInterface {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'OpenAI TTS generation failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Generate speech for chunked text
+	 *
+	 * @param string $text Text to convert (will be chunked)
+	 * @param string $voice_id Voice ID
+	 * @param string $model Model ID
+	 * @param string $output_format Output format
+	 * @param array $options Additional options
+	 * @return array Result array with combined audio
+	 * @throws ProviderException If generation fails
+	 */
+	private function generateChunkedSpeech( string $text, string $voice_id, string $model, string $output_format, array $options ): array {
+		$chunks = TextChunker::chunkText( $text, 'openai' );
+		$audio_chunks = [];
+		$api_key = $this->config['api_key'];
+
+		$this->logger->info( 'OpenAI: Generating chunked speech', [
+			'total_chunks' => count( $chunks ),
+			'voice_id' => $voice_id,
+			'model' => $model,
+		] );
+
+		try {
+			foreach ( $chunks as $index => $chunk ) {
+				$this->logger->debug( 'OpenAI: Processing chunk ' . ( $index + 1 ) . '/' . count( $chunks ), [
+					'chunk_length' => strlen( $chunk ),
+				] );
+
+				$api_url = 'https://api.openai.com/v1/audio/speech';
+				$request_body = wp_json_encode( [
+					'model' => $model,
+					'input' => $chunk,
+					'voice' => $voice_id,
+					'response_format' => $output_format,
+				] );
+
+				$response = wp_remote_post( $api_url, [
+					'method' => 'POST',
+					'headers' => [
+						'Authorization' => 'Bearer ' . $api_key,
+						'Content-Type' => 'application/json',
+					],
+					'body' => $request_body,
+					'timeout' => 120, // Longer timeout for chunks
+				] );
+
+				if ( is_wp_error( $response ) ) {
+					$this->logger->error( 'OpenAI chunk API request failed', [
+						'chunk' => $index + 1,
+						'error' => $response->get_error_message(),
+					] );
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+					throw new ProviderException( 'OpenAI chunk ' . ( $index + 1 ) . ' failed: ' . $response->get_error_message() );
+				}
+
+				$response_code = wp_remote_retrieve_response_code( $response );
+				$response_body = wp_remote_retrieve_body( $response );
+
+				if ( $response_code !== 200 ) {
+					$error_details = json_decode( $response_body, true );
+					$error_message = $error_details['error']['message'] ?? $response_body;
+
+					$this->logger->error( 'OpenAI chunk API returned error', [
+						'chunk' => $index + 1,
+						'response_code' => $response_code,
+						'error' => $error_message,
+					] );
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+					throw new ProviderException( "OpenAI chunk " . ( $index + 1 ) . " error ({$response_code}): {$error_message}" );
+				}
+
+				$audio_chunks[] = $response_body;
+
+				// Small delay between chunks to avoid rate limiting
+				if ( $index < count( $chunks ) - 1 ) {
+					usleep( 300000 ); // 0.3 second delay
+				}
+			}
+
+			// Combine all audio chunks
+			$combined_audio = $this->combineAudioChunks( $audio_chunks );
+
+			$this->logger->info( 'OpenAI: Chunked speech generation completed', [
+				'total_chunks' => count( $chunks ),
+				'combined_audio_size' => strlen( $combined_audio ),
+				'voice_id' => $voice_id,
+			] );
+
+			return [
+				'success' => true,
+				'audio_data' => $combined_audio,
+				'provider' => $this->name,
+				'voice' => $voice_id,
+				'format' => $output_format,
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'model' => $model,
+					'characters' => strlen( $text ),
+					'data_size' => strlen( $combined_audio ),
+					'chunks_processed' => count( $chunks ),
+				],
+			];
+
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'OpenAI chunked TTS generation failed', [
+				'error' => esc_html( $e->getMessage() ),
+			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new ProviderException( 'OpenAI chunked generation failed: ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Combine multiple audio chunks into single audio
+	 *
+	 * @param array $audio_chunks Array of audio binary data
+	 * @return string Combined audio data
+	 */
+	private function combineAudioChunks( array $audio_chunks ): string {
+		// For MP3 files, simple concatenation works for most cases
+		// For production, you might want to use FFmpeg for proper audio merging
+		return implode( '', $audio_chunks );
 	}
 
 	/**

@@ -13,11 +13,13 @@ class TextChunker {
 	 * Character limits for each provider
 	 */
 	private static $provider_limits = [
-		'azure' => 8000,      // Azure TTS limit
-		'polly' => 3000,      // Amazon Polly limit  
-		'google' => 5000,     // Google TTS limit
-		'elevenlabs' => 2500, // ElevenLabs limit
-		'openai' => 4096      // OpenAI TTS limit
+		'azure' => 8000,         // Azure TTS limit
+		'azure_tts' => 8000,     // Azure TTS limit (alternate name)
+		'polly' => 3000,         // Amazon Polly limit
+		'amazon_polly' => 3000,  // Amazon Polly limit (alternate name)
+		'google' => 5000,        // Google TTS limit
+		'elevenlabs' => 2500,    // ElevenLabs limit (safe limit to avoid quota issues)
+		'openai' => 4000         // OpenAI TTS limit (4096 max, leave margin)
 	];
 
 	/**

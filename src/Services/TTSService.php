@@ -9,6 +9,7 @@ namespace WP_TTS\Services;
 
 use WP_TTS\Utils\Logger;
 use WP_TTS\Utils\TTSMetaManager;
+use WP_TTS\Utils\TextProcessor;
 use WP_TTS\Interfaces\CacheServiceInterface;
 use WP_TTS\Core\StorageProviderFactory;
 use WP_TTS\Core\ConfigurationManager;
@@ -722,11 +723,11 @@ class TTSService {
 			if ( ! $post ) {
 				throw new \Exception( 'Post not found' );
 			}
-			
-			// Get post content and strip HTML
-			$content = wp_strip_all_tags( $post->post_content );
+
+			// Get post content using TextProcessor (filters Gutenberg blocks, strips HTML smartly)
+			$full_text = TextProcessor::extractPostContent( $post_id );
 			$title = $post->post_title;
-			$full_text = $title . '. ' . $content;
+			$content = substr( $full_text, strlen( $title ) + 2 ); // Remove title prefix for logging
 			
 			$this->logger->info( 'Post content extracted', [
 				'post_id' => $post_id,

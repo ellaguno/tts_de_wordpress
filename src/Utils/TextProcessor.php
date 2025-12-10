@@ -23,24 +23,178 @@ class TextProcessor {
 		if ( ! $post ) {
 			return '';
 		}
-		
+
 		// Get post content
 		$content = $post->post_content;
 		$title = $post->post_title;
-		
+
+		// Remove Gutenberg blocks that shouldn't be read (images, HTML blocks, etc.)
+		$content = self::filterGutenbergBlocks( $content );
+
 		// Remove shortcodes but keep their content where possible
 		$content = self::processShortcodes( $content );
-		
+
 		// Strip HTML tags but preserve basic structure
 		$content = self::stripHtmlSmart( $content );
-		
+
 		// Clean up whitespace and special characters
 		$content = self::cleanText( $content );
-		
+
 		// Combine title and content
 		$full_text = trim( $title . '. ' . $content );
-		
+
 		return $full_text;
+	}
+
+	/**
+	 * Filter out Gutenberg blocks that shouldn't be converted to speech
+	 *
+	 * Removes blocks like images, custom HTML, embeds, etc. that contain
+	 * content not suitable for audio narration.
+	 *
+	 * @param string $content Post content with Gutenberg blocks
+	 * @return string Content with unwanted blocks removed
+	 */
+	public static function filterGutenbergBlocks( string $content ): string {
+		// List of Gutenberg block types to completely remove
+		$blocks_to_remove = [
+			// Media blocks
+			'wp:image',
+			'wp:gallery',
+			'wp:audio',
+			'wp:video',
+			'wp:cover',
+			'wp:media-text',
+			'wp:file',
+
+			// Custom HTML and code blocks
+			'wp:html',
+			'wp:code',
+			'wp:preformatted',
+
+			// Embed blocks
+			'wp:embed',
+			'wp:core-embed/youtube',
+			'wp:core-embed/twitter',
+			'wp:core-embed/facebook',
+			'wp:core-embed/instagram',
+			'wp:core-embed/vimeo',
+			'wp:core-embed/soundcloud',
+			'wp:core-embed/spotify',
+			'wp:core-embed/flickr',
+			'wp:core-embed/tiktok',
+
+			// Widget and dynamic blocks
+			'wp:shortcode',
+			'wp:archives',
+			'wp:calendar',
+			'wp:categories',
+			'wp:latest-comments',
+			'wp:latest-posts',
+			'wp:rss',
+			'wp:search',
+			'wp:tag-cloud',
+			'wp:social-links',
+			'wp:social-link',
+			'wp:navigation',
+			'wp:navigation-link',
+			'wp:site-logo',
+			'wp:site-title',
+			'wp:site-tagline',
+			'wp:login-logout',
+			'wp:page-list',
+			'wp:post-navigation-link',
+
+			// Table of contents and indexes
+			'wp:table-of-contents',
+			'yoast-seo/table-of-contents',
+			'rank-math/toc-block',
+
+			// Forms
+			'wp:form',
+			'contact-form-7/contact-form-selector',
+			'wpforms/form-selector',
+			'formidable/simple-form',
+			'gravityforms/form',
+
+			// Separators and spacers (no content anyway)
+			'wp:separator',
+			'wp:spacer',
+
+			// Buttons (not useful for audio)
+			'wp:buttons',
+			'wp:button',
+		];
+
+		// Remove each block type
+		foreach ( $blocks_to_remove as $block_type ) {
+			// Pattern for self-closing blocks: <!-- wp:image {"id":123} /-->
+			$pattern_self_closing = '/<!--\s*' . preg_quote( $block_type, '/' ) . '(?:\s+\{[^}]*\})?\s*\/?-->/s';
+			$content = preg_replace( $pattern_self_closing, '', $content );
+
+			// Pattern for blocks with content: <!-- wp:html -->content<!-- /wp:html -->
+			$pattern_with_content = '/<!--\s*' . preg_quote( $block_type, '/' ) . '(?:\s+\{[^}]*\})?\s*-->.*?<!--\s*\/' . preg_quote( $block_type, '/' ) . '\s*-->/s';
+			$content = preg_replace( $pattern_with_content, '', $content );
+		}
+
+		// Remove image tags that might not be in Gutenberg blocks
+		$content = preg_replace( '/<img[^>]*>/i', '', $content );
+
+		// Remove figure elements containing images
+		$content = preg_replace( '/<figure[^>]*class="[^"]*wp-block-image[^"]*"[^>]*>.*?<\/figure>/is', '', $content );
+
+		// Remove figcaption elements (image captions)
+		$content = preg_replace( '/<figcaption[^>]*>.*?<\/figcaption>/is', '', $content );
+
+		// Remove iframe embeds
+		$content = preg_replace( '/<iframe[^>]*>.*?<\/iframe>/is', '', $content );
+		$content = preg_replace( '/<iframe[^>]*\/>/i', '', $content );
+
+		// Remove object and embed tags
+		$content = preg_replace( '/<object[^>]*>.*?<\/object>/is', '', $content );
+		$content = preg_replace( '/<embed[^>]*>/i', '', $content );
+
+		// Remove script and style tags
+		$content = preg_replace( '/<script[^>]*>.*?<\/script>/is', '', $content );
+		$content = preg_replace( '/<style[^>]*>.*?<\/style>/is', '', $content );
+
+		// Remove noscript tags
+		$content = preg_replace( '/<noscript[^>]*>.*?<\/noscript>/is', '', $content );
+
+		// Remove SVG elements
+		$content = preg_replace( '/<svg[^>]*>.*?<\/svg>/is', '', $content );
+
+		// Remove any remaining Gutenberg block comments
+		$content = preg_replace( '/<!--\s*wp:[^\s]+[^>]*-->/s', '', $content );
+		$content = preg_replace( '/<!--\s*\/wp:[^\s]+\s*-->/s', '', $content );
+
+		// Clean up URLs that might appear alone (from removed links context)
+		// Keep URLs that are part of sentences, remove standalone URLs
+		$content = preg_replace( '/(?<!["\'])(https?:\/\/[^\s<>"\']+)(?!["\'])/i', '', $content );
+
+		return $content;
+	}
+
+	/**
+	 * Get list of Gutenberg block types that are filtered out
+	 *
+	 * Useful for admin interface to show users what blocks are skipped
+	 *
+	 * @return array List of block type names
+	 */
+	public static function getFilteredBlockTypes(): array {
+		return [
+			'Imágenes (wp:image, wp:gallery, wp:cover)',
+			'Audio y Video (wp:audio, wp:video)',
+			'HTML personalizado (wp:html)',
+			'Código (wp:code, wp:preformatted)',
+			'Embeds (YouTube, Twitter, Facebook, Instagram, etc.)',
+			'Widgets (archivos, calendario, categorías, etc.)',
+			'Navegación y enlaces sociales',
+			'Formularios de contacto',
+			'Separadores y espaciadores',
+			'Botones',
+		];
 	}
 	
 	/**

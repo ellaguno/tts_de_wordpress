@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * ElevenLabs TTS Provider
@@ -131,8 +132,14 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			'stability' => $stability,
 			'similarity_boost' => $similarity_boost,
 			'api_key_length' => strlen( $api_key ),
+			'needs_chunking' => TextChunker::needsChunking( $text, 'elevenlabs' ),
 		] );
-		
+
+		// Check if text needs chunking
+		if ( TextChunker::needsChunking( $text, 'elevenlabs' ) ) {
+			return $this->generateChunkedSpeech( $text, $voice_id, $model_id, $stability, $similarity_boost, $options );
+		}
+
 		try {
 			$api_url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
 			
@@ -254,6 +261,158 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			throw new ProviderException( 'ElevenLabs TTS generation failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Generate speech for chunked text
+	 *
+	 * @param string $text Text to convert (will be chunked)
+	 * @param string $voice_id Voice ID
+	 * @param string $model_id Model ID
+	 * @param float $stability Voice stability setting
+	 * @param float $similarity_boost Voice similarity boost setting
+	 * @param array $options Additional options
+	 * @return array Result array with combined audio
+	 * @throws ProviderException If generation fails
+	 */
+	private function generateChunkedSpeech( string $text, string $voice_id, string $model_id, float $stability, float $similarity_boost, array $options ): array {
+		$chunks = TextChunker::chunkText( $text, 'elevenlabs' );
+		$audio_chunks = [];
+		$api_key = $this->config['api_key'];
+
+		$this->logger->info( 'ElevenLabs: Generating chunked speech', [
+			'total_chunks' => count( $chunks ),
+			'voice_id' => $voice_id,
+			'model_id' => $model_id,
+		] );
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[WP_TTS ElevenLabs] Starting chunked generation with ' . count( $chunks ) . ' chunks' );
+
+		try {
+			foreach ( $chunks as $index => $chunk ) {
+				$this->logger->debug( 'ElevenLabs: Processing chunk ' . ( $index + 1 ) . '/' . count( $chunks ), [
+					'chunk_length' => strlen( $chunk ),
+				] );
+
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[WP_TTS ElevenLabs] Processing chunk ' . ( $index + 1 ) . '/' . count( $chunks ) . ' (length: ' . strlen( $chunk ) . ')' );
+
+				$api_url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
+
+				$request_body = wp_json_encode( [
+					'text' => $chunk,
+					'model_id' => $model_id,
+					'voice_settings' => [
+						'stability' => $stability,
+						'similarity_boost' => $similarity_boost,
+					],
+				] );
+
+				$response = wp_remote_post( $api_url, [
+					'method' => 'POST',
+					'headers' => [
+						'Accept' => 'audio/mpeg',
+						'Content-Type' => 'application/json',
+						'xi-api-key' => $api_key,
+					],
+					'body' => $request_body,
+					'timeout' => 120, // Longer timeout for chunks
+				] );
+
+				if ( is_wp_error( $response ) ) {
+					$this->logger->error( 'ElevenLabs chunk API request failed', [
+						'chunk' => $index + 1,
+						'error' => $response->get_error_message(),
+					] );
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+					throw new ProviderException( 'ElevenLabs chunk ' . ( $index + 1 ) . ' failed: ' . $response->get_error_message() );
+				}
+
+				$response_code = wp_remote_retrieve_response_code( $response );
+				$response_body = wp_remote_retrieve_body( $response );
+
+				if ( $response_code !== 200 ) {
+					$error_details = json_decode( $response_body, true );
+					$error_message = $error_details['detail']['message'] ?? $error_details['detail'] ?? 'Unknown error';
+
+					// Check for quota exceeded
+					if ( isset( $error_details['detail']['status'] ) && $error_details['detail']['status'] === 'quota_exceeded' ) {
+						$remaining = $error_details['detail']['message'] ?? '';
+						$this->logger->error( 'ElevenLabs quota exceeded', [
+							'chunk' => $index + 1,
+							'message' => $remaining,
+						] );
+						// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+						throw new ProviderException( 'ElevenLabs quota exceeded. ' . $remaining );
+					}
+
+					$this->logger->error( 'ElevenLabs chunk API returned error', [
+						'chunk' => $index + 1,
+						'response_code' => $response_code,
+						'error' => $error_message,
+					] );
+					// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+					throw new ProviderException( "ElevenLabs chunk " . ( $index + 1 ) . " error ({$response_code}): {$error_message}" );
+				}
+
+				$audio_chunks[] = $response_body;
+
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[WP_TTS ElevenLabs] Chunk ' . ( $index + 1 ) . ' completed, audio size: ' . strlen( $response_body ) . ' bytes' );
+
+				// Small delay between chunks to avoid rate limiting
+				if ( $index < count( $chunks ) - 1 ) {
+					usleep( 500000 ); // 0.5 second delay
+				}
+			}
+
+			// Combine all audio chunks
+			$combined_audio = $this->combineAudioChunks( $audio_chunks );
+
+			$this->logger->info( 'ElevenLabs: Chunked speech generation completed', [
+				'total_chunks' => count( $chunks ),
+				'combined_audio_size' => strlen( $combined_audio ),
+				'voice_id' => $voice_id,
+			] );
+
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WP_TTS ElevenLabs] SUCCESS - Chunked audio combined, total size: ' . strlen( $combined_audio ) . ' bytes' );
+
+			return [
+				'success' => true,
+				'audio_data' => $combined_audio,
+				'provider' => $this->name,
+				'voice' => $voice_id,
+				'format' => 'mp3',
+				'duration' => $this->estimateAudioDuration( $text ),
+				'metadata' => [
+					'model_id' => $model_id,
+					'characters' => strlen( $text ),
+					'data_size' => strlen( $combined_audio ),
+					'chunks_processed' => count( $chunks ),
+				],
+			];
+
+		} catch ( \Exception $e ) {
+			$this->logger->error( 'ElevenLabs chunked TTS generation failed', [
+				'error' => esc_html( $e->getMessage() ),
+			] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new ProviderException( 'ElevenLabs chunked generation failed: ' . $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Combine multiple audio chunks into single audio
+	 *
+	 * @param array $audio_chunks Array of audio binary data
+	 * @return string Combined audio data
+	 */
+	private function combineAudioChunks( array $audio_chunks ): string {
+		// For MP3 files, simple concatenation works for most cases
+		// For production, you might want to use FFmpeg for proper audio merging
+		return implode( '', $audio_chunks );
 	}
 
 	/**
