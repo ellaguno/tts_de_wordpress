@@ -1580,17 +1580,31 @@ class Plugin {
 	 * @param int $post_id Post ID
 	 */
 	private function setupPostForAutoGeneration( int $post_id ): void {
-		// Get default settings
-		$defaults = $this->config->getDefaults();
-		$default_provider = $defaults['default_provider'] ?? 'google';
-		$provider_config = $this->config->getProviderConfig( $default_provider );
+		// Get default settings from wp_tts_config (where admin settings are actually stored)
+		$config = get_option( 'wp_tts_config', [] );
+		$defaults_config = get_option( 'wp_tts_default_settings', [] );
+
+		// Get default provider - check both locations for compatibility
+		$default_provider = $defaults_config['default_provider']
+			?? $config['defaults']['default_provider']
+			?? 'google';
+
+		// Get default voice from wp_tts_config where admin saves provider settings
+		$provider_config = $config['providers'][ $default_provider ] ?? [];
 		$default_voice = $provider_config['default_voice'] ?? '';
 
-		// Get default audio assets
-		$audio_library = $this->config->getAudioLibrary();
-		$default_intro = $audio_library['default_intro'] ?? '';
-		$default_outro = $audio_library['default_outro'] ?? '';
-		$default_background = $audio_library['default_background'] ?? '';
+		$this->container->get( 'logger' )->info( 'Setting up post for auto-generation with voice config', [
+			'post_id' => $post_id,
+			'default_provider' => $default_provider,
+			'default_voice' => $default_voice,
+			'provider_config_keys' => array_keys( $provider_config )
+		] );
+
+		// Get default audio assets from wp_tts_config
+		$audio_assets = $config['audio_assets'] ?? [];
+		$default_intro = $audio_assets['default_intro'] ?? '';
+		$default_outro = $audio_assets['default_outro'] ?? '';
+		$default_background = $audio_assets['default_background'] ?? '';
 
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
 			// Enable TTS for this post
