@@ -142,7 +142,7 @@ class StorageProviderFactory {
 			error_log( "StorageProviderFactory: Emergency local storage provider created successfully" );
 			return $local_provider;
 			
-		} catch ( Exception $e ) {
+		} catch ( \Throwable $e ) {
 			error_log( "StorageProviderFactory: Even emergency local storage failed: " . $e->getMessage() );
 			throw new ProviderException( 'No storage providers are available, including emergency local storage: ' . $e->getMessage() );
 		}

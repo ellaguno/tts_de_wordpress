@@ -102,6 +102,23 @@ class TTSEnhancedSesoLibrePlayer {
         // Progress bar seeking
         this.progress.addEventListener('click', (e) => this.seek(e));
 
+        // Keyboard-operable seeking (slider semantics)
+        this.progress.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.seekToTime(Math.max(0, this.currentTime - 10));
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.seekToTime(Math.min(this.totalDuration, this.currentTime + 10));
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                this.seekToTime(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                this.seekToTime(this.totalDuration);
+            }
+        });
+
         // Volume controls
         if (this.voiceSlider) {
             this.voiceSlider.addEventListener('input', (e) => this.updateVoiceVolume(e.target.value));
@@ -410,9 +427,15 @@ class TTSEnhancedSesoLibrePlayer {
         if (this.progressBar && this.totalDuration) {
             const percentage = (this.currentTime / this.totalDuration) * 100;
             this.progressBar.style.width = `${percentage}%`;
-            
+
             if (this.progressHandle) {
                 this.progressHandle.style.left = `${percentage}%`;
+            }
+
+            if (this.progress) {
+                this.progress.setAttribute('aria-valuenow', Math.round(percentage));
+                this.progress.setAttribute('aria-valuetext',
+                    this.formatTime(this.currentTime) + ' de ' + this.formatTime(this.totalDuration));
             }
         }
     }

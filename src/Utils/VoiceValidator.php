@@ -115,16 +115,20 @@ class VoiceValidator {
 	 * @return string Valid voice name
 	 */
 	public static function fixVoice( string $provider, string $voice ): string {
-		// If voice is already valid, return it
-		if ( self::isValidVoice( $provider, $voice ) ) {
-			return $voice;
+		$voice = trim( $voice );
+
+		// Only fall back to the default when no voice was supplied. The static
+		// whitelist is intentionally not exhaustive (the plugin offers many more
+		// voices in the UI than are listed here), so a non-empty voice is passed
+		// through and left for the provider's API to validate. Substituting a
+		// "valid" voice here silently changed the user's selection.
+		if ( $voice === '' ) {
+			$default = self::getDefaultVoice( $provider );
+			error_log( "[VoiceValidator] Empty voice for provider '{$provider}', using default '{$default}'" );
+			return $default;
 		}
 
-		// Log the invalid voice
-		error_log( "[VoiceValidator] Invalid voice '{$voice}' for provider '{$provider}', using default" );
-
-		// Return default voice for provider
-		return self::getDefaultVoice( $provider );
+		return $voice;
 	}
 
 	/**

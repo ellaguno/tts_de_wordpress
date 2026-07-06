@@ -393,3 +393,13 @@
         border-top-color: #007cba;
     }
 }
+/* Visible keyboard focus (accessibility) */
+.wp-tts-minimal-player button:focus-visible,
+.wp-tts-minimal-player [tabindex]:focus-visible,
+.tts-sesolibre-player button:focus-visible,
+.tts-sesolibre-player [tabindex]:focus-visible,
+.tts-enhanced-sesolibre-player button:focus-visible,
+.tts-enhanced-sesolibre-player [tabindex]:focus-visible {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}

@@ -43,6 +43,10 @@ class ServiceContainer {
 
 		if ( $singleton ) {
 			$this->singletons[ $name ] = true;
+		} else {
+			// Re-registering as non-singleton must clear a previous singleton
+			// flag, or get() keeps returning the old cached shared instance.
+			unset( $this->singletons[ $name ] );
 		}
 
 		// Clear cached instance if it exists

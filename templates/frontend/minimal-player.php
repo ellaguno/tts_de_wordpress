@@ -43,33 +43,33 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
 <style>
 /* Minimal Player Custom Colors */
-#<?php echo $player_id; ?> {
+#<?php echo esc_attr($player_id); ?> {
     background: <?php echo esc_html($background_color); ?>;
     color: <?php echo esc_html($text_color); ?>;
 }
 
-#<?php echo $player_id; ?> .wp-tts-minimal-play-btn {
+#<?php echo esc_attr($player_id); ?> .wp-tts-minimal-play-btn {
     background: <?php echo esc_html($play_icon_color); ?>;
 }
 
-#<?php echo $player_id; ?> .wp-tts-minimal-play-btn:hover {
+#<?php echo esc_attr($player_id); ?> .wp-tts-minimal-play-btn:hover {
     background: <?php echo esc_html($pause_icon_color); ?>;
 }
 
-#<?php echo $player_id; ?> .progress-filled {
+#<?php echo esc_attr($player_id); ?> .progress-filled {
     background: <?php echo esc_html($progress_color); ?>;
 }
 
-#<?php echo $player_id; ?> .waveform-bar.active,
-#<?php echo $player_id; ?> .waveform-bar.playing {
+#<?php echo esc_attr($player_id); ?> .waveform-bar.active,
+#<?php echo esc_attr($player_id); ?> .waveform-bar.playing {
     background: <?php echo esc_html($progress_color); ?>;
 }
 </style>
 
-<div class="wp-tts-minimal-player-container" id="<?php echo $player_id; ?>">
+<div class="wp-tts-minimal-player-container" id="<?php echo esc_attr($player_id); ?>">
     <div class="wp-tts-minimal-player">
         <!-- Play/Pause Button -->
-        <button class="wp-tts-minimal-play-btn" type="button" aria-label="Play/Pause">
+        <button class="wp-tts-minimal-play-btn" type="button" aria-label="<?php esc_attr_e('Reproducir', 'tts-sesolibre'); ?>" aria-pressed="false">
             <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"></path>
             </svg>
@@ -159,11 +159,11 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
         <!-- Duration Display -->
         <div class="wp-tts-minimal-duration">
-            <span class="total-time">-0:00</span>
+            <span class="total-time">0:00</span>
         </div>
 
         <!-- Settings Button -->
-        <button class="wp-tts-minimal-settings-btn" type="button" aria-label="Settings">
+        <button class="wp-tts-minimal-settings-btn" type="button" aria-label="<?php esc_attr_e('Ajustes de reproducción', 'tts-sesolibre'); ?>" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path>
             </svg>
@@ -174,7 +174,7 @@ $text_color = $config->get('player.player_text_color', '#333333');
     <div class="wp-tts-minimal-settings-panel" style="display: none;">
         <div class="settings-content">
             <div class="setting-item">
-                <label>Velocidad de reproducción:</label>
+                <label><?php esc_html_e('Velocidad de reproducción:', 'tts-sesolibre'); ?></label>
                 <select class="playback-rate">
                     <option value="0.5">0.5x</option>
                     <option value="0.75">0.75x</option>
@@ -186,16 +186,16 @@ $text_color = $config->get('player.player_text_color', '#333333');
             </div>
             <?php if ($download_link): ?>
             <div class="setting-item">
-                <a href="<?php echo $download_link; ?>" download class="download-link">
+                <a href="<?php echo esc_url($download_link); ?>" download class="download-link">
                     <span class="headphones-icon">🎧</span>
-                    Descargar audio
+                    <?php esc_html_e('Descargar audio', 'tts-sesolibre'); ?>
                 </a>
             </div>
             <?php endif; ?>
             <div class="setting-item">
                 <div class="audio-info">
-                    <div class="service-info"><?php echo $service_name; ?></div>
-                    <div class="voice-info"><?php echo $voice_name; ?></div>
+                    <div class="service-info"><?php echo esc_html($service_name); ?></div>
+                    <div class="voice-info"><?php echo esc_html($voice_name); ?></div>
                 </div>
             </div>
         </div>
@@ -205,24 +205,24 @@ $text_color = $config->get('player.player_text_color', '#333333');
     <audio class="wp-tts-audio" preload="none" crossorigin="anonymous">
         <source src="<?php echo $audio_url; ?>" type="audio/mpeg">
         <source src="<?php echo $audio_url; ?>" type="audio/ogg">
-        Tu navegador no soporta el elemento de audio.
+        <?php esc_html_e('Tu navegador no soporta el elemento de audio.', 'tts-sesolibre'); ?>
     </audio>
 
     <!-- Loading Indicator -->
     <div class="wp-tts-minimal-loading" style="display: none;">
         <div class="loading-spinner"></div>
-        <span>Cargando audio...</span>
+        <span><?php esc_html_e('Cargando audio…', 'tts-sesolibre'); ?></span>
     </div>
 
     <!-- Error Message -->
     <div class="wp-tts-minimal-error" style="display: none;">
-        <span>Error al cargar el audio. <button class="retry-btn">Reintentar</button></span>
+        <span><?php esc_html_e('Error al cargar el audio.', 'tts-sesolibre'); ?> <button class="retry-btn" type="button"><?php esc_html_e('Reintentar', 'tts-sesolibre'); ?></button></span>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const playerId = '<?php echo $player_id; ?>';
+    const playerId = '<?php echo esc_attr($player_id); ?>';
     const playerContainer = document.getElementById(playerId);
     
     if (playerContainer && !playerContainer.classList.contains('initialized')) {

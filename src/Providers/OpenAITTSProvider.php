@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * OpenAI TTS Provider
@@ -60,26 +61,18 @@ class OpenAITTSProvider implements TTSProviderInterface {
 	public function synthesize( string $text, array $options = [] ): AudioResult {
 		$result = $this->generateSpeech( $text, $options );
 		
-		if ( ! $result['success'] ) {
+		if ( ! $result['success'] || empty( $result['audio_data'] ) ) {
 			throw new ProviderException( 'OpenAI TTS synthesis failed' );
 		}
 
-		// Read the audio file
-		$audio_data = file_get_contents( $result['file_path'] );
-		if ( $audio_data === false ) {
-			throw new ProviderException( 'Failed to read generated audio file' );
-		}
-
 		return new AudioResult(
-			$audio_data,
+			$result['audio_data'],
 			$result['format'],
 			$result['duration'],
 			[
 				'provider' => $this->name,
 				'voice' => $result['voice'],
 				'character_count' => strlen( $text ),
-				'file_path' => $result['file_path'],
-				'audio_url' => $result['audio_url'],
 			]
 		);
 	}
@@ -114,75 +107,30 @@ class OpenAITTSProvider implements TTSProviderInterface {
 		
 		$model = $options['model'] ?? $this->config['default_model'] ?? 'tts-1'; // Allow model override from config
 		$output_format = $options['output_format'] ?? 'mp3'; // OpenAI supports mp3, opus, aac, flac
-		
-		// Handle OpenAI's 4096 character limit
-		$max_chars = 4000; // Leave some margin
-		if ( strlen( $text ) > $max_chars ) {
-			$this->logger->warning( 'Text too long for OpenAI TTS, truncating', [
-				'original_length' => strlen( $text ),
-				'truncated_to' => $max_chars
-			] );
-			// Truncate at word boundary to avoid cutting words
-			$text = substr( $text, 0, $max_chars );
-			$last_space = strrpos( $text, ' ' );
-			if ( $last_space !== false ) {
-				$text = substr( $text, 0, $last_space );
-			}
-			$text .= '...'; // Indicate truncation
-		}
 
 		$this->logger->info( 'Starting OpenAI TTS generation', [
 			'text_length' => strlen( $text ),
 			'voice' => $voice_id,
 			'model' => $model,
 			'format' => $output_format,
+			'needs_chunking' => TextChunker::needsChunking( $text, 'openai' ),
 		] );
-		
+
 		try {
-			$api_url = 'https://api.openai.com/v1/audio/speech';
-			$request_body = json_encode( [
-				'model' => $model,
-				'input' => $text,
-				'voice' => $voice_id,
-				'response_format' => $output_format,
-			] );
+			// OpenAI has a 4096-character limit per request: chunk long text
+			// and concatenate the audio instead of truncating content.
+			$chunks = TextChunker::chunkText( $text, 'openai' );
+			$audio_chunks = [];
 
-			$this->logger->debug( 'OpenAI API Request', [ 'url' => $api_url, 'body_preview' => substr($request_body, 0, 100) . '...' ] );
-
-			$response = wp_remote_post( $api_url, [
-				'method'    => 'POST',
-				'headers'   => [
-					'Authorization' => 'Bearer ' . $api_key,
-					'Content-Type'  => 'application/json',
-				],
-				'body'      => $request_body,
-				'timeout'   => 60, // Increased timeout for potentially long audio generation
-			] );
-
-			if ( is_wp_error( $response ) ) {
-				$this->logger->error( 'OpenAI API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
-				throw new ProviderException( 'OpenAI API request failed: ' . $response->get_error_message() );
+			foreach ( $chunks as $index => $chunk ) {
+				$audio_chunks[] = $this->requestSpeech( $chunk, $voice_id, $model, $output_format, $api_key, $index + 1, count( $chunks ) );
 			}
 
-			$response_code = wp_remote_retrieve_response_code( $response );
-			$response_body = wp_remote_retrieve_body( $response );
-
-			if ( $response_code !== 200 ) {
-				$error_details = json_decode( $response_body, true );
-				$error_message = $error_details['error']['message'] ?? $response_body;
-				$this->logger->error( 'OpenAI API returned an error', [
-					'response_code' => $response_code,
-					'error_message' => $error_message,
-					'response_body' => $response_body,
-				] );
-				throw new ProviderException( "OpenAI API error ({$response_code}): {$error_message}" );
-			}
-			
-			// At this point, $response_body contains the audio data
-			$audio_data = $response_body;
+			$audio_data = implode( '', $audio_chunks );
 
 			$this->logger->info( 'OpenAI TTS generation completed', [
 				'audio_data_size' => strlen( $audio_data ),
+				'chunks_processed' => count( $chunks ),
 				'voice_id' => $voice_id
 			] );
 
@@ -198,6 +146,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 				'metadata' => [
 					'model' => $model,
 					'characters' => strlen( $text ),
+					'chunks_processed' => count( $chunks ),
 					'data_size' => strlen( $audio_data ),
 				],
 			];
@@ -208,6 +157,59 @@ class OpenAITTSProvider implements TTSProviderInterface {
 			] );
 			throw new ProviderException( 'OpenAI TTS generation failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Make a single TTS API request
+	 *
+	 * @param string $text Text chunk (within the provider limit).
+	 * @param string $voice_id Voice ID.
+	 * @param string $model Model name.
+	 * @param string $output_format Audio format.
+	 * @param string $api_key API key.
+	 * @param int    $chunk_number Chunk number (for logging).
+	 * @param int    $total_chunks Total chunks (for logging).
+	 * @return string Audio binary data.
+	 * @throws ProviderException If the request fails.
+	 */
+	private function requestSpeech( string $text, string $voice_id, string $model, string $output_format, string $api_key, int $chunk_number = 1, int $total_chunks = 1 ): string {
+		$request_body = wp_json_encode( [
+			'model' => $model,
+			'input' => $text,
+			'voice' => $voice_id,
+			'response_format' => $output_format,
+		] );
+
+		$response = wp_remote_post( 'https://api.openai.com/v1/audio/speech', [
+			'method'    => 'POST',
+			'headers'   => [
+				'Authorization' => 'Bearer ' . $api_key,
+				'Content-Type'  => 'application/json',
+			],
+			'body'      => $request_body,
+			'timeout'   => 60, // Increased timeout for potentially long audio generation
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			$this->logger->error( 'OpenAI API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+			throw new ProviderException( 'OpenAI API request failed: ' . $response->get_error_message() );
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+
+		if ( $response_code !== 200 ) {
+			$error_details = json_decode( $response_body, true );
+			$error_message = $error_details['error']['message'] ?? $response_body;
+			$this->logger->error( 'OpenAI API returned an error', [
+				'response_code' => $response_code,
+				'error_message' => $error_message,
+				'chunk' => "{$chunk_number}/{$total_chunks}",
+			] );
+			throw new ProviderException( "OpenAI API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" );
+		}
+
+		return $response_body;
 	}
 
 	/**

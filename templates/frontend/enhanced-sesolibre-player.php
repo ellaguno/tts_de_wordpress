@@ -104,8 +104,9 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
 }
 
 <?php if (!empty($custom_css)): ?>
-/* Custom CSS from admin settings */
-<?php echo $custom_css; ?>
+/* Custom CSS from admin settings (tags stripped so it can never close
+   the <style> block and inject markup) */
+<?php echo wp_strip_all_tags( $custom_css ); ?>
 <?php endif; ?>
 </style>
 
@@ -132,7 +133,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
         
         <!-- Center: Play button and Progress -->
         <div class="tts-main-controls-compact">
-            <button class="tts-play-pause" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+            <button class="tts-play-pause" type="button" aria-label="<?php esc_attr_e('Reproducir/Pausar', 'tts-sesolibre'); ?>">
                 <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8 5v14l11-7z"></path>
                 </svg>
@@ -149,7 +150,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
                 <?php endif; ?>
                 
                 <div class="tts-progress-container">
-                    <div class="tts-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div class="tts-progress" role="slider" tabindex="0" aria-label="<?php esc_attr_e('Posición de reproducción', 'tts-sesolibre'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                         <div class="tts-progress-bar"></div>
                         <div class="tts-progress-handle"></div>
                     </div>
@@ -167,7 +168,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
         <div class="tts-right-controls">
             <?php if ($player_config['show_speed_control'] ?? true): ?>
             <div class="tts-speed-control-compact">
-                <button class="tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                <button class="tts-speed-btn" type="button" aria-label="<?php esc_attr_e('Control de velocidad', 'tts-sesolibre'); ?>">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M13,2.05V5.08C16.39,5.57 19,8.47 19,12C19,12.9 18.82,13.75 18.5,14.54L21.12,16.07C21.68,14.83 22,13.45 22,12C22,6.82 18.05,2.55 13,2.05M12,19A7,7 0 0,1 5,12C5,8.47 7.61,5.57 11,5.08V2.05C5.94,2.55 2,6.81 2,12A10,10 0 0,0 12,22C15.3,22 18.23,20.39 20.09,17.93L17.97,16.54C16.64,18.34 14.47,19.5 12,19.5M8,8V16L16,12L8,8Z"></path>
                     </svg>
@@ -194,7 +195,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
                            id="tts-voice-volume-<?php echo $post_id; ?>"
                            class="tts-volume-slider-compact tts-voice-slider" 
                            min="0" max="1" step="0.1" value="1"
-                           aria-label="<?php esc_attr_e('Volumen de Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Voz', 'tts-sesolibre'); ?>">
                 </div>
                 <?php endif; ?>
                 
@@ -208,7 +209,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
                            class="tts-volume-slider-compact tts-background-slider" 
                            min="0" max="1" step="0.1" 
                            value="<?php echo esc_attr($background_volume); ?>"
-                           aria-label="<?php esc_attr_e('Volumen de Música de Fondo', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>">
+                           aria-label="<?php esc_attr_e('Volumen de Música de Fondo', 'tts-sesolibre'); ?>">
                 </div>
                 <?php endif; ?>
             </div>
@@ -232,7 +233,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
         <?php if ($show_download_link): ?>
             <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-compact">
                 <span class="tts-headphones">🎧</span>
-                <?php _e('Descargar', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+                <?php _e('Descargar', 'tts-sesolibre'); ?>
             </a>
         <?php endif; ?>
     </div>
@@ -242,7 +243,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
     <div class="tts-status-container">
         <div class="tts-loading" style="display: none;">
             <div class="loading-spinner"></div>
-            <span><?php _e('Cargando audio...', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?></span>
+            <span><?php _e('Cargando audio...', 'tts-sesolibre'); ?></span>
         </div>
         <div class="tts-error-container"></div>
     </div>
@@ -253,7 +254,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
     <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
     </svg>
-    <?php _e('Reproduciendo archivo de audio personalizado', 'TTS-SesoLibre-v1.6.7-shortcode-docs'); ?>
+    <?php _e('Reproduciendo archivo de audio personalizado', 'tts-sesolibre'); ?>
 </p>
 <?php endif; ?>
 

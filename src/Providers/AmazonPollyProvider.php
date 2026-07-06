@@ -150,24 +150,13 @@ class AmazonPollyProvider implements TTSProviderInterface {
 				throw new ProviderException( 'Invalid response from Amazon Polly: No AudioStream' );
 			}
 			$audio_data = $audio_stream->getContents();
-			
-			// Generate unique filename
-			$filename = 'polly_' . md5( $text . $voice_id . $engine . time() ) . '.' . $output_format;
-			$upload_dir = wp_upload_dir();
-			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
-			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
 
-			// Ensure directory exists
-			wp_mkdir_p( dirname( $file_path ) );
-
-			// Save audio file
-			if ( file_put_contents( $file_path, $audio_data ) === false ) { // Use $audio_data here
-				throw new ProviderException( 'Failed to save audio file' );
-			}
-			
+			// Return raw audio data; the TTSService persists it via the configured
+			// storage provider. We intentionally do NOT write to uploads/tts-audio/
+			// here — doing so left orphaned polly_*.mp3 files that nothing referenced.
 			$this->logger->info( 'Amazon Polly TTS generation completed', [
-				'file_path' => $file_path,
-				'file_size' => filesize( $file_path ),
+				'voice'     => $voice_id,
+				'data_size' => strlen( $audio_data ),
 			] );
 
 			return [
@@ -301,27 +290,19 @@ class AmazonPollyProvider implements TTSProviderInterface {
 	 */
 	public function synthesize( string $text, array $options = [] ): AudioResult {
 		$result = $this->generateSpeech( $text, $options );
-		
-		if ( ! $result['success'] ) {
+
+		if ( empty( $result['success'] ) || empty( $result['audio_data'] ) ) {
 			throw new ProviderException( 'Speech synthesis failed' );
 		}
 
-		// Read the audio file
-		$audio_data = file_get_contents( $result['file_path'] );
-		if ( $audio_data === false ) {
-			throw new ProviderException( 'Failed to read generated audio file' );
-		}
-
 		return new AudioResult(
-			$audio_data,
+			$result['audio_data'],
 			$result['format'],
 			$result['duration'],
 			[
 				'provider' => $this->name,
 				'voice' => $result['voice'],
-				'character_count' => strlen( $text ),
-				'file_path' => $result['file_path'],
-				'audio_url' => $result['audio_url'],
+				'character_count' => mb_strlen( $text ),
 			]
 		);
 	}

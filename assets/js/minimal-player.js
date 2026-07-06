@@ -134,6 +134,8 @@ class WPTTSMinimalPlayer {
     onPlay() {
         this.isPlaying = true;
         this.playBtn.classList.add('playing');
+        this.playBtn.setAttribute('aria-pressed', 'true');
+        this.playBtn.setAttribute('aria-label', 'Pausar');
         this.startWaveformAnimation();
         this.trackAnalytics('play');
     }
@@ -141,6 +143,8 @@ class WPTTSMinimalPlayer {
     onPause() {
         this.isPlaying = false;
         this.playBtn.classList.remove('playing');
+        this.playBtn.setAttribute('aria-pressed', 'false');
+        this.playBtn.setAttribute('aria-label', 'Reproducir');
         this.stopWaveformAnimation();
         this.trackAnalytics('pause');
     }
@@ -148,6 +152,8 @@ class WPTTSMinimalPlayer {
     onEnded() {
         this.isPlaying = false;
         this.playBtn.classList.remove('playing');
+        this.playBtn.setAttribute('aria-pressed', 'false');
+        this.playBtn.setAttribute('aria-label', 'Reproducir');
         this.stopWaveformAnimation();
         this.audio.currentTime = 0;
         this.updateProgress();

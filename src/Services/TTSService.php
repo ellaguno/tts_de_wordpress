@@ -79,21 +79,7 @@ class TTSService {
 		try {
 			$this->logger->info( 'Starting TTS generation (Round Robin DISABLED)', [ 'text_length' => strlen( $text ) ] );
 			$this->logger->debug( '[generateAudio] Initial options received', $options );
-			
-			// Check cache first
-			$textHash = $this->cache->generateTextHash( $text, $options );
-			$cached_url = $this->cache->getCachedAudioUrl( $textHash );
-			
-			if ( $cached_url ) {
-				$this->logger->info( 'Audio found in cache', [ 'hash' => $textHash ] );
-				return [
-					'success' => true,
-					'audio_url' => $cached_url,
-					'source' => 'cache',
-					'hash' => $textHash,
-				];
-			}
-			
+
 			$current_provider_name = null;
 			$provider_instance = null;
 
@@ -130,7 +116,7 @@ class TTSService {
 				$this->logger->error( 'No TTS providers are configured and available for audio generation.' );
 				return [
 					'success' => false,
-					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS.', 'tts-sesolibre' ),
 					'error_code' => 'NO_PROVIDERS_CONFIGURED',
 					'available_providers' => [
 						'openai' => 'OpenAI TTS',
@@ -146,7 +132,32 @@ class TTSService {
 				'current_provider_name' => $current_provider_name,
 				'provider_instance_class' => is_object($provider_instance) ? get_class($provider_instance) : 'N/A'
 			] );
-			
+
+			// Check cache AFTER resolving the provider: the key must reflect the
+			// provider and effective voice actually used, or switching the
+			// default provider/voice would keep serving stale audio.
+			$config = get_option( 'wp_tts_config', [] );
+			$effective_voice = ! empty( $options['voice'] )
+				? $options['voice']
+				: ( $config['providers'][ $current_provider_name ]['default_voice'] ?? '' );
+
+			$textHash = $this->cache->generateTextHash( $text, [
+				'provider' => $current_provider_name,
+				'voice' => $effective_voice,
+			] );
+			$cached_url = $this->cache->getCachedAudioUrl( $textHash );
+
+			if ( $cached_url ) {
+				$this->logger->info( 'Audio found in cache', [ 'hash' => $textHash ] );
+				return [
+					'success' => true,
+					'audio_url' => $cached_url,
+					'source' => 'cache',
+					'provider' => $current_provider_name,
+					'hash' => $textHash,
+				];
+			}
+
 			try {
 				$speech_call_options = [];
 				if ( isset( $options['voice'] ) ) {
@@ -173,10 +184,12 @@ class TTSService {
 								'provider_class' => get_class($storage_provider)
 							]);
 							
-							// Generate filename
+							// Generate filename. sanitize_file_name() strips path
+							// separators so a crafted voice value can't traverse
+							// outside the audio directory.
 							$hash = md5( $text . $current_provider_name . time() );
 							$voice_suffix = isset($speech_call_options['voice']) ? '-' . $speech_call_options['voice'] : '';
-							$filename = "{$current_provider_name}{$voice_suffix}-{$hash}.mp3";
+							$filename = sanitize_file_name( "{$current_provider_name}{$voice_suffix}-{$hash}.mp3" );
 							
 							// Prepare metadata including post information
 							$metadata = [
@@ -270,7 +283,7 @@ class TTSService {
 								return [
 									'success' => false,
 									'message' => sprintf( 
-										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'tts-sesolibre' ),
 										$storage_error->getMessage(),
 										$fallback_error->getMessage()
 									),
@@ -323,7 +336,7 @@ class TTSService {
 				return [
 					'success' => false,
 					'message' => sprintf( 
-						__( 'La generación TTS falló con %s: %s', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'La generación TTS falló con %s: %s', 'tts-sesolibre' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -338,7 +351,7 @@ class TTSService {
 			return [
 				'success' => false,
 				'message' => sprintf( 
-					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'tts-sesolibre' ),
 					$current_provider_name
 				),
 				'error_code' => 'GENERATION_FAILED',
@@ -514,6 +527,19 @@ class TTSService {
 	 * @throws \Exception If generation fails.
 	 */
 	public function generateAudioForPost( int $post_id ) {
+		// Per-post lock: a double click or a simultaneous cron+manual trigger
+		// would otherwise run two paid generations and publish two episodes.
+		// add_option() is atomic (INSERT), unlike get+set on a transient.
+		$lock_key = 'wp_tts_generating_' . $post_id;
+		if ( ! add_option( $lock_key, time(), '', 'no' ) ) {
+			$lock_time = (int) get_option( $lock_key );
+			if ( $lock_time && ( time() - $lock_time ) < 10 * MINUTE_IN_SECONDS ) {
+				throw new \Exception( __( 'Ya hay una generación de audio en curso para esta entrada. Espera a que termine.', 'tts-sesolibre' ) );
+			}
+			// Stale lock (crashed request): take it over.
+			update_option( $lock_key, time(), 'no' );
+		}
+
 		try {
 			$this->logger->info( 'Starting audio generation for post', [ 'post_id' => $post_id ] );
 			
@@ -833,13 +859,13 @@ class TTSService {
 				'post_id' => $post_id,
 				'audio_url' => $result['audio_url']
 			] );
-			
+
 			return (object) [
 				'url' => $result['audio_url'],
-				'duration' => 0, // Mock duration
-				'provider' => $result['provider'] ?? $provider,
+				'duration' => $result['duration'] ?? 0,
+				'provider' => $result['provider'] ?? $provider_from_meta,
 			];
-			
+
 		} catch ( \Exception $e ) {
 			$this->logger->error( 'Exception in generateAudioForPost', [
 				'post_id' => $post_id,
@@ -868,9 +894,11 @@ class TTSService {
 			}
 			
 			throw $e;
+		} finally {
+			delete_option( $lock_key );
 		}
 	}
-	
+
 	/**
 	 * Generate preview audio
 	 *

@@ -149,14 +149,15 @@ class TextProcessor {
 	 */
 	private static function cleanText( string $text ): string {
 		// Remove multiple spaces, tabs, newlines
-		$text = preg_replace( '/\s+/', ' ', $text );
+		$text = preg_replace( '/\s+/u', ' ', $text );
 		
-		// Basic HTML entity replacements
-		$text = str_replace( '&amp;', ' y ', $text );
-		$text = str_replace( '&nbsp;', ' ', $text );
-		$text = str_replace( '&lt;', '<', $text );
-		$text = str_replace( '&gt;', '>', $text );
-		$text = str_replace( '&quot;', '"', $text );
+		// Decode ALL HTML entities (named + numeric) so accented Spanish content
+		// pasted from editors (&aacute; &eacute; &ntilde; &#8217; &hellip; …) is
+		// resolved to real characters instead of being read out literally
+		// ("y aacute") by the residual ampersand handling below.
+		$text = html_entity_decode( $text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		// Normalize any decoded non-breaking spaces (U+00A0) to plain spaces.
+		$text = str_replace( "\xC2\xA0", ' ', $text );
 		
 		// Clean up multiple punctuation with simple regex
 		$text = preg_replace( '/\.{2,}/', '.', $text );
@@ -177,8 +178,8 @@ class TextProcessor {
 		// Trim and clean up final spacing
 		$text = trim( $text );
 		
-		// Ensure sentences end properly
-		if ( ! empty( $text ) && ! in_array( substr( $text, -1 ), array( '.', '!', '?' ) ) ) {
+		// Ensure sentences end properly (mb-safe: last char may be multibyte)
+		if ( ! empty( $text ) && ! in_array( mb_substr( $text, -1 ), array( '.', '!', '?' ), true ) ) {
 			$text .= '.';
 		}
 		
@@ -201,25 +202,28 @@ class TextProcessor {
 			];
 		}
 		
-		if ( strlen( $text ) < 5 ) {
+		$char_length = mb_strlen( $text );
+
+		if ( $char_length < 5 ) {
 			return [
 				'valid' => false,
 				'message' => 'El texto es demasiado corto (mínimo 5 caracteres).'
 			];
 		}
-		
-		if ( strlen( $text ) > 50000 ) {
+
+		if ( $char_length > 50000 ) {
 			return [
 				'valid' => false,
 				'message' => 'El texto es demasiado largo (máximo 50,000 caracteres).'
 			];
 		}
-		
-		// Check for too many special characters
-		$special_char_count = preg_match_all( '/[^\w\s\.,\!\?\-\(\)]/', $text );
-		$text_length = strlen( $text );
-		
-		if ( $special_char_count > ( $text_length * 0.1 ) ) {
+
+		// Check for too many special characters. Unicode-aware: letters (á, ñ),
+		// digits, whitespace and normal Spanish punctuation (¿ ¡ « » — …) do
+		// NOT count as special.
+		$special_char_count = preg_match_all( '/[^\p{L}\p{N}\s\.,;:\!\?\-\(\)¿¡«»"\'—–…%$€]/u', $text );
+
+		if ( $special_char_count > ( $char_length * 0.1 ) ) {
 			return [
 				'valid' => false,
 				'message' => 'El texto contiene demasiados caracteres especiales.'

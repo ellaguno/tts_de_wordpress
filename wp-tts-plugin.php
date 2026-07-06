@@ -8,7 +8,7 @@
  * Author URI: https://sesolibre.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: TTS-SesoLibre-
+ * Text Domain: tts-sesolibre
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
@@ -26,6 +26,18 @@ define('WP_TTS_PLUGIN_FILE', __FILE__);
 define('WP_TTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TTS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_TTS_PLUGIN_BASENAME', plugin_basename(__FILE__));
+
+/**
+ * Translate a string and escape it for safe output inside inline JavaScript.
+ *
+ * Convenience wrapper equivalent to esc_js( __( $text, $domain ) ). Several admin
+ * views call esc_js__() directly; define it here so those calls resolve.
+ */
+if (!function_exists('esc_js__')) {
+    function esc_js__($text, $domain = 'default') {
+        return esc_js(__($text, $domain));
+    }
+}
 
 // Include required classes directly for activation/deactivation
 require_once WP_TTS_PLUGIN_DIR . 'src/Core/Activator.php';
@@ -62,6 +74,10 @@ use WP_TTS\Core\Deactivator;
  * Initialize the plugin
  */
 function wp_tts_plugin_init() {
+    // Encrypt provider API keys at rest. Must be registered before any
+    // get_option()/update_option() of the plugin config options.
+    \WP_TTS\Utils\SecurityManager::registerSecretStorageFilters();
+
     $plugin = Plugin::getInstance();
     $plugin->run();
 }
@@ -91,7 +107,7 @@ add_action('plugins_loaded', 'wp_tts_plugin_init');
  * Add action links to plugin page
  */
 function wp_tts_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=wp-tts-settings') . '">' . __('Configuración', 'TTS-SesoLibre') . '</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=wp-tts-settings') . '">' . __('Configuración', 'tts-sesolibre') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
@@ -102,8 +118,8 @@ add_filter('plugin_action_links_' . WP_TTS_PLUGIN_BASENAME, 'wp_tts_plugin_actio
  */
 function wp_tts_plugin_meta_links($links, $file) {
     if ($file === WP_TTS_PLUGIN_BASENAME) {
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/wiki" target="_blank">' . __('Documentación', 'TTS-SesoLibre') . '</a>';
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/issues" target="_blank">' . __('Soporte', 'TTS-SesoLibre') . '</a>';
+        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/wiki" target="_blank">' . __('Documentación', 'tts-sesolibre') . '</a>';
+        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/issues" target="_blank">' . __('Soporte', 'tts-sesolibre') . '</a>';
     }
     return $links;
 }

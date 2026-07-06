@@ -492,7 +492,20 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'private' => $upload_data['private'] ? 'true' : 'false',
 			'audio_file' => new \CURLFile( $file_path, 'audio/mpeg', $filename )
 		];
-		
+
+		// Include the optional episode fields that uploadFile() prepared. These
+		// were silently dropped before, so configured default tags, the artist
+		// and the summary never reached Buzzsprout.
+		if ( ! empty( $upload_data['tags'] ) ) {
+			$post_fields['tags'] = $upload_data['tags'];
+		}
+		if ( ! empty( $upload_data['artist'] ) ) {
+			$post_fields['artist'] = $upload_data['artist'];
+		}
+		if ( ! empty( $upload_data['summary'] ) ) {
+			$post_fields['summary'] = $upload_data['summary'];
+		}
+
 		// Add artwork if provided
 		if ( ! empty( $upload_data['artwork_url'] ) ) {
 			$post_fields['artwork_url'] = $upload_data['artwork_url'];

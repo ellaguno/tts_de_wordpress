@@ -1,8 +1,14 @@
 jQuery(document).ready(function($) {
+    // This script drives the settings/tools screens, which localize wpTtsAdmin.
+    // It is also enqueued on the post editor (for the metabox), where wpTtsAdmin
+    // is NOT localized — referencing it there threw a ReferenceError that aborted
+    // the whole ready() callback. Bail out early when it is absent.
+    if (typeof wpTtsAdmin === 'undefined') {
+        return;
+    }
+
     // Debug: Log that admin.js is loading
-    console.log('Admin.js loaded successfully');
-    console.log('wpTtsAdmin object:', wpTtsAdmin);
-    
+
     // Test TTS Generation on Tools Page
     $('#test-tts').on('click', function() {
         const button = $(this);
@@ -70,7 +76,6 @@ jQuery(document).ready(function($) {
             configSections.find('input, select, textarea').prop('disabled', true);
         }
         
-        console.log('Provider ' + provider + ' ' + (isEnabled ? 'enabled' : 'disabled'));
     });
     
     // Initialize the state on page load
@@ -94,7 +99,6 @@ jQuery(document).ready(function($) {
         playerSettings.nonce = wpTtsAdmin.nonce;
         playerSettings.action = 'tts_save_player_config';
         
-        console.log('Saving player settings:', playerSettings);
         
         $.ajax({
             url: wpTtsAdmin.ajaxUrl,
@@ -102,7 +106,6 @@ jQuery(document).ready(function($) {
             data: playerSettings,
             success: function(response) {
                 if (response.success) {
-                    console.log('Player settings saved successfully');
                     // Show a brief success indicator
                     $field.css('background-color', '#d4edda').delay(1000).queue(function() {
                         $(this).css('background-color', '').dequeue();
@@ -120,18 +123,23 @@ jQuery(document).ready(function($) {
     });
 
     // TTS Tools Page Functionality
-    console.log('Setting up TTS Tools functionality...');
-    
+    // The dedicated Tools page (tools_page_wp-tts-tools) emits its own complete,
+    // co-located inline handlers for these same controls (voice preview, custom
+    // generator, content editor). When that inline script is present it sets
+    // window.wpTtsToolsInline; bail out here to avoid binding duplicate handlers,
+    // which fired every AJAX action twice (double TTS billing) and raised spurious
+    // error alerts from diverging field names/nonces.
+    if (window.wpTtsToolsInline) {
+        return;
+    }
+
     // Check if preview elements exist
     if ($('#preview_provider').length > 0) {
-        console.log('Preview provider element found');
     } else {
-        console.log('Preview provider element NOT found');
     }
     
     // Voice Preview Tool - with robust event handling
     function loadVoicesForProvider(providerElement, voiceElement, provider) {
-        console.log('Loading voices for provider:', provider);
         
         voiceElement.prop('disabled', true).html('<option>Cargando voces...</option>');
         
@@ -149,17 +157,16 @@ jQuery(document).ready(function($) {
                 nonce: wpTtsAdmin.nonce
             },
             success: function(response) {
-                console.log('Voices response:', response);
                 if (response.success && response.data.voices) {
-                    let options = '<option value="">Selecciona una voz</option>';
+                    // Build <option> nodes via new Option(): text is set as
+                    // textContent, so provider voice names can't inject HTML.
+                    voiceElement.empty().append(new Option('Selecciona una voz', ''));
                     response.data.voices.forEach(function(voice) {
-                        options += '<option value="' + voice.id + '">' + voice.name + '</option>';
+                        voiceElement.append(new Option(voice.name, voice.id));
                     });
-                    voiceElement.html(options).prop('disabled', false);
-                    console.log('Voices loaded successfully, count:', response.data.voices.length);
+                    voiceElement.prop('disabled', false);
                 } else {
                     voiceElement.html('<option value="">No hay voces disponibles</option>').prop('disabled', true);
-                    console.log('No voices available or error:', response.data?.message);
                 }
             },
             error: function(xhr, status, error) {
@@ -170,7 +177,6 @@ jQuery(document).ready(function($) {
     }
     
     $('#preview_provider').on('change', function() {
-        console.log('Preview provider changed:', $(this).val());
         const provider = $(this).val();
         const voiceSelect = $('#preview_voice');
         const generateBtn = $('#generate_preview');
@@ -179,35 +185,23 @@ jQuery(document).ready(function($) {
         loadVoicesForProvider($(this), voiceSelect, provider);
     });
     
-    // Force manual trigger for debugging
-    $(document).on('click', '#force_load_voices', function() {
-        console.log('Forcing voice reload...');
-        const provider = $('#preview_provider').val();
-        if (provider) {
-            loadVoicesForProvider($('#preview_provider'), $('#preview_voice'), provider);
-        }
-    });
-    
     // Also trigger on page load if providers are already selected
     $(function() {
         // Preview provider
         const initialPreviewProvider = $('#preview_provider').val();
         if (initialPreviewProvider) {
-            console.log('Initial preview provider detected:', initialPreviewProvider);
             loadVoicesForProvider($('#preview_provider'), $('#preview_voice'), initialPreviewProvider);
         }
         
         // Custom provider
         const initialCustomProvider = $('#custom_provider').val();
         if (initialCustomProvider) {
-            console.log('Initial custom provider detected:', initialCustomProvider);
             loadVoicesForCustomProvider($('#custom_provider'), $('#custom_voice'), initialCustomProvider);
         }
         
         // Editor provider
         const initialEditorProvider = $('#editor_provider').val();
         if (initialEditorProvider) {
-            console.log('Initial editor provider detected:', initialEditorProvider);
             loadVoicesForEditor($('#editor_provider'), $('#editor_voice'), initialEditorProvider);
         }
     });
@@ -261,7 +255,6 @@ jQuery(document).ready(function($) {
     
     // Custom Text Generator
     $('#custom_provider').on('change', function() {
-        console.log('Custom provider changed:', $(this).val());
         const provider = $(this).val();
         const voiceSelect = $('#custom_voice');
         
@@ -275,7 +268,6 @@ jQuery(document).ready(function($) {
     
     // Load voices for custom generator with optional default voice option
     function loadVoicesForCustomProvider(providerElement, voiceElement, provider) {
-        console.log('Loading voices for custom provider:', provider);
         
         if (!provider) {
             voiceElement.html('<option value="">Usar voz predeterminada</option>').prop('disabled', false);
@@ -293,17 +285,16 @@ jQuery(document).ready(function($) {
                 nonce: wpTtsAdmin.nonce
             },
             success: function(response) {
-                console.log('Custom voices response:', response);
                 if (response.success && response.data.voices) {
-                    let options = '<option value="">Usar voz predeterminada</option>';
+                    // Build <option> nodes via new Option(): text is set as
+                    // textContent, so provider voice names can't inject HTML.
+                    voiceElement.empty().append(new Option('Usar voz predeterminada', ''));
                     response.data.voices.forEach(function(voice) {
-                        options += '<option value="' + voice.id + '">' + voice.name + '</option>';
+                        voiceElement.append(new Option(voice.name, voice.id));
                     });
-                    voiceElement.html(options).prop('disabled', false);
-                    console.log('Custom voices loaded successfully, count:', response.data.voices.length);
+                    voiceElement.prop('disabled', false);
                 } else {
                     voiceElement.html('<option value="">No hay voces disponibles</option>').prop('disabled', true);
-                    console.log('No custom voices available or error:', response.data?.message);
                 }
             },
             error: function(xhr, status, error) {
@@ -313,14 +304,30 @@ jQuery(document).ready(function($) {
         });
     }
     
-    $('#custom_text').on('input', function() {
-        const text = $(this).val();
-        const charCount = text.length;
-        const estimatedCost = (charCount * 0.000015).toFixed(4); // Rough estimate
-        
+    // Approximate USD cost per character, per provider (mirrors each
+    // provider's getCostPerCharacter() in PHP). A flat rate misled admins:
+    // ElevenLabs costs ~7x what Google/Azure/Polly do.
+    const ttsCostPerChar = {
+        openai: 0.000015,
+        elevenlabs: 0.00003,
+        google: 0.000004,
+        azure_tts: 0.000004,
+        amazon_polly: 0.000004
+    };
+
+    function ttsEstimateCost(charCount, provider) {
+        const rate = ttsCostPerChar[provider] || 0.000015;
+        return (charCount * rate).toFixed(4);
+    }
+
+    function updateCustomCost() {
+        const charCount = ($('#custom_text').val() || '').length;
         $('#custom_character_count').text(charCount);
-        $('#custom_estimated_cost').text('$' + estimatedCost);
-    });
+        $('#custom_estimated_cost').text('$' + ttsEstimateCost(charCount, $('#custom_provider').val()));
+    }
+
+    $('#custom_text').on('input', updateCustomCost);
+    $('#custom_provider').on('change', updateCustomCost);
     
     $('#generate_custom').on('click', function() {
         const provider = $('#custom_provider').val();
@@ -487,7 +494,6 @@ jQuery(document).ready(function($) {
     
     // Editor provider change handler
     $('#editor_provider').on('change', function() {
-        console.log('Editor provider changed:', $(this).val());
         const provider = $(this).val();
         const voiceSelect = $('#editor_voice');
         
@@ -501,7 +507,6 @@ jQuery(document).ready(function($) {
     
     // Load voices for editor
     function loadVoicesForEditor(providerElement, voiceElement, provider) {
-        console.log('Loading voices for editor provider:', provider);
         
         if (!provider) {
             voiceElement.html('<option value="">Seleccionar Voz</option>').prop('disabled', false);
@@ -519,17 +524,16 @@ jQuery(document).ready(function($) {
                 nonce: wpTtsAdmin.nonce
             },
             success: function(response) {
-                console.log('Editor voices response:', response);
                 if (response.success && response.data.voices) {
-                    let options = '<option value="">Seleccionar Voz</option>';
+                    // Build <option> nodes via new Option(): text is set as
+                    // textContent, so provider voice names can't inject HTML.
+                    voiceElement.empty().append(new Option('Seleccionar Voz', ''));
                     response.data.voices.forEach(function(voice) {
-                        options += '<option value="' + voice.id + '">' + voice.name + '</option>';
+                        voiceElement.append(new Option(voice.name, voice.id));
                     });
-                    voiceElement.html(options).prop('disabled', false);
-                    console.log('Editor voices loaded successfully, count:', response.data.voices.length);
+                    voiceElement.prop('disabled', false);
                 } else {
                     voiceElement.html('<option value="">No hay voces disponibles</option>').prop('disabled', true);
-                    console.log('No editor voices available or error:', response.data?.message);
                 }
             },
             error: function(xhr, status, error) {
@@ -540,16 +544,18 @@ jQuery(document).ready(function($) {
     }
     
     // Editor text change handler for stats
-    $('#editor_text').on('input', function() {
-        const text = $(this).val();
+    function updateEditorStats() {
+        const text = $('#editor_text').val() || '';
         const charCount = text.length;
         const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
-        const estimatedCost = (charCount * 0.000015).toFixed(4);
-        
+
         $('#editor_character_count').text(charCount);
         $('#editor_word_count').text(wordCount);
-        $('#editor_estimated_cost').text('$' + estimatedCost);
-    });
+        $('#editor_estimated_cost').text('$' + ttsEstimateCost(charCount, $('#editor_provider').val()));
+    }
+
+    $('#editor_text').on('input', updateEditorStats);
+    $('#editor_provider').on('change', updateEditorStats);
 
     // Other admin JS can go here, e.g., for settings page interactions
     // Example: Test provider connection button
@@ -565,7 +571,7 @@ jQuery(document).ready(function($) {
             url: wpTtsAdmin.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'wp_tts_validate_provider',
+                action: 'tts_validate_provider',
                 provider: provider,
                 nonce: wpTtsAdmin.nonce
             },

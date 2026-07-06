@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * Google Cloud TTS Provider
@@ -60,26 +61,18 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	public function synthesize( string $text, array $options = [] ): AudioResult {
 		$result = $this->generateSpeech( $text, $options );
 		
-		if ( ! $result['success'] ) {
+		if ( ! $result['success'] || empty( $result['audio_data'] ) ) {
 			throw new ProviderException( 'Google Cloud TTS synthesis failed' );
 		}
 
-		// Read the audio file
-		$audio_data = file_get_contents( $result['file_path'] );
-		if ( $audio_data === false ) {
-			throw new ProviderException( 'Failed to read generated audio file' );
-		}
-
 		return new AudioResult(
-			$audio_data,
+			$result['audio_data'],
 			$result['format'],
 			$result['duration'],
 			[
 				'provider' => $this->name,
 				'voice' => $result['voice'],
 				'character_count' => strlen( $text ),
-				'file_path' => $result['file_path'],
-				'audio_url' => $result['audio_url'],
 			]
 		);
 	}
@@ -137,20 +130,16 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 		}
 		
 		$voice_id = (!empty($options['voice'])) ? $options['voice'] : ($this->config['default_voice'] ?? 'es-ES-Standard-A');
-		
-		// Validate Google voice ID - get all available voices and check if provided voice exists
-		$all_voices = $this->getAvailableVoices();
-		$valid_voice_ids = array_column($all_voices, 'id');
-		
-		if (!in_array($voice_id, $valid_voice_ids)) {
-			$this->logger->warning('Invalid Google TTS voice ID provided, using default', [
-				'provided_voice' => $voice_id,
-				'valid_voices' => $valid_voice_ids,
-				'using_default' => 'es-ES-Standard-A'
-			]);
-			$voice_id = $this->config['default_voice'] ?? 'es-ES-Standard-A';
+
+		// Note: we deliberately do NOT reject the voice against getAvailableVoices()
+		// here. That list only contains the built-in Standard voices, so validating
+		// against it silently replaced perfectly valid Wavenet/Neural2 voices the
+		// user selected. Google's API returns a clear error for a genuinely invalid
+		// voice, which is preferable to substituting a different one without notice.
+		if ( empty( $voice_id ) ) {
+			$voice_id = 'es-ES-Standard-A';
 		}
-		
+
 		// Google voice names are like 'es-ES-Standard-A'. We need language code and name separately.
 		$language_code = substr( $voice_id, 0, 5 ); // e.g., es-ES
 		$voice_name = $voice_id;
@@ -177,39 +166,54 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			$client = new $client_class( [
 				'credentials' => $credentials_path,
 			] );
-			
-			$synthesis_input = ( new \Google\Cloud\TextToSpeech\V1\SynthesisInput() )
-				->setText( $text );
-			
+
 			$voice_selection_params = ( new \Google\Cloud\TextToSpeech\V1\VoiceSelectionParams() )
 				->setLanguageCode( $language_code )
 				->setName( $voice_name );
-			
+
 			$audio_config = ( new \Google\Cloud\TextToSpeech\V1\AudioConfig() )
 				->setAudioEncoding( $output_format_enum )
 				->setSpeakingRate( (float) $speaking_rate )
 				->setPitch( (float) $pitch );
-			
+
 			$this->logger->debug( 'Google Cloud API Request details', [
 				'language_code' => $language_code,
 				'voice_name' => $voice_name,
 				'audio_encoding' => $output_format_enum,
 			]);
 
-			// Crear el request completo para la nueva API
-			$request = new \Google\Cloud\TextToSpeech\V1\SynthesizeSpeechRequest();
-			$request->setInput($synthesis_input);
-			$request->setVoice($voice_selection_params);
-			$request->setAudioConfig($audio_config);
-			
-			$response = $client->synthesizeSpeech( $request );
-			$audio_content = $response->getAudioContent();
+			// Google rejects requests over 5000 bytes: chunk long text and
+			// concatenate the audio (same pattern as Azure/Polly providers).
+			$chunks = TextChunker::chunkText( $text, 'google' );
+			$audio_chunks = [];
+
+			foreach ( $chunks as $index => $chunk ) {
+				$synthesis_input = ( new \Google\Cloud\TextToSpeech\V1\SynthesisInput() )
+					->setText( $chunk );
+
+				$request = new \Google\Cloud\TextToSpeech\V1\SynthesizeSpeechRequest();
+				$request->setInput( $synthesis_input );
+				$request->setVoice( $voice_selection_params );
+				$request->setAudioConfig( $audio_config );
+
+				$response = $client->synthesizeSpeech( $request );
+				$chunk_audio = $response->getAudioContent();
+
+				if ( empty( $chunk_audio ) ) {
+					$client->close();
+					throw new ProviderException( 'Google Cloud TTS: empty audio for chunk ' . ( $index + 1 ) . '/' . count( $chunks ) );
+				}
+
+				$audio_chunks[] = $chunk_audio;
+			}
+
 			$client->close();
-			
-			$audio_data = $audio_content;
+
+			$audio_data = implode( '', $audio_chunks );
 
 			$this->logger->info( 'Google Cloud TTS generation completed', [
 				'audio_data_size' => strlen( $audio_data ),
+				'chunks_processed' => count( $chunks ),
 				'voice_id' => $voice_id
 			] );
 
@@ -224,6 +228,7 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
 					'characters' => strlen( $text ),
+					'chunks_processed' => count( $chunks ),
 					'data_size' => strlen( $audio_data ),
 				],
 			];

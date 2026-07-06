@@ -145,29 +145,20 @@ class AzureTTSProvider implements TTSProviderInterface {
 	 */
 	public function synthesize( string $text, array $options = [] ): AudioResult {
 		$voice_id = $options['voice'] ?? $this->config['default_voice'] ?? 'es-MX-DaliaNeural';
-		$result = $this->generateSpeech( $text, $voice_id, $options );
-		
-		if ( ! $result['success'] ) {
+		$result = $this->generateSpeech( $text, array_merge( $options, [ 'voice' => $voice_id ] ) );
+
+		if ( empty( $result['success'] ) || empty( $result['audio_data'] ) ) {
 			throw new ProviderException( 'Azure TTS synthesis failed' );
 		}
 
-		// Get audio data from URL
-		$audio_data = wp_remote_get( $result['audio_url'] );
-		if ( is_wp_error( $audio_data ) ) {
-			throw new ProviderException( 'Failed to retrieve generated audio file' );
-		}
-
-		$audio_content = wp_remote_retrieve_body( $audio_data );
-
 		return new AudioResult(
-			$audio_content,
-			'mp3',
-			$result['duration'],
+			$result['audio_data'],
+			$result['format'] ?? 'mp3',
+			$result['duration'] ?? 0,
 			[
 				'provider' => 'azure_tts',
 				'voice' => $voice_id,
-				'character_count' => strlen( $text ),
-				'audio_url' => $result['audio_url'],
+				'character_count' => mb_strlen( $text ),
 			]
 		);
 	}

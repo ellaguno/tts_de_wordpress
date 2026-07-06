@@ -29,36 +29,47 @@ class ConfigurationManager {
 	 */
 	private $defaults = array(
 		'providers'     => array(
-			'azure'      => array(
+			// Provider keys MUST match the runtime identifiers used across the
+			// plugin (AdminInterface, TTSService, metabox AJAX): azure_tts,
+			// amazon_polly, openai, google, elevenlabs. Using azure/polly here
+			// produced a "phantom" provider with no voices on fresh installs.
+			'openai'       => array(
+				'enabled'       => false,
+				'api_key'       => '',
+				'default_voice' => 'nova',
+				'quota_limit'   => 500000,
+				'priority'      => 1,
+			),
+			'azure_tts'    => array(
 				'enabled'       => false,
 				'api_key'       => '',
 				'region'        => 'eastus',
 				'default_voice' => 'es-MX-DaliaNeural',
 				'quota_limit'   => 500000, // characters per month
-				'priority'      => 1,
+				'priority'      => 2,
 			),
-			'google'     => array(
+			'google'       => array(
 				'enabled'          => false,
 				'credentials_json' => '',
 				'default_voice'    => 'es-US-Neural2-A',
 				'quota_limit'      => 1000000,
-				'priority'         => 2,
+				'priority'         => 3,
 			),
-			'polly'      => array(
+			'amazon_polly' => array(
 				'enabled'       => false,
 				'access_key'    => '',
 				'secret_key'    => '',
 				'region'        => 'us-east-1',
-				'default_voice' => 'es-MX-DaliaNeural',
+				'default_voice' => 'Mia',
 				'quota_limit'   => 5000000,
-				'priority'      => 3,
+				'priority'      => 4,
 			),
-			'elevenlabs' => array(
+			'elevenlabs'   => array(
 				'enabled'       => false,
 				'api_key'       => '',
 				'default_voice' => '',
 				'quota_limit'   => 10000,
-				'priority'      => 4,
+				'priority'      => 5,
 			),
 		),
 		'storage'       => array(
@@ -92,7 +103,7 @@ class ConfigurationManager {
 			),
 		),
 		'defaults'      => array(
-			'default_provider'      => 'azure',
+			'default_provider'      => 'google',
 			'default_storage'       => 'local',
 			'auto_generate'         => false,
 			'voice_speed'           => 1.0,
@@ -413,28 +424,28 @@ class ConfigurationManager {
 		switch ( $provider ) {
 			case 'azure':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave API es requerida', 'tts-sesolibre' );
 				}
 				if ( empty( $config['region'] ) ) {
-					$errors[] = __( 'La región es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La región es requerida', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'google':
 				if ( empty( $config['credentials_json'] ) ) {
-					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'Las credenciales de cuenta de servicio son requeridas', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'polly':
 				if ( empty( $config['access_key'] ) || empty( $config['secret_key'] ) ) {
-					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave de acceso y clave secreta de AWS son requeridas', 'tts-sesolibre' );
 				}
 				break;
 
 			case 'elevenlabs':
 				if ( empty( $config['api_key'] ) ) {
-					$errors[] = __( 'La clave API es requerida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+					$errors[] = __( 'La clave API es requerida', 'tts-sesolibre' );
 				}
 				break;
 		}
@@ -454,14 +465,14 @@ class ConfigurationManager {
 		if ( isset( $defaults['voice_speed'] ) ) {
 			$speed = floatval( $defaults['voice_speed'] );
 			if ( $speed < 0.25 || $speed > 4.0 ) {
-				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+				$errors[] = __( 'La velocidad de voz debe estar entre 0.25 y 4.0', 'tts-sesolibre' );
 			}
 		}
 
 		if ( isset( $defaults['voice_pitch'] ) ) {
 			$pitch = intval( $defaults['voice_pitch'] );
 			if ( $pitch < -20 || $pitch > 20 ) {
-				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'TTS-SesoLibre-v1.6.7-shortcode-docs' );
+				$errors[] = __( 'El tono de voz debe estar entre -20 y 20', 'tts-sesolibre' );
 			}
 		}
 
@@ -552,7 +563,10 @@ class ConfigurationManager {
 		}
 
 		if ( $merge ) {
-			$this->config = array_merge_recursive( $this->config, $config );
+			// array_replace_recursive, NOT array_merge_recursive: the latter
+			// turns colliding scalars into arrays (api_key => ['old','new'])
+			// and corrupts the stored configuration.
+			$this->config = array_replace_recursive( $this->config, $config );
 		} else {
 			$this->config = array_merge( $this->defaults, $config );
 		}

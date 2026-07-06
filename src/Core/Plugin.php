@@ -166,7 +166,7 @@ class Plugin {
 	 */
 	public function loadTextDomain(): void {
 		load_plugin_textdomain(
-			'TTS-SesoLibre-v1.6.7-shortcode-docs',
+			'tts-sesolibre',
 			false,
 			dirname( WP_TTS_PLUGIN_BASENAME ) . '/languages'
 		);
@@ -209,6 +209,9 @@ class Plugin {
 		add_action( 'wp_ajax_tts_auto_save_voice', array( $this, 'handleAutoSaveVoice' ) );
 		add_action( 'wp_ajax_tts_load_default_assets', array( $this, 'handleLoadDefaultAssets' ) );
 
+		// Background (cron) audio (re)generation scheduled by scheduleAudioGeneration()
+		add_action( 'wp_tts_generate_audio_background', array( $this, 'handleBackgroundAudioGeneration' ) );
+
 		// Custom hooks for extensibility
 		do_action( 'wp_tts_plugin_loaded', $this );
 	}
@@ -240,7 +243,7 @@ class Plugin {
 		foreach ( $post_types as $post_type ) {
 			add_meta_box(
 				'wp-tts-settings',
-				__( 'Configuración de Texto a Voz', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				__( 'Configuración de Texto a Voz', 'tts-sesolibre' ),
 				array( $this, 'renderTTSMetaBox' ),
 				$post_type,
 				'side',
@@ -416,7 +419,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_generate_audio' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -425,8 +428,15 @@ class Plugin {
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'ID de entrada inválido', 'tts-sesolibre' )
 			] );
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' )
+			], 403 );
 			return;
 		}
 
@@ -448,7 +458,7 @@ class Plugin {
 					'audio_url' => $result->url,
 					'duration'  => $result->duration ?? 0,
 					'provider'  => $result->provider ?? '',
-					'message'   => __( 'Audio generado exitosamente', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message'   => __( 'Audio generado exitosamente', 'tts-sesolibre' ),
 				] );
 			} else {
 				$this->container->get( 'logger' )->error( 'Audio generation returned invalid result', [
@@ -457,7 +467,7 @@ class Plugin {
 				] );
 
 				wp_send_json_error( [
-					'message' => __( 'Falló la generación de audio: Resultado inválido devuelto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'Falló la generación de audio: Resultado inválido devuelto', 'tts-sesolibre' ),
 				] );
 			}
 		} catch ( \Exception $e ) {
@@ -468,7 +478,7 @@ class Plugin {
 			] );
 
 			wp_send_json_error( [
-				'message' => __( 'Falló la generación de audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'message' => __( 'Falló la generación de audio', 'tts-sesolibre' ),
 				'error'   => $e->getMessage(),
 			] );
 		}
@@ -480,10 +490,11 @@ class Plugin {
 	 * Handle AJAX provider validation request
 	 */
 	public function handleValidateProvider(): void {
-		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_validate_provider' ) ||
+		// Verify nonce and permissions. The JS (admin.js) sends wpTtsAdmin.nonce,
+		// which is created for the 'wp_tts_admin' action.
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ||
 			! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) );
+			wp_die( __( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
 		}
 
 		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
@@ -496,14 +507,14 @@ class Plugin {
 				array(
 					'valid' => $is_valid,
 					'message' => $is_valid ?
-						__( 'La configuración del proveedor es válida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) :
-						__( 'La configuración del proveedor es inválida', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						__( 'La configuración del proveedor es válida', 'tts-sesolibre' ) :
+						__( 'La configuración del proveedor es inválida', 'tts-sesolibre' ),
 				)
 			);
 		} catch ( \Exception $e ) {
 			wp_send_json_error(
 				array(
-					'message' => __( 'Falló la validación del proveedor', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'Falló la validación del proveedor', 'tts-sesolibre' ),
 					'error'   => $e->getMessage(),
 				)
 			);
@@ -518,7 +529,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_admin' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -555,10 +566,14 @@ class Plugin {
 		// Verify nonce and permissions
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_delete_audio' ) ||
 			! current_user_can( 'edit_posts' ) ) {
-			wp_die( __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ) );
+			wp_die( __( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
 		}
 
 		$post_id = intval( $_POST['post_id'] );
+
+		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' ) );
+		}
 
 		try {
 			// Get audio URL and file path with fallback
@@ -572,13 +587,17 @@ class Plugin {
 				// Parse file path from URL
 				$upload_dir = wp_upload_dir();
 				$file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $audio_url );
-				
-				// Delete physical file if it exists
-				if ( file_exists( $file_path ) ) {
-					unlink( $file_path );
+
+				// Delete physical file only if it resolves inside the uploads
+				// directory: the URL comes from stored meta, and a manipulated
+				// value must not be able to delete arbitrary server files.
+				$real_file = realpath( $file_path );
+				$real_base = realpath( $upload_dir['basedir'] );
+				if ( $real_file && $real_base && strpos( $real_file, $real_base . DIRECTORY_SEPARATOR ) === 0 ) {
+					unlink( $real_file );
 					$this->container->get( 'logger' )->info( 'Audio file deleted', [
 						'post_id' => $post_id,
-						'file_path' => $file_path
+						'file_path' => $real_file
 					] );
 				}
 			}
@@ -599,13 +618,24 @@ class Plugin {
 				update_post_meta( $post_id, '_tts_generation_status', 'pending' );
 			}
 
+			// Invalidate cached audio so a subsequent "Generate" with the same text
+			// does not serve the URL of the file we just deleted (which would 404).
+			try {
+				$cache = $this->container->get( 'cache' );
+				if ( $cache && method_exists( $cache, 'clearAllCache' ) ) {
+					$cache->clearAllCache();
+				}
+			} catch ( \Throwable $e ) {
+				// Non-fatal: cache invalidation is best-effort.
+			}
+
 			$this->container->get( 'logger' )->info( 'Audio deleted for post', [
 				'post_id' => $post_id
 			] );
 
 			wp_send_json_success(
 				array(
-					'message' => __( 'Audio eliminado exitosamente', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'Audio eliminado exitosamente', 'tts-sesolibre' ),
 				)
 			);
 		} catch ( \Exception $e ) {
@@ -619,7 +649,7 @@ class Plugin {
 
 			wp_send_json_error(
 				array(
-					'message' => __( 'Falló la eliminación del audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+					'message' => __( 'Falló la eliminación del audio', 'tts-sesolibre' ),
 					'error'   => $e->getMessage(),
 				)
 			);
@@ -652,73 +682,7 @@ class Plugin {
 			if ( $enabled && $audio_url ) {
 				// Get current player style
 				$player_style = $this->config->get('player.style', 'classic');
-				
-				// Always enqueue common player styles
-				wp_enqueue_style(
-					'wp-tts-player',
-					WP_TTS_PLUGIN_URL . 'assets/css/frontend-player.css',
-					array(),
-					$this->version
-				);
-				
-				// Enqueue style-specific assets based on player type
-				switch ($player_style) {
-					case 'sesolibre':
-						wp_enqueue_style(
-							'wp-tts-sesolibre-player',
-							WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
-							array(),
-							$this->version
-						);
-						
-						wp_enqueue_script(
-							'wp-tts-sesolibre-player',
-							WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
-							array( 'jquery' ),
-							$this->version,
-							true
-						);
-						break;
-						
-					case 'minimal':
-						wp_enqueue_style(
-							'wp-tts-minimal-player',
-							WP_TTS_PLUGIN_URL . 'assets/css/minimal-player.css',
-							array(),
-							$this->version
-						);
-						
-						wp_enqueue_script(
-							'wp-tts-minimal-player',
-							WP_TTS_PLUGIN_URL . 'assets/js/minimal-player.js',
-							array( 'jquery' ),
-							$this->version,
-							true
-						);
-						break;
-						
-					case 'enhanced_sesolibre':
-						wp_enqueue_style(
-							'wp-tts-enhanced-sesolibre-player',
-							WP_TTS_PLUGIN_URL . 'assets/css/enhanced-sesolibre-player.css',
-							array(),
-							$this->version
-						);
-						
-						wp_enqueue_script(
-							'wp-tts-enhanced-sesolibre-player',
-							WP_TTS_PLUGIN_URL . 'assets/js/enhanced-sesolibre-player.js',
-							array( 'jquery' ),
-							$this->version . '-' . time(),
-							true
-						);
-						break;
-						
-					case 'classic':
-					default:
-						// Classic player uses the common styles already loaded
-						break;
-				}
+				$this->enqueuePlayerStyleAssets( $player_style );
 			}
 		}
 
@@ -729,6 +693,81 @@ class Plugin {
 			$this->version,
 			true
 		);
+	}
+
+	/**
+	 * Enqueue the CSS/JS a given player style needs
+	 *
+	 * Called from enqueueFrontendAssets() (global style) AND from the
+	 * shortcode renderer: a per-shortcode style override must load its own
+	 * assets or the player markup renders dead (ReferenceError in the
+	 * template's inline init script).
+	 *
+	 * @param string $style Player style.
+	 */
+	private function enqueuePlayerStyleAssets( string $style ): void {
+		// Common player styles
+		wp_enqueue_style(
+			'wp-tts-player',
+			WP_TTS_PLUGIN_URL . 'assets/css/frontend-player.css',
+			array(),
+			$this->version
+		);
+
+		switch ( $style ) {
+			case 'sesolibre':
+				wp_enqueue_style(
+					'wp-tts-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/css/tts-player.css',
+					array(),
+					$this->version
+				);
+				wp_enqueue_script(
+					'wp-tts-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
+					array( 'jquery' ),
+					$this->version,
+					true
+				);
+				break;
+
+			case 'minimal':
+				wp_enqueue_style(
+					'wp-tts-minimal-player',
+					WP_TTS_PLUGIN_URL . 'assets/css/minimal-player.css',
+					array(),
+					$this->version
+				);
+				wp_enqueue_script(
+					'wp-tts-minimal-player',
+					WP_TTS_PLUGIN_URL . 'assets/js/minimal-player.js',
+					array( 'jquery' ),
+					$this->version,
+					true
+				);
+				break;
+
+			case 'enhanced_sesolibre':
+				wp_enqueue_style(
+					'wp-tts-enhanced-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/css/enhanced-sesolibre-player.css',
+					array(),
+					$this->version
+				);
+				wp_enqueue_script(
+					'wp-tts-enhanced-sesolibre-player',
+					WP_TTS_PLUGIN_URL . 'assets/js/enhanced-sesolibre-player.js',
+					array( 'jquery' ),
+					$this->version, // plugin version, NOT time(): time() defeated browser caching on every page view
+					true
+				);
+				break;
+
+			case 'classic':
+			default:
+				// Classic player uses the common styles already loaded
+				break;
+		}
 	}
 
 	/**
@@ -789,17 +828,10 @@ class Plugin {
 			'adminNonce' => wp_create_nonce( 'wp_tts_admin' ),
 			'generateNonce' => wp_create_nonce( 'wp_tts_generate_audio' ),
 			'deleteNonce' => wp_create_nonce( 'wp_tts_delete_audio' ),
-			'mediaTitle' => __( 'Seleccionar Archivo de Audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
-			'mediaButton' => __( 'Usar este audio', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+			'mediaTitle' => __( 'Seleccionar Archivo de Audio', 'tts-sesolibre' ),
+			'mediaButton' => __( 'Usar este audio', 'tts-sesolibre' ),
 		] );
 		
-		// Add inline script for media handling
-		wp_add_inline_script( 'jquery', '
-			// Ensure media library is loaded
-			if (typeof wp !== "undefined" && wp.media) {
-				console.log("[TTS] Media library loaded for metabox");
-			}
-		' );
 	}
 
 	/**
@@ -823,7 +855,7 @@ class Plugin {
 
 		$post_id = intval( $atts['post_id'] );
 		$style   = $atts['style'];
-		
+
 		// Get main audio URL
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
 			$main_audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
@@ -834,8 +866,23 @@ class Plugin {
 		}
 
 		if ( ! $main_audio_url ) {
+			// Anonymous visitors see nothing, but editors get a hint instead of
+			// silently-empty output that looks like a broken shortcode.
+			if ( $post_id && current_user_can( 'edit_post', $post_id ) ) {
+				return '<div class="wp-tts-editor-notice" style="padding:8px 12px;border-left:4px solid #dba617;background:#fcf9e8;font-size:13px;">'
+					. sprintf(
+						/* translators: %s: edit post URL */
+						__( 'TTS: aún no hay audio generado para esta entrada. <a href="%s">Generar audio</a> (este aviso solo lo ven los editores).', 'tts-sesolibre' ),
+						esc_url( get_edit_post_link( $post_id ) )
+					)
+					. '</div>';
+			}
 			return '';
 		}
+
+		// A per-shortcode style override must enqueue its own assets: the
+		// global enqueue only loaded the configured default style.
+		$this->enqueuePlayerStyleAssets( $style );
 		
 		// Player configuration from global settings
 		$player_config = [
@@ -890,8 +937,8 @@ class Plugin {
 		// Debug: Check if auto-insert is enabled globally
 		$auto_insert = $this->config->get('player.auto_insert', false);
 		
-		// Debug for troubleshooting - now visible to all users when tts_debug is set
-		if ( isset($_GET['tts_debug']) ) {
+		// Debug for troubleshooting - restricted to administrators to avoid leaking config
+		if ( isset($_GET['tts_debug']) && current_user_can('manage_options') ) {
 			$all_player_config = $this->config->get('player', []);
 			$wp_option_data = get_option('wp_tts_player_settings', 'NOT_FOUND');
 			$debug_info = "<!-- TTS DEBUG: auto_insert=" . ($auto_insert ? 'true' : 'false') . 
@@ -915,7 +962,7 @@ class Plugin {
 		}
 
 		// More debug info
-		if ( isset($_GET['tts_debug']) ) {
+		if ( isset($_GET['tts_debug']) && current_user_can('manage_options') ) {
 			$debug_info2 = "<!-- TTS DEBUG: post_id=$post_id, enabled=" . ($enabled ? 'true' : 'false') . ", audio_url=" . ($audio_url ? 'exists' : 'empty') . " -->";
 			$content = $debug_info2 . $content;
 		}
@@ -935,9 +982,9 @@ class Plugin {
 				'style'   => $player_style
 			) );
 			
-			// Debug the player output
-			if ( isset($_GET['tts_debug']) ) {
-				$debug_info3 = "<!-- TTS DEBUG: player_style=$player_style, player_position=$player_position, player_length=" . strlen($player) . " -->";
+			// Debug the player output (admins only — never for anonymous visitors)
+			if ( isset($_GET['tts_debug']) && current_user_can('manage_options') ) {
+				$debug_info3 = "<!-- TTS DEBUG: player_style=" . esc_html( $player_style ) . ", player_position=" . esc_html( $player_position ) . ", player_length=" . strlen($player) . " -->";
 				$content = $debug_info3 . $content;
 			}
 			
@@ -987,6 +1034,33 @@ class Plugin {
 	}
 
 	/**
+	 * Cron callback that (re)generates audio for a post in the background.
+	 *
+	 * Registered on the 'wp_tts_generate_audio_background' hook scheduled by
+	 * scheduleAudioGeneration(). Without this callback the scheduled event fired
+	 * with no listener and audio was never regenerated.
+	 *
+	 * @param int $post_id
+	 */
+	public function handleBackgroundAudioGeneration( $post_id ): void {
+		$post_id = intval( $post_id );
+
+		if ( ! $post_id || ! get_post( $post_id ) ) {
+			return;
+		}
+
+		try {
+			$tts_service = $this->container->get( 'tts_service' );
+			$tts_service->generateAudioForPost( $post_id );
+		} catch ( \Throwable $e ) {
+			$this->container->get( 'logger' )->error( 'Background audio generation failed', [
+				'post_id' => $post_id,
+				'error'   => $e->getMessage(),
+			] );
+		}
+	}
+
+	/**
 	 * Get service container
 	 *
 	 * @return ServiceContainer
@@ -1012,7 +1086,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -1022,38 +1096,52 @@ class Plugin {
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'ID de entrada inválido', 'tts-sesolibre' )
 			] );
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' )
+			], 403 );
 			return;
 		}
 
 		try {
 			if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
-				// Check if this is the first time enabling TTS
+				// Check if this is the first time enabling TTS. Note: audio_assets is
+				// always populated with defaults (e.g. background_volume), so
+				// empty($tts_data['audio_assets']) is never true — we must instead
+				// look at whether any actual intro/outro/background clip is set.
 				$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post_id );
-				$is_first_time = $enabled && empty( $tts_data['audio_assets'] );
+				$assets = $tts_data['audio_assets'] ?? [];
+				$has_assets = ! empty( $assets['intro_audio'] )
+					|| ! empty( $assets['outro_audio'] )
+					|| ! empty( $assets['background_audio'] );
+				$is_first_time = $enabled && ! $has_assets;
 				
 				$result = \WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
 				
 				if ( $result ) {
 					wp_send_json_success( [
-						'message' => __( 'Estado de TTS habilitado guardado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						'message' => __( 'Estado de TTS habilitado guardado', 'tts-sesolibre' ),
 						'enabled' => $enabled,
 						'load_defaults' => $is_first_time
 					] );
 				} else {
 					wp_send_json_error( [
-						'message' => __( 'Falló al guardar el estado de TTS habilitado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+						'message' => __( 'Falló al guardar el estado de TTS habilitado', 'tts-sesolibre' )
 					] );
 				}
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'TTSMetaManager no disponible', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+					'message' => __( 'TTSMetaManager no disponible', 'tts-sesolibre' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Error al guardar el estado de TTS habilitado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'message' => __( 'Error al guardar el estado de TTS habilitado', 'tts-sesolibre' ),
 				'error' => $e->getMessage()
 			] );
 		}
@@ -1067,7 +1155,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -1077,8 +1165,15 @@ class Plugin {
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'ID de entrada inválido', 'tts-sesolibre' )
 			] );
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' )
+			], 403 );
 			return;
 		}
 
@@ -1095,22 +1190,22 @@ class Plugin {
 				
 				if ( $result ) {
 					wp_send_json_success( [
-						'message' => __( 'Proveedor de TTS guardado', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						'message' => __( 'Proveedor de TTS guardado', 'tts-sesolibre' ),
 						'provider' => $provider
 					] );
 				} else {
 					wp_send_json_error( [
-						'message' => __( 'Falló al guardar el proveedor de TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+						'message' => __( 'Falló al guardar el proveedor de TTS', 'tts-sesolibre' )
 					] );
 				}
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'TTSMetaManager no disponible', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+					'message' => __( 'TTSMetaManager no disponible', 'tts-sesolibre' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Error al guardar el proveedor de TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'message' => __( 'Error al guardar el proveedor de TTS', 'tts-sesolibre' ),
 				'error' => $e->getMessage()
 			] );
 		}
@@ -1124,7 +1219,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -1135,8 +1230,15 @@ class Plugin {
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'ID de entrada inválido', 'tts-sesolibre' )
 			] );
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' )
+			], 403 );
 			return;
 		}
 
@@ -1151,23 +1253,23 @@ class Plugin {
 				
 				if ( $result ) {
 					wp_send_json_success( [
-						'message' => __( 'Voz de TTS guardada', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+						'message' => __( 'Voz de TTS guardada', 'tts-sesolibre' ),
 						'provider' => $provider,
 						'voice_id' => $voice_id
 					] );
 				} else {
 					wp_send_json_error( [
-						'message' => __( 'Falló al guardar la voz de TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+						'message' => __( 'Falló al guardar la voz de TTS', 'tts-sesolibre' )
 					] );
 				}
 			} else {
 				wp_send_json_error( [
-					'message' => __( 'TTSMetaManager no disponible', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+					'message' => __( 'TTSMetaManager no disponible', 'tts-sesolibre' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Error al guardar la voz de TTS', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'message' => __( 'Error al guardar la voz de TTS', 'tts-sesolibre' ),
 				'error' => $e->getMessage()
 			] );
 		}
@@ -1181,7 +1283,7 @@ class Plugin {
 		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
-				'message' => __( 'Falló la verificación de seguridad', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
 			], 403 );
 			return;
 		}
@@ -1190,8 +1292,15 @@ class Plugin {
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
-				'message' => __( 'ID de entrada inválido', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+				'message' => __( 'ID de entrada inválido', 'tts-sesolibre' )
 			] );
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [
+				'message' => __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' )
+			], 403 );
 			return;
 		}
 
@@ -1216,27 +1325,27 @@ class Plugin {
 					
 					if ( $result ) {
 						wp_send_json_success( [
-							'message' => __( 'Recursos de audio por defecto cargados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+							'message' => __( 'Recursos de audio por defecto cargados', 'tts-sesolibre' ),
 							'assets' => $audio_assets
 						] );
 					} else {
 						wp_send_json_error( [
-							'message' => __( 'Falló al cargar recursos de audio por defecto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+							'message' => __( 'Falló al cargar recursos de audio por defecto', 'tts-sesolibre' )
 						] );
 					}
 				} else {
 					wp_send_json_error( [
-						'message' => __( 'TTSMetaManager no disponible', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+						'message' => __( 'TTSMetaManager no disponible', 'tts-sesolibre' )
 					] );
 				}
 			} else {
 				wp_send_json_success( [
-					'message' => __( 'No hay recursos de audio por defecto configurados', 'TTS-SesoLibre-v1.6.7-shortcode-docs' )
+					'message' => __( 'No hay recursos de audio por defecto configurados', 'tts-sesolibre' )
 				] );
 			}
 		} catch ( \Exception $e ) {
 			wp_send_json_error( [
-				'message' => __( 'Error al cargar recursos de audio por defecto', 'TTS-SesoLibre-v1.6.7-shortcode-docs' ),
+				'message' => __( 'Error al cargar recursos de audio por defecto', 'tts-sesolibre' ),
 				'error' => $e->getMessage()
 			] );
 		}

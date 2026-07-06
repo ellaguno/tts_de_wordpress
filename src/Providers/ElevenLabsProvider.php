@@ -6,6 +6,7 @@ use WP_TTS\Interfaces\TTSProviderInterface;
 use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
+use WP_TTS\Utils\TextChunker;
 
 /**
  * ElevenLabs TTS Provider
@@ -60,26 +61,18 @@ class ElevenLabsProvider implements TTSProviderInterface {
 	public function synthesize( string $text, array $options = [] ): AudioResult {
 		$result = $this->generateSpeech( $text, $options );
 		
-		if ( ! $result['success'] ) {
+		if ( ! $result['success'] || empty( $result['audio_data'] ) ) {
 			throw new ProviderException( 'ElevenLabs TTS synthesis failed' );
 		}
 
-		// Read the audio file
-		$audio_data = file_get_contents( $result['file_path'] );
-		if ( $audio_data === false ) {
-			throw new ProviderException( 'Failed to read generated audio file' );
-		}
-
 		return new AudioResult(
-			$audio_data,
+			$result['audio_data'],
 			$result['format'],
 			$result['duration'],
 			[
 				'provider' => $this->name,
 				'voice' => $result['voice'],
 				'character_count' => strlen( $text ),
-				'file_path' => $result['file_path'],
-				'audio_url' => $result['audio_url'],
 			]
 		);
 	}
@@ -117,81 +110,38 @@ class ElevenLabsProvider implements TTSProviderInterface {
 		] );
 		
 		try {
-			$api_url = "https://api.elevenlabs.io/v1/text-to-speech/{$voice_id}";
-			
-			$request_body = json_encode( [
-				'text' => $text,
-				'model_id' => $model_id,
-				'voice_settings' => [
-					'stability' => (float) $stability,
-					'similarity_boost' => (float) $similarity_boost,
-				],
-			] );
+			// ElevenLabs limits request size: chunk long text and concatenate
+			// the audio (same pattern as the other providers).
+			$chunks = TextChunker::chunkText( $text, 'elevenlabs' );
+			$audio_chunks = [];
 
-			$this->logger->debug( 'ElevenLabs API Request', [ 'url' => $api_url, 'body_preview' => substr($request_body, 0, 100) . '...' ] );
-
-			$response = wp_remote_post( $api_url, [
-				'method'    => 'POST',
-				'headers'   => [
-					'Accept'        => 'audio/mpeg',
-					'Content-Type'  => 'application/json',
-					'xi-api-key'    => $api_key,
-				],
-				'body'      => $request_body,
-				'timeout'   => 60, // Increased timeout
-			] );
-
-			if ( is_wp_error( $response ) ) {
-				$this->logger->error( 'ElevenLabs API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
-				throw new ProviderException( 'ElevenLabs API request failed: ' . $response->get_error_message() );
+			foreach ( $chunks as $index => $chunk ) {
+				$audio_chunks[] = $this->requestSpeech( $chunk, $voice_id, $model_id, (float) $stability, (float) $similarity_boost, $api_key, $index + 1, count( $chunks ) );
 			}
 
-			$response_code = wp_remote_retrieve_response_code( $response );
-			$response_body = wp_remote_retrieve_body( $response );
-
-			if ( $response_code !== 200 ) {
-				$error_details = json_decode( $response_body, true );
-				$error_message = $error_details['detail']['message'] ?? $error_details['detail'] ?? $response_body;
-				$this->logger->error( 'ElevenLabs API returned an error', [
-					'response_code' => $response_code,
-					'error_message' => $error_message,
-					'response_body' => $response_body,
-				] );
-				throw new ProviderException( "ElevenLabs API error ({$response_code}): {$error_message}" );
-			}
-			
-			$audio_data = $response_body;
-			
-			// Generate unique filename, use 'mp3' for extension as $output_format is specific to API
-			$filename = 'elevenlabs_' . md5( $text . $voice_id . $model_id . time() ) . '.mp3';
-			$upload_dir = wp_upload_dir();
-			$file_path = $upload_dir['basedir'] . '/tts-audio/' . $filename;
-			$file_url = $upload_dir['baseurl'] . '/tts-audio/' . $filename;
-
-			// Ensure directory exists
-			wp_mkdir_p( dirname( $file_path ) );
-
-			// Save audio file
-			if ( file_put_contents( $file_path, $audio_data ) === false ) {
-				throw new ProviderException( 'Failed to save audio file' );
-			}
+			$audio_data = implode( '', $audio_chunks );
 
 			$this->logger->info( 'ElevenLabs TTS generation completed', [
-				'file_path' => $file_path,
-				'file_size' => filesize( $file_path ),
+				'audio_data_size' => strlen( $audio_data ),
+				'chunks_processed' => count( $chunks ),
+				'voice_id' => $voice_id,
 			] );
 
+			// Return raw audio data instead of saving to file: the TTSService
+			// routes audio_data through the configured storage provider
+			// (local, Buzzsprout, etc.), same as the other TTS providers.
 			return [
 				'success' => true,
-				'audio_url' => $file_url,
-				'file_path' => $file_path,
+				'audio_data' => $audio_data,
 				'provider' => $this->name,
 				'voice' => $voice_id,
-				'format' => $output_format,
+				'format' => 'mp3',
 				'duration' => $this->estimateAudioDuration( $text ),
 				'metadata' => [
 					'model_id' => $model_id,
 					'characters' => strlen( $text ),
+					'chunks_processed' => count( $chunks ),
+					'data_size' => strlen( $audio_data ),
 				],
 			];
 
@@ -201,6 +151,68 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			] );
 			throw new ProviderException( 'ElevenLabs TTS generation failed: ' . $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Make a single TTS API request
+	 *
+	 * @param string $text Text chunk (within the provider limit).
+	 * @param string $voice_id Voice ID.
+	 * @param string $model_id Model ID.
+	 * @param float  $stability Stability setting.
+	 * @param float  $similarity_boost Similarity boost setting.
+	 * @param string $api_key API key.
+	 * @param int    $chunk_number Chunk number (for logging).
+	 * @param int    $total_chunks Total chunks (for logging).
+	 * @return string Audio binary data.
+	 * @throws ProviderException If the request fails.
+	 */
+	private function requestSpeech( string $text, string $voice_id, string $model_id, float $stability, float $similarity_boost, string $api_key, int $chunk_number = 1, int $total_chunks = 1 ): string {
+		$api_url = 'https://api.elevenlabs.io/v1/text-to-speech/' . rawurlencode( $voice_id );
+
+		$request_body = wp_json_encode( [
+			'text' => $text,
+			'model_id' => $model_id,
+			'voice_settings' => [
+				'stability' => $stability,
+				'similarity_boost' => $similarity_boost,
+			],
+		] );
+
+		$response = wp_remote_post( $api_url, [
+			'method'    => 'POST',
+			'headers'   => [
+				'Accept'        => 'audio/mpeg',
+				'Content-Type'  => 'application/json',
+				'xi-api-key'    => $api_key,
+			],
+			'body'      => $request_body,
+			'timeout'   => 60, // Increased timeout
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			$this->logger->error( 'ElevenLabs API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
+			throw new ProviderException( 'ElevenLabs API request failed: ' . $response->get_error_message() );
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		$response_body = wp_remote_retrieve_body( $response );
+
+		if ( $response_code !== 200 ) {
+			$error_details = json_decode( $response_body, true );
+			$error_message = $error_details['detail']['message'] ?? $error_details['detail'] ?? $response_body;
+			if ( is_array( $error_message ) ) {
+				$error_message = wp_json_encode( $error_message );
+			}
+			$this->logger->error( 'ElevenLabs API returned an error', [
+				'response_code' => $response_code,
+				'error_message' => $error_message,
+				'chunk' => "{$chunk_number}/{$total_chunks}",
+			] );
+			throw new ProviderException( "ElevenLabs API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" );
+		}
+
+		return $response_body;
 	}
 
 	/**

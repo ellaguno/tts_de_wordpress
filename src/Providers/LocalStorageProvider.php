@@ -209,11 +209,13 @@ class LocalStorageProvider implements SimpleStorageProviderInterface {
 	 */
 	private function getRelativePath( string $filename ): string {
 		$base_path = 'tts-audio';
-		
+
 		// Add date-based subdirectory
 		$date_path = date( 'Y/m' );
-		
-		return $base_path . '/' . $date_path . '/' . $filename;
+
+		// sanitize_file_name() strips slashes and "..", so a crafted filename
+		// can never escape the tts-audio directory.
+		return $base_path . '/' . $date_path . '/' . sanitize_file_name( $filename );
 	}
 
 	/**
