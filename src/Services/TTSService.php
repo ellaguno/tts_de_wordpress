@@ -958,19 +958,8 @@ class TTSService {
 		
 		switch ( $provider ) {
 			case 'google':
-				$credentials_path = $config['providers']['google']['credentials_path'] ?? '';
-				// If not set in config, try the user's uploaded file
-				if ( empty( $credentials_path ) ) {
-					$upload_dir = wp_upload_dir();
-					$credentials_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
-				} else {
-					// Convert relative paths to absolute paths
-					if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
-						// This is a relative path, convert to absolute
-						$credentials_path = ABSPATH . $credentials_path;
-					}
-				}
-				return ! empty( $credentials_path ) && file_exists( $credentials_path );
+				$configured = $config['providers']['google']['credentials_path'] ?? '';
+				return null !== \WP_TTS\Utils\GoogleCredentialsResolver::resolve( $configured );
 				
 			case 'openai':
 				$api_key = $config['providers']['openai']['api_key'] ?? '';

@@ -130,9 +130,10 @@ class Activator {
 	private static function setupDefaultConfiguration(): void {
 		$config_manager = new ConfigurationManager();
 
-		// Only set defaults if this is a fresh installation
-		if ( ! get_option( 'wp_tts_providers_config' ) ) {
-			// Configuration will be set with defaults automatically
+		// Only set defaults if this is a fresh installation. Configuration is
+		// unified inside the single wp_tts_config option; the manager seeds it
+		// with defaults (migrating any legacy standalone options it finds).
+		if ( ! get_option( 'wp_tts_config' ) ) {
 			$config_manager->save();
 		}
 

@@ -335,10 +335,18 @@ class AdminInterface {
 			WP_TTS_PLUGIN_VERSION
 		);
 		
+		wp_register_script(
+			'wp-tts-player-core',
+			WP_TTS_PLUGIN_URL . 'assets/js/tts-player-core.js',
+			[],
+			WP_TTS_PLUGIN_VERSION,
+			true
+		);
+
 		wp_enqueue_script(
 			'wp-tts-player',
 			WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
-			[ 'jquery' ],
+			[ 'wp-tts-player-core' ],
 			WP_TTS_PLUGIN_VERSION,
 			true
 		);
@@ -3239,8 +3247,16 @@ class AdminInterface {
 	 * Sanitize and save settings
 	 */
 	public function sanitizeSettings( $input ): array {
-		// Debug: Log the incoming input structure
-		
+		// Re-entrancy guard: ConfigurationManager::save() (called by the
+		// set()/updateDefaults() helpers below) writes wp_tts_config, and
+		// WordPress runs this sanitize callback on every write of that
+		// option — without the guard that recurses.
+		static $sanitizing = false;
+		if ( $sanitizing ) {
+			return is_array( $input ) ? $input : [];
+		}
+		$sanitizing = true;
+
 		// Get current configuration
 		$config = $this->config;
 		
@@ -3364,12 +3380,31 @@ class AdminInterface {
 			}
 			$config->updateDefaults( $defaults );
 		}
-		
-		// Ensure all changes are saved to database
-		$config->save();
-		
-		// Return the input as-is (settings are saved via ConfigurationManager)
-		return $input;
+
+		// Top-level default provider selector
+		if ( isset( $input['default_provider'] ) ) {
+			$config->set( 'defaults.default_provider', sanitize_text_field( $input['default_provider'] ), false );
+		}
+
+		// Cache settings
+		if ( isset( $input['cache'] ) && is_array( $input['cache'] ) ) {
+			$cache = $config->get( 'cache', [] );
+			foreach ( $input['cache'] as $key => $value ) {
+				if ( 'enable_cache' === $key ) {
+					$cache[ $key ] = (bool) $value;
+				} else {
+					$cache[ $key ] = (int) $value;
+				}
+			}
+			$config->set( 'cache', $cache, false );
+		}
+
+		// Return the manager's canonical array: WordPress writes the sanitize
+		// callback's return value to wp_tts_config, so this makes the option
+		// and the ConfigurationManager identical by construction (previously
+		// the raw form input was stored and the two stores drifted).
+		$sanitizing = false;
+		return $config->toOptionArray();
 	}
 
 	/**

@@ -7,6 +7,7 @@ use WP_TTS\Interfaces\AudioResult;
 use WP_TTS\Exceptions\ProviderException;
 use WP_TTS\Utils\Logger;
 use WP_TTS\Utils\TextChunker;
+use WP_TTS\Utils\GoogleCredentialsResolver;
 
 /**
  * Google Cloud TTS Provider
@@ -91,22 +92,9 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			throw new ProviderException( 'Google Cloud TTS provider is not properly configured (credentials missing or invalid)' );
 		}
 
-		$credentials_path = $this->config['credentials_path'];
-		// Attempt to use the uploaded file if the configured path is empty or default-looking
-		if (empty($credentials_path) || strpos($credentials_path, 'google-credentials.json') !== false) {
-			$upload_dir = wp_upload_dir();
-			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
-			if (file_exists($default_path)) {
-				$credentials_path = $default_path;
-				$this->logger->info('Using default credentials path for Google TTS.', ['path' => $credentials_path]);
-			}
-		} else {
-			// Convert relative paths to absolute paths
-			if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
-				// This is a relative path, convert to absolute
-				$credentials_path = ABSPATH . $credentials_path;
-				$this->logger->info('Converted relative to absolute path for Google TTS.', ['path' => $credentials_path]);
-			}
+		$credentials_path = GoogleCredentialsResolver::resolve( $this->config['credentials_path'] ?? '' );
+		if ( null === $credentials_path ) {
+			throw new ProviderException( 'Google Cloud TTS: credentials file not found' );
 		}
 
 
@@ -301,8 +289,8 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 */
 	public function validateCredentials( array $credentials = [] ): bool {
 		$config = ! empty( $credentials ) ? $credentials : $this->config;
-		
-		return ! empty( $config['credentials_path'] ) && file_exists( $config['credentials_path'] );
+
+		return null !== GoogleCredentialsResolver::resolve( $config['credentials_path'] ?? '' );
 	}
 
 	/**
@@ -488,21 +476,7 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	 * @return bool True if configured.
 	 */
 	public function isConfigured(): bool {
-		$path = $this->config['credentials_path'] ?? '';
-		if (empty($path) || strpos($path, 'google-credentials.json') !== false) { // Check default if specific path is empty or looks like a placeholder
-			$upload_dir = wp_upload_dir();
-			$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
-			if (file_exists($default_path)) {
-				return true;
-			}
-		} else {
-			// Convert relative paths to absolute paths
-			if ( substr( $path, 0, 1 ) !== '/' && strpos( $path, ':' ) === false ) {
-				// This is a relative path, convert to absolute
-				$path = ABSPATH . $path;
-			}
-		}
-		return ! empty( $path ) && file_exists( $path );
+		return null !== GoogleCredentialsResolver::resolve( $this->config['credentials_path'] ?? '' );
 	}
 
 	/**

@@ -7,20 +7,50 @@ namespace WP_TTS\Core;
  *
  * Manages plugin configuration, settings, and provider credentials
  * with secure storage and validation.
+ *
+ * SINGLE SOURCE OF TRUTH: everything is persisted inside the one
+ * `wp_tts_config` option — the same option the Settings API form posts and
+ * that TTSService/RoundRobinManager/meta-box read directly. The plugin
+ * previously kept a parallel set of 8 wp_tts_* options that drifted from
+ * wp_tts_config (phantom providers, stale defaults); those legacy options
+ * are now read once as a migration source and never written again.
  */
 class ConfigurationManager {
 
 	/**
-	 * Option names for WordPress options table
+	 * The single option backing all configuration
 	 */
-	private const OPTION_PROVIDERS     = 'wp_tts_providers_config';
-	private const OPTION_STORAGE       = 'wp_tts_storage_config';
-	private const OPTION_DEFAULTS      = 'wp_tts_default_settings';
-	private const OPTION_ROUND_ROBIN   = 'wp_tts_round_robin_state';
-	private const OPTION_CACHE         = 'wp_tts_cache_settings';
-	private const OPTION_AUDIO_LIBRARY = 'wp_tts_audio_library';
-	private const OPTION_ANALYTICS     = 'wp_tts_analytics_settings';
-	private const OPTION_PLAYER        = 'wp_tts_player_settings';
+	private const OPTION_MAIN = 'wp_tts_config';
+
+	/**
+	 * Legacy option names (pre-unification), kept only as migration sources
+	 */
+	private const LEGACY_OPTIONS = array(
+		'providers'     => 'wp_tts_providers_config',
+		'storage'       => 'wp_tts_storage_config',
+		'defaults'      => 'wp_tts_default_settings',
+		'round_robin'   => 'wp_tts_round_robin_state',
+		'cache'         => 'wp_tts_cache_settings',
+		'audio_library' => 'wp_tts_audio_library',
+		'analytics'     => 'wp_tts_analytics_settings',
+		'player'        => 'wp_tts_player_settings',
+	);
+
+	/**
+	 * Map internal section name → key inside wp_tts_config.
+	 * 'audio_library' lives under the 'audio_assets' key because that is what
+	 * the meta box and admin templates already read.
+	 */
+	private const SECTION_KEYS = array(
+		'providers'     => 'providers',
+		'storage'       => 'storage',
+		'defaults'      => 'defaults',
+		'round_robin'   => 'round_robin',
+		'cache'         => 'cache',
+		'audio_library' => 'audio_assets',
+		'analytics'     => 'analytics',
+		'player'        => 'player',
+	);
 
 	/**
 	 * Default configuration values
@@ -162,27 +192,55 @@ class ConfigurationManager {
 	}
 
 	/**
-	 * Load configuration from WordPress options
+	 * Load configuration from the single wp_tts_config option.
+	 *
+	 * Per section: value inside wp_tts_config wins; if absent, fall back to
+	 * the legacy standalone option (one-time migration source); else class
+	 * defaults. Saved values are merged over defaults so new keys added in
+	 * later versions appear automatically.
 	 */
 	private function loadConfiguration(): void {
-		$this->config = array(
-			'providers'     => $this->getOption( self::OPTION_PROVIDERS, $this->defaults['providers'] ),
-			'storage'       => $this->getOption( self::OPTION_STORAGE, $this->defaults['storage'] ),
-			'defaults'      => $this->getOption( self::OPTION_DEFAULTS, $this->defaults['defaults'] ),
-			'round_robin'   => $this->getOption(
-				self::OPTION_ROUND_ROBIN,
-				array(
-					'current_provider' => $this->defaults['defaults']['default_provider'],
-					'usage_count'      => array(),
-					'last_reset'       => date( 'Y-m-01' ), // First day of current month
-					'failed_providers' => array(),
-				)
+		$data = get_option( self::OPTION_MAIN, array() );
+		if ( ! is_array( $data ) ) {
+			$data = array();
+		}
+
+		$section_defaults = array(
+			'providers'     => $this->defaults['providers'],
+			'storage'       => $this->defaults['storage'],
+			'defaults'      => $this->defaults['defaults'],
+			'round_robin'   => array(
+				'current_provider' => $this->defaults['defaults']['default_provider'],
+				'usage_count'      => array(),
+				'last_reset'       => date( 'Y-m-01' ), // First day of current month
+				'failed_providers' => array(),
 			),
-			'cache'         => $this->getOption( self::OPTION_CACHE, $this->defaults['cache'] ),
-			'audio_library' => $this->getOption( self::OPTION_AUDIO_LIBRARY, $this->defaults['audio_library'] ),
-			'analytics'     => $this->getOption( self::OPTION_ANALYTICS, $this->defaults['analytics'] ),
-			'player'        => $this->getOption( self::OPTION_PLAYER, $this->defaults['player'] ),
+			'cache'         => $this->defaults['cache'],
+			'audio_library' => $this->defaults['audio_library'],
+			'analytics'     => $this->defaults['analytics'],
+			'player'        => $this->defaults['player'],
 		);
+
+		$this->config = array();
+		foreach ( $section_defaults as $section => $defaults ) {
+			$key = self::SECTION_KEYS[ $section ];
+
+			if ( isset( $data[ $key ] ) && is_array( $data[ $key ] ) ) {
+				$saved = $data[ $key ];
+			} else {
+				// Migration source: the pre-unification standalone option.
+				$legacy = get_option( self::LEGACY_OPTIONS[ $section ], null );
+				$saved = is_array( $legacy ) ? $legacy : array();
+			}
+
+			$this->config[ $section ] = array_replace_recursive( $defaults, $saved );
+		}
+
+		// The top-level default_provider key is what TTSService and the meta
+		// box read directly; it is canonical over defaults.default_provider.
+		if ( ! empty( $data['default_provider'] ) && is_string( $data['default_provider'] ) ) {
+			$this->config['defaults']['default_provider'] = $data['default_provider'];
+		}
 	}
 
 	/**
@@ -483,14 +541,34 @@ class ConfigurationManager {
 	 * Save configuration to database
 	 */
 	public function save(): void {
-		update_option( self::OPTION_PROVIDERS, $this->config['providers'] );
-		update_option( self::OPTION_STORAGE, $this->config['storage'] );
-		update_option( self::OPTION_DEFAULTS, $this->config['defaults'] );
-		update_option( self::OPTION_ROUND_ROBIN, $this->config['round_robin'] );
-		update_option( self::OPTION_CACHE, $this->config['cache'] );
-		update_option( self::OPTION_AUDIO_LIBRARY, $this->config['audio_library'] );
-		update_option( self::OPTION_ANALYTICS, $this->config['analytics'] );
-		update_option( self::OPTION_PLAYER, $this->config['player'] );
+		update_option( self::OPTION_MAIN, $this->toOptionArray() );
+	}
+
+	/**
+	 * Build the canonical wp_tts_config array from the in-memory sections,
+	 * preserving any unknown top-level keys already stored in the option.
+	 *
+	 * Also used by the Settings API sanitize callback: returning this array
+	 * makes WordPress write exactly what the manager holds, instead of the
+	 * raw form input (which is how the two stores used to drift).
+	 *
+	 * @return array Canonical option value.
+	 */
+	public function toOptionArray(): array {
+		$data = get_option( self::OPTION_MAIN, array() );
+		if ( ! is_array( $data ) ) {
+			$data = array();
+		}
+
+		foreach ( self::SECTION_KEYS as $section => $key ) {
+			$data[ $key ] = $this->config[ $section ];
+		}
+
+		// Keep the top-level mirror that runtime code reads directly.
+		$data['default_provider'] = $this->config['defaults']['default_provider']
+			?? ( $data['default_provider'] ?? 'google' );
+
+		return $data;
 	}
 
 	/**
@@ -618,17 +696,6 @@ class ConfigurationManager {
 		$current = $value;
 	}
 
-	/**
-	 * Get option with default value
-	 *
-	 * @param string $option Option name
-	 * @param mixed  $default Default value
-	 * @return mixed Option value
-	 */
-	private function getOption( string $option, $default = null ) {
-		return get_option( $option, $default );
-	}
-	
 	/**
 	 * Get logger instance
 	 *

@@ -84,7 +84,7 @@ $text_color = $config->get('player.player_text_color', '#333333');
         </div>
 
         <!-- Waveform/Progress Container -->
-        <div class="wp-tts-minimal-progress-container">
+        <div class="wp-tts-minimal-progress-container" role="slider" tabindex="0" aria-label="<?php esc_attr_e('Posición de reproducción', 'tts-sesolibre'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="wp-tts-minimal-waveform">
                 <!-- Waveform bars - Enhanced with 60 bars for better visualization -->
                 <div class="waveform-bar" style="height: 20%"></div>

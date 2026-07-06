@@ -1,228 +1,95 @@
 /**
- * Minimal TTS Player JavaScript
- * Clean, minimalist audio player with waveform visualization
+ * Minimal TTS Player (variant of TTSPlayerCore)
+ *
+ * Presentation-only subclass: adopts the <audio> element already rendered in
+ * the template (no intro/outro/background mixing), decorative waveform,
+ * settings panel and retry button. All playback/seek/speed logic lives in
+ * tts-player-core.js.
  */
-
-class WPTTSMinimalPlayer {
+class WPTTSMinimalPlayer extends TTSPlayerCore {
     constructor(container) {
-        this.container = container;
-        this.audio = container.querySelector('.wp-tts-audio');
-        this.playBtn = container.querySelector('.wp-tts-minimal-play-btn');
-        this.currentTimeEl = container.querySelector('.current-time');
-        this.totalTimeEl = container.querySelector('.total-time');
-        this.progressContainer = container.querySelector('.wp-tts-minimal-progress-container');
-        this.progressFilled = container.querySelector('.progress-filled');
-        this.waveformBars = container.querySelectorAll('.waveform-bar');
-        this.settingsBtn = container.querySelector('.wp-tts-minimal-settings-btn');
-        this.settingsPanel = container.querySelector('.wp-tts-minimal-settings-panel');
-        this.playbackRateSelect = container.querySelector('.playback-rate');
-        this.loadingEl = container.querySelector('.wp-tts-minimal-loading');
-        this.errorEl = container.querySelector('.wp-tts-minimal-error');
-        this.retryBtn = container.querySelector('.retry-btn');
-
-        this.isPlaying = false;
-        this.isLoading = false;
-        this.currentTime = 0;
-        this.duration = 0;
-        this.settingsOpen = false;
-
-        this.init();
+        super(container, {
+            label: 'minimal_player',
+            adoptAudio: '.wp-tts-audio',
+            selectors: {
+                playBtn: '.wp-tts-minimal-play-btn',
+                progress: '.wp-tts-minimal-progress-container',
+                progressBar: '.progress-filled',
+                currentTime: '.current-time',
+                totalTime: '.total-time',
+                loading: '.wp-tts-minimal-loading',
+                error: '.wp-tts-minimal-error',
+                playbackRateSelect: '.playback-rate',
+                retryBtn: '.retry-btn'
+            }
+        });
     }
 
     init() {
-        this.setupEventListeners();
-        this.setupAudioEventListeners();
-        this.initializeWaveform();
-    }
+        this.waveformBars = this.container.querySelectorAll('.waveform-bar');
+        this.settingsBtn = this.container.querySelector('.wp-tts-minimal-settings-btn');
+        this.settingsPanel = this.container.querySelector('.wp-tts-minimal-settings-panel');
+        this.settingsOpen = false;
 
-    setupEventListeners() {
-        // Play/Pause button
-        this.playBtn.addEventListener('click', () => this.togglePlay());
-
-        // Progress container click for seeking
-        this.progressContainer.addEventListener('click', (e) => this.seek(e));
-
-        // Settings button
-        this.settingsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleSettings();
-        });
-
-        // Playback rate change
-        if (this.playbackRateSelect) {
-            this.playbackRateSelect.addEventListener('change', (e) => {
-                this.audio.playbackRate = parseFloat(e.target.value);
-            });
-        }
-
-        // Retry button
-        if (this.retryBtn) {
-            this.retryBtn.addEventListener('click', () => this.retry());
-        }
-
-        // Close settings when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!this.container.contains(e.target)) {
-                this.closeSettings();
-            }
-        });
-
-        // Keyboard shortcuts
-        this.container.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                this.togglePlay();
-            }
-        });
-    }
-
-    setupAudioEventListeners() {
-        this.audio.addEventListener('loadstart', () => this.showLoading());
-        this.audio.addEventListener('canplay', () => this.hideLoading());
-        this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
-        this.audio.addEventListener('timeupdate', () => this.updateProgress());
-        this.audio.addEventListener('ended', () => this.onEnded());
-        this.audio.addEventListener('error', () => this.showError());
-        this.audio.addEventListener('play', () => this.onPlay());
-        this.audio.addEventListener('pause', () => this.onPause());
-        this.audio.addEventListener('waiting', () => this.showLoading());
-        this.audio.addEventListener('playing', () => this.hideLoading());
-    }
-
-    initializeWaveform() {
-        // Set initial waveform state
+        // Stagger the waveform bar animations
         this.waveformBars.forEach((bar, index) => {
             bar.style.animationDelay = `${index * 0.1}s`;
         });
-    }
 
-    togglePlay() {
-        if (this.isLoading) return;
+        // Extra loading signals from the in-DOM audio element
+        if (this.audio.main) {
+            this.audio.main.addEventListener('loadstart', () => this.showLoading());
+            this.audio.main.addEventListener('playing', () => this.hideLoading());
+        }
 
-        if (this.isPlaying) {
-            this.pause();
-        } else {
-            this.play();
+        // Settings panel toggle
+        if (this.settingsBtn && this.settingsPanel) {
+            this.settingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleSettings();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!this.container.contains(e.target)) {
+                    this.closeSettings();
+                }
+            });
         }
     }
 
-    async play() {
-        try {
-            this.hideError();
-            await this.audio.play();
-        } catch (error) {
-            console.error('Error playing audio:', error);
-            this.showError();
+    onProgressRender(percentage) {
+        if (!this.waveformBars.length) {
+            return;
         }
-    }
 
-    pause() {
-        this.audio.pause();
-    }
-
-    seek(e) {
-        if (!this.duration) return;
-
-        const rect = this.progressContainer.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const percentage = clickX / rect.width;
-        const newTime = percentage * this.duration;
-
-        this.audio.currentTime = Math.max(0, Math.min(newTime, this.duration));
-    }
-
-    onPlay() {
-        this.isPlaying = true;
-        this.playBtn.classList.add('playing');
-        this.playBtn.setAttribute('aria-pressed', 'true');
-        this.playBtn.setAttribute('aria-label', 'Pausar');
-        this.startWaveformAnimation();
-        this.trackAnalytics('play');
-    }
-
-    onPause() {
-        this.isPlaying = false;
-        this.playBtn.classList.remove('playing');
-        this.playBtn.setAttribute('aria-pressed', 'false');
-        this.playBtn.setAttribute('aria-label', 'Reproducir');
-        this.stopWaveformAnimation();
-        this.trackAnalytics('pause');
-    }
-
-    onEnded() {
-        this.isPlaying = false;
-        this.playBtn.classList.remove('playing');
-        this.playBtn.setAttribute('aria-pressed', 'false');
-        this.playBtn.setAttribute('aria-label', 'Reproducir');
-        this.stopWaveformAnimation();
-        this.audio.currentTime = 0;
-        this.updateProgress();
-        this.trackAnalytics('ended');
-    }
-
-    updateDuration() {
-        this.duration = this.audio.duration;
-        this.totalTimeEl.textContent = this.formatTime(this.duration);
-    }
-
-    updateProgress() {
-        this.currentTime = this.audio.currentTime;
-        this.currentTimeEl.textContent = this.formatTime(this.currentTime);
-        
-        if (this.duration) {
-            const percentage = (this.currentTime / this.duration) * 100;
-            this.progressFilled.style.width = `${percentage}%`;
-            this.updateWaveformProgress(percentage);
-        }
-    }
-
-    updateWaveformProgress(percentage) {
         const activeIndex = Math.floor((percentage / 100) * this.waveformBars.length);
-        
+
         this.waveformBars.forEach((bar, index) => {
             bar.classList.remove('active', 'playing');
-            
+
             if (index < activeIndex) {
                 bar.classList.add('active');
             } else if (index === activeIndex && this.isPlaying) {
                 bar.classList.add('playing');
             }
         });
-        
-        // Generate dynamic waveform based on audio frequency data if available
-        if (this.isPlaying && this.audio) {
-            this.animateWaveformBars();
+    }
+
+    /**
+     * The error element carries static translated text plus the retry button,
+     * so unlike the core we only toggle visibility instead of replacing its
+     * content (which would remove the button).
+     */
+    showError(message) {
+        this.hideLoading();
+        if (this.el.error) {
+            this.el.error.style.display = 'block';
+        } else {
+            console.error('TTS Player Error:', message);
         }
-    }
-
-    animateWaveformBars() {
-        // Create animated waveform effect during playback
-        this.waveformBars.forEach((bar, index) => {
-            if (bar.classList.contains('active') || bar.classList.contains('playing')) {
-                const randomHeight = 20 + Math.random() * 80; // Random between 20% and 100%
-                bar.style.height = `${randomHeight}%`;
-                
-                // Add animation delay based on position
-                setTimeout(() => {
-                    const newHeight = 30 + Math.random() * 60;
-                    bar.style.height = `${newHeight}%`;
-                }, Math.random() * 500);
-            }
-        });
-    }
-
-    startWaveformAnimation() {
-        this.waveformBars.forEach(bar => {
-            if (bar.classList.contains('active') || bar.classList.contains('playing')) {
-                bar.classList.add('playing');
-            }
-        });
-    }
-
-    stopWaveformAnimation() {
-        this.waveformBars.forEach(bar => {
-            bar.classList.remove('playing');
-        });
+        if (this.isPlaying) {
+            this.pause();
+        }
     }
 
     toggleSettings() {
@@ -238,6 +105,7 @@ class WPTTSMinimalPlayer {
         this.settingsOpen = true;
         this.settingsBtn.style.background = '#e9ecef';
         this.settingsBtn.style.color = '#007cba';
+        this.settingsBtn.setAttribute('aria-expanded', 'true');
     }
 
     closeSettings() {
@@ -245,102 +113,13 @@ class WPTTSMinimalPlayer {
         this.settingsOpen = false;
         this.settingsBtn.style.background = '';
         this.settingsBtn.style.color = '';
-    }
-
-    showLoading() {
-        this.isLoading = true;
-        this.loadingEl.style.display = 'flex';
-        this.hideError();
-    }
-
-    hideLoading() {
-        this.isLoading = false;
-        this.loadingEl.style.display = 'none';
-    }
-
-    showError() {
-        this.hideLoading();
-        this.errorEl.style.display = 'block';
-        this.onPause();
-    }
-
-    hideError() {
-        this.errorEl.style.display = 'none';
-    }
-
-    retry() {
-        this.hideError();
-        this.audio.load();
-        this.showLoading();
-    }
-
-    formatTime(seconds) {
-        if (isNaN(seconds) || !isFinite(seconds)) {
-            return '0:00';
-        }
-
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
-
-    trackAnalytics(action) {
-        // Track usage analytics if available
-        if (typeof wpTTSAnalytics !== 'undefined') {
-            wpTTSAnalytics.track('minimal_player', action, {
-                duration: this.duration,
-                currentTime: this.currentTime,
-                playbackRate: this.audio.playbackRate
-            });
-        }
-
-        // Google Analytics tracking
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'tts_minimal_player_' + action, {
-                event_category: 'TTS',
-                event_label: 'Minimal Player',
-                value: Math.round(this.currentTime)
-            });
-        }
-    }
-
-    // Public API methods
-    getCurrentTime() {
-        return this.currentTime;
-    }
-
-    getDuration() {
-        return this.duration;
-    }
-
-    setPlaybackRate(rate) {
-        this.audio.playbackRate = rate;
-        if (this.playbackRateSelect) {
-            this.playbackRateSelect.value = rate;
-        }
-    }
-
-    getPlaybackRate() {
-        return this.audio.playbackRate;
-    }
-
-    isCurrentlyPlaying() {
-        return this.isPlaying;
-    }
-
-    destroy() {
-        // Cleanup event listeners
-        this.audio.pause();
-        this.audio.src = '';
-        this.container.classList.remove('initialized');
+        this.settingsBtn.setAttribute('aria-expanded', 'false');
     }
 }
 
 // Auto-initialize players when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    const players = document.querySelectorAll('.wp-tts-minimal-player-container:not(.initialized)');
-    
-    players.forEach(container => {
+    document.querySelectorAll('.wp-tts-minimal-player-container:not(.initialized)').forEach((container) => {
         new WPTTSMinimalPlayer(container);
         container.classList.add('initialized');
     });

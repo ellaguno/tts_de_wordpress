@@ -714,6 +714,16 @@ class Plugin {
 			$this->version
 		);
 
+		// Shared engine all custom player variants extend (classic uses the
+		// native <audio> enhancement in audio-player.js instead).
+		wp_register_script(
+			'wp-tts-player-core',
+			WP_TTS_PLUGIN_URL . 'assets/js/tts-player-core.js',
+			array(),
+			$this->version,
+			true
+		);
+
 		switch ( $style ) {
 			case 'sesolibre':
 				wp_enqueue_style(
@@ -725,7 +735,7 @@ class Plugin {
 				wp_enqueue_script(
 					'wp-tts-sesolibre-player',
 					WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
-					array( 'jquery' ),
+					array( 'wp-tts-player-core' ),
 					$this->version,
 					true
 				);
@@ -741,7 +751,7 @@ class Plugin {
 				wp_enqueue_script(
 					'wp-tts-minimal-player',
 					WP_TTS_PLUGIN_URL . 'assets/js/minimal-player.js',
-					array( 'jquery' ),
+					array( 'wp-tts-player-core' ),
 					$this->version,
 					true
 				);
@@ -757,7 +767,7 @@ class Plugin {
 				wp_enqueue_script(
 					'wp-tts-enhanced-sesolibre-player',
 					WP_TTS_PLUGIN_URL . 'assets/js/enhanced-sesolibre-player.js',
-					array( 'jquery' ),
+					array( 'wp-tts-player-core' ),
 					$this->version, // plugin version, NOT time(): time() defeated browser caching on every page view
 					true
 				);
@@ -813,10 +823,18 @@ class Plugin {
 			$this->version
 		);
 		
+		wp_register_script(
+			'wp-tts-player-core',
+			WP_TTS_PLUGIN_URL . 'assets/js/tts-player-core.js',
+			[],
+			$this->version,
+			true
+		);
+
 		wp_enqueue_script(
 			'wp-tts-player-admin',
 			WP_TTS_PLUGIN_URL . 'assets/js/tts-player.js',
-			[ 'jquery' ],
+			[ 'wp-tts-player-core' ],
 			$this->version,
 			true
 		);
@@ -940,7 +958,7 @@ class Plugin {
 		// Debug for troubleshooting - restricted to administrators to avoid leaking config
 		if ( isset($_GET['tts_debug']) && current_user_can('manage_options') ) {
 			$all_player_config = $this->config->get('player', []);
-			$wp_option_data = get_option('wp_tts_player_settings', 'NOT_FOUND');
+			$wp_option_data = get_option('wp_tts_config', 'NOT_FOUND');
 			$debug_info = "<!-- TTS DEBUG: auto_insert=" . ($auto_insert ? 'true' : 'false') . 
 			             ", full_player_config=" . print_r($all_player_config, true) . 
 			             ", wp_option_data=" . print_r($wp_option_data, true) . " -->";

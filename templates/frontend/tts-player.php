@@ -148,7 +148,7 @@ $player_id = 'tts-sesolibre-player-' . $post_id;
                 ▶
             </button>
             
-            <div class="tts-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="tts-progress" role="slider" tabindex="0" aria-label="<?php esc_attr_e('Posición de reproducción', 'tts-sesolibre'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                 <div class="tts-progress-bar"></div>
             </div>
             

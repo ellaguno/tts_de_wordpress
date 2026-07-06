@@ -92,25 +92,8 @@ class RoundRobinManager {
 
 		switch ( $provider ) {
 			case 'google':
-				$credentials_path = $config['providers']['google']['credentials_path'] ?? '';
-
-				// Check for default credentials file
-				if ( empty( $credentials_path ) ) {
-					$upload_dir = wp_upload_dir();
-					$default_path = $upload_dir['basedir'] . '/private/sesolibre-tts-13985ba22d36.json';
-					if ( file_exists( $default_path ) ) {
-						return true;
-					}
-				} else {
-					// Convert relative paths to absolute paths
-					if ( substr( $credentials_path, 0, 1 ) !== '/' && strpos( $credentials_path, ':' ) === false ) {
-						$credentials_path = ABSPATH . $credentials_path;
-					}
-					if ( file_exists( $credentials_path ) ) {
-						return true;
-					}
-				}
-				return false;
+				$configured = $config['providers']['google']['credentials_path'] ?? '';
+				return null !== \WP_TTS\Utils\GoogleCredentialsResolver::resolve( $configured );
 
 			case 'openai':
 				$api_key = $config['providers']['openai']['api_key'] ?? '';
