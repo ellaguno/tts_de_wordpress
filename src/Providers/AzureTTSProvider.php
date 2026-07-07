@@ -131,7 +131,7 @@ class AzureTTSProvider implements TTSProviderInterface {
 				'voice_id' => $voice_id ?? 'unknown'
 			] );
 			
-			throw new ProviderException( 'Azure TTS generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'Azure TTS generation failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -439,7 +439,7 @@ class AzureTTSProvider implements TTSProviderInterface {
 			$audio_data = $this->makeTTSRequest( $ssml, $access_token );
 
 			if ( ! $audio_data ) {
-				throw new ProviderException( "Azure TTS: Failed to generate audio for chunk " . ($index + 1) );
+				throw new ProviderException( esc_html( "Azure TTS: Failed to generate audio for chunk " . ($index + 1) ) );
 			}
 
 			$audio_chunks[] = $audio_data;

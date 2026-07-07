@@ -155,7 +155,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 			$this->logger->error( 'OpenAI TTS generation failed', [
 				'error' => $e->getMessage(),
 			] );
-			throw new ProviderException( 'OpenAI TTS generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'OpenAI TTS generation failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -192,7 +192,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 
 		if ( is_wp_error( $response ) ) {
 			$this->logger->error( 'OpenAI API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
-			throw new ProviderException( 'OpenAI API request failed: ' . $response->get_error_message() );
+			throw new ProviderException( esc_html( 'OpenAI API request failed: ' . $response->get_error_message() ) );
 		}
 
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -206,7 +206,7 @@ class OpenAITTSProvider implements TTSProviderInterface {
 				'error_message' => $error_message,
 				'chunk' => "{$chunk_number}/{$total_chunks}",
 			] );
-			throw new ProviderException( "OpenAI API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" );
+			throw new ProviderException( esc_html( "OpenAI API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" ) );
 		}
 
 		return $response_body;

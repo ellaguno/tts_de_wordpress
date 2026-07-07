@@ -177,7 +177,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			$this->logger->error( 'Amazon Polly TTS generation failed', [
 				'error' => $e->getMessage(),
 			] );
-			throw new ProviderException( 'Amazon Polly generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'Amazon Polly generation failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -229,7 +229,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 				$result = $pollyClient->synthesizeSpeech( $request_args );
 				
 				if ( ! isset( $result['AudioStream'] ) ) {
-					throw new ProviderException( "Amazon Polly: Invalid response for chunk " . ($index + 1) . ": No AudioStream" );
+					throw new ProviderException( esc_html( "Amazon Polly: Invalid response for chunk " . ($index + 1) . ": No AudioStream" ) );
 				}
 				
 				$audio_data = $result['AudioStream']->getContents();
@@ -264,7 +264,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			$this->logger->error( 'Amazon Polly chunked TTS generation failed', [
 				'error' => $e->getMessage(),
 			] );
-			throw new ProviderException( 'Amazon Polly chunked generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'Amazon Polly chunked generation failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -544,7 +544,7 @@ class AmazonPollyProvider implements TTSProviderInterface {
 			$response = $this->makePollyRequest( 'describe-voices', [] );
 			return isset( $response['Voices'] );
 		} catch ( \Exception $e ) {
-			throw new ProviderException( 'Amazon Polly connection test failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'Amazon Polly connection test failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -604,14 +604,14 @@ class AmazonPollyProvider implements TTSProviderInterface {
 				'aws_error_message' => $e->getAwsErrorMessage(),
 				'message' => $e->getMessage(),
 			]);
-			throw new ProviderException( "Amazon Polly API request for {$action} failed: " . $e->getAwsErrorMessage() );
+			throw new ProviderException( esc_html( "Amazon Polly API request for {$action} failed: " . $e->getAwsErrorMessage() ) );
 		} catch ( \Exception $e ) {
 			$this->logger->error( "[AmazonPollyProvider::makePollyRequest] Generic Exception for Polly action {$action}", [ 'message' => $e->getMessage() ]);
-			throw new ProviderException( "Amazon Polly request for {$action} failed: " . $e->getMessage() );
+			throw new ProviderException( esc_html( "Amazon Polly request for {$action} failed: " . $e->getMessage() ) );
 		}
 		
 		$this->logger->warn('[AmazonPollyProvider::makePollyRequest] Unknown or unhandled Polly action.', ['action' => $action]);
-		throw new ProviderException( 'Unknown or unhandled Polly action in makePollyRequest: ' . $action );
+		throw new ProviderException( esc_html( 'Unknown or unhandled Polly action in makePollyRequest: ' . $action ) );
 	}
 
 	/**

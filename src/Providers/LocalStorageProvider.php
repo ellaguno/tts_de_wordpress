@@ -75,12 +75,12 @@ class LocalStorageProvider implements SimpleStorageProviderInterface {
 		// Ensure directory exists
 		$directory = dirname( $full_path );
 		if ( ! wp_mkdir_p( $directory ) ) {
-			throw new ProviderException( "Failed to create directory: {$directory}" );
+			throw new ProviderException( esc_html( "Failed to create directory: {$directory}" ) );
 		}
 
 		// Save audio file
 		if ( file_put_contents( $full_path, $audio_data ) === false ) {
-			throw new ProviderException( "Failed to save audio file: {$full_path}" );
+			throw new ProviderException( esc_html( "Failed to save audio file: {$full_path}" ) );
 		}
 
 		// Get file info
@@ -109,7 +109,8 @@ class LocalStorageProvider implements SimpleStorageProviderInterface {
 		$file_path = $this->getFilePathFromIdentifier( $identifier );
 
 		if ( file_exists( $file_path ) ) {
-			return unlink( $file_path );
+			wp_delete_file( $file_path );
+			return ! file_exists( $file_path );
 		}
 
 		return true; // File doesn't exist, consider it deleted
@@ -196,7 +197,7 @@ class LocalStorageProvider implements SimpleStorageProviderInterface {
 		}
 
 		// Clean up test file
-		unlink( $test_file );
+		wp_delete_file( $test_file );
 
 		return true;
 	}
@@ -211,7 +212,7 @@ class LocalStorageProvider implements SimpleStorageProviderInterface {
 		$base_path = 'tts-audio';
 
 		// Add date-based subdirectory
-		$date_path = date( 'Y/m' );
+		$date_path = gmdate( 'Y/m' );
 
 		// sanitize_file_name() strips slashes and "..", so a crafted filename
 		// can never escape the tts-audio directory.

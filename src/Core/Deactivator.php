@@ -33,7 +33,7 @@ class Deactivator {
 		// Flush rewrite rules
 		flush_rewrite_rules();
 
-		error_log( 'WP TTS Plugin deactivated successfully' );
+		\WP_TTS\Utils\Logger::debugLog( 'WP TTS Plugin deactivated successfully' );
 	}
 
 	/**
@@ -84,6 +84,7 @@ class Deactivator {
 		global $wpdb;
 
 		// Clear plugin transients
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- transient cleanup on deactivation
 		$wpdb->query(
 			"DELETE FROM {$wpdb->options} 
              WHERE option_name LIKE '_transient_wp_tts_%' 
@@ -113,11 +114,29 @@ class Deactivator {
 		$files = glob( $dir . '/*' );
 		foreach ( $files as $file ) {
 			if ( is_file( $file ) ) {
-				unlink( $file );
+				wp_delete_file( $file );
 			} elseif ( is_dir( $file ) ) {
 				self::deleteDirectoryContents( $file );
-				rmdir( $file );
+				self::removeDirectory( $file );
 			}
+		}
+	}
+
+	/**
+	 * Remove an (empty) directory via WP_Filesystem
+	 *
+	 * @param string $dir Directory path
+	 */
+	private static function removeDirectory( string $dir ): void {
+		global $wp_filesystem;
+
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( $wp_filesystem ) {
+			$wp_filesystem->rmdir( $dir );
 		}
 	}
 
@@ -137,7 +156,7 @@ class Deactivator {
 
 		foreach ( $files as $file ) {
 			if ( is_file( $file ) && filemtime( $file ) < $cutoff_time ) {
-				unlink( $file );
+				wp_delete_file( $file );
 			}
 		}
 	}
@@ -190,6 +209,7 @@ class Deactivator {
 		}
 
 		// Remove post meta (optional)
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- meta cleanup on uninstall
 		$wpdb->query(
 			"DELETE FROM {$wpdb->postmeta} 
              WHERE meta_key LIKE '_tts_%'"
@@ -197,7 +217,10 @@ class Deactivator {
 
 		// Drop custom tables if they exist
 		$table_name = $wpdb->prefix . 'tts_analytics';
-		$wpdb->query( "DROP TABLE IF EXISTS {$table_name}" );
+		// Table name is internal prefix + fixed literal (never user input);
+		// the schema change is intentional uninstall cleanup.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( 'DROP TABLE IF EXISTS `' . esc_sql( $table_name ) . '`' );
 	}
 
 	/**
@@ -216,6 +239,7 @@ class Deactivator {
 		if ( $admin_email ) {
 			$subject = __( 'Plugin TTS de WordPress Desactivado', 'tts-sesolibre' );
 			$message = sprintf(
+				/* translators: 1: site name, 2: date/time of deactivation */
 				__( 'El Plugin TTS de WordPress ha sido desactivado en %1$s el %2$s.', 'tts-sesolibre' ),
 				get_bloginfo( 'name' ),
 				current_time( 'mysql' )
@@ -242,7 +266,7 @@ class Deactivator {
 
 		// Log to file if debug is enabled
 		if ( WP_DEBUG_LOG ) {
-			error_log( 'WP TTS Plugin Deactivation: ' . json_encode( $log_data ) );
+			\WP_TTS\Utils\Logger::debugLog( 'WP TTS Plugin Deactivation: ' . json_encode( $log_data ) );
 		}
 	}
 
@@ -343,7 +367,7 @@ class Deactivator {
 			$tts_dir    = $upload_dir['basedir'] . '/tts-audio';
 			if ( is_dir( $tts_dir ) ) {
 				self::deleteDirectoryContents( $tts_dir );
-				rmdir( $tts_dir );
+				self::removeDirectory( $tts_dir );
 			}
 		}
 

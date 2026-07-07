@@ -189,7 +189,7 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 
 				if ( empty( $chunk_audio ) ) {
 					$client->close();
-					throw new ProviderException( 'Google Cloud TTS: empty audio for chunk ' . ( $index + 1 ) . '/' . count( $chunks ) );
+					throw new ProviderException( esc_html( 'Google Cloud TTS: empty audio for chunk ' . ( $index + 1 ) . '/' . count( $chunks ) ) );
 				}
 
 				$audio_chunks[] = $chunk_audio;
@@ -225,7 +225,7 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 			$this->logger->error( 'Google Cloud TTS generation failed', [
 				'error' => $e->getMessage(),
 			] );
-			throw new ProviderException( 'Google Cloud TTS generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'Google Cloud TTS generation failed: ' . $e->getMessage() ) );
 		}
 	}
 

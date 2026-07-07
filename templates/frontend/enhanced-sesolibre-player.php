@@ -95,7 +95,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
 
 <style>
 /* Enhanced SesoLibre Player Custom Styles */
-#<?php echo $player_id; ?> {
+#<?php echo esc_attr($player_id); ?> {
     --play-icon-color: <?php echo esc_html($play_icon_color); ?>;
     --pause-icon-color: <?php echo esc_html($pause_icon_color); ?>;
     --progress-color: <?php echo esc_html($progress_color); ?>;
@@ -111,7 +111,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
 </style>
 
 <div class="tts-enhanced-sesolibre-player" 
-     id="<?php echo $player_id; ?>"
+     id="<?php echo esc_attr($player_id); ?>"
      data-main-audio="<?php echo esc_attr($main_audio_url); ?>"
      data-intro-audio="<?php echo esc_attr($intro_url); ?>"
      data-background-audio="<?php echo esc_attr($background_url); ?>"
@@ -192,7 +192,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
                         <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path>
                     </svg>
                     <input type="range" 
-                           id="tts-voice-volume-<?php echo $post_id; ?>"
+                           id="tts-voice-volume-<?php echo esc_attr($post_id); ?>"
                            class="tts-volume-slider-compact tts-voice-slider" 
                            min="0" max="1" step="0.1" value="1"
                            aria-label="<?php esc_attr_e('Volumen de Voz', 'tts-sesolibre'); ?>">
@@ -205,7 +205,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
                         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
                     </svg>
                     <input type="range" 
-                           id="tts-background-volume-<?php echo $post_id; ?>"
+                           id="tts-background-volume-<?php echo esc_attr($post_id); ?>"
                            class="tts-volume-slider-compact tts-background-slider" 
                            min="0" max="1" step="0.1" 
                            value="<?php echo esc_attr($background_volume); ?>"
@@ -233,7 +233,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
         <?php if ($show_download_link): ?>
             <a href="<?php echo esc_url($main_audio_url); ?>" download class="tts-download-compact">
                 <span class="tts-headphones">🎧</span>
-                <?php _e('Descargar', 'tts-sesolibre'); ?>
+                <?php esc_html_e('Descargar', 'tts-sesolibre'); ?>
             </a>
         <?php endif; ?>
     </div>
@@ -243,7 +243,7 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
     <div class="tts-status-container">
         <div class="tts-loading" style="display: none;">
             <div class="loading-spinner"></div>
-            <span><?php _e('Cargando audio...', 'tts-sesolibre'); ?></span>
+            <span><?php esc_html_e('Cargando audio...', 'tts-sesolibre'); ?></span>
         </div>
         <div class="tts-error-container"></div>
     </div>
@@ -254,13 +254,13 @@ $player_id = 'tts-enhanced-sesolibre-player-' . $post_id;
     <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
     </svg>
-    <?php _e('Reproduciendo archivo de audio personalizado', 'tts-sesolibre'); ?>
+    <?php esc_html_e('Reproduciendo archivo de audio personalizado', 'tts-sesolibre'); ?>
 </p>
 <?php endif; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const playerId = '<?php echo $player_id; ?>';
+    const playerId = '<?php echo esc_js($player_id); ?>';
     const playerContainer = document.getElementById(playerId);
     
     if (playerContainer && !playerContainer.classList.contains('initialized')) {

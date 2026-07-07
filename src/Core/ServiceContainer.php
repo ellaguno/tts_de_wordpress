@@ -68,7 +68,7 @@ class ServiceContainer {
 
 		// Check if service is defined
 		if ( ! isset( $this->services[ $name ] ) ) {
-			throw new \InvalidArgumentException( "Service '{$name}' is not defined" );
+			throw new \InvalidArgumentException( esc_html( "Service '{$name}' is not defined" ) );
 		}
 
 		$definition = $this->services[ $name ];
@@ -81,7 +81,7 @@ class ServiceContainer {
 		} elseif ( is_string( $definition ) && class_exists( $definition ) ) {
 			$instance = new $definition();
 		} else {
-			throw new \InvalidArgumentException( "Invalid service definition for '{$name}'" );
+			throw new \InvalidArgumentException( esc_html( "Invalid service definition for '{$name}'" ) );
 		}
 
 		// Cache instance if it's a singleton
@@ -176,7 +176,7 @@ class ServiceContainer {
 		$reflection = new \ReflectionClass( $className );
 
 		if ( ! $reflection->isInstantiable() ) {
-			throw new \InvalidArgumentException( "Class '{$className}' is not instantiable" );
+			throw new \InvalidArgumentException( esc_html( "Class '{$className}' is not instantiable" ) );
 		}
 
 		$constructor = $reflection->getConstructor();

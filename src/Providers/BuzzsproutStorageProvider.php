@@ -106,10 +106,10 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		try {
 			$result = $this->uploadFile( $temp_file, $filename, $metadata );
-			unlink( $temp_file ); // Clean up temp file
+			wp_delete_file( $temp_file ); // Clean up temp file
 			return $result;
 		} catch ( \Exception $e ) {
-			unlink( $temp_file ); // Clean up temp file on error
+			wp_delete_file( $temp_file ); // Clean up temp file on error
 			throw $e;
 		}
 	}
@@ -129,7 +129,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		}
 
 		if ( ! file_exists( $file_path ) ) {
-			throw new StorageException( 'File does not exist: ' . $file_path );
+			throw new StorageException( esc_html( 'File does not exist: ' . $file_path ) );
 		}
 
 		$this->log( 'info', 'Starting Buzzsprout file upload', [
@@ -203,7 +203,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 					'title' => $response['title'] ?? $upload_data['title'],
 					'duration' => $response['duration'] ?? 0,
 					'file_size' => $response['file_size'] ?? filesize( $file_path ),
-					'uploaded_at' => date( 'Y-m-d H:i:s' ),
+					'uploaded_at' => gmdate( 'Y-m-d H:i:s' ),
 				],
 			];
 
@@ -212,7 +212,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 				'error' => $e->getMessage(),
 				'file_path' => $file_path,
 			] );
-			throw new StorageException( 'Buzzsprout upload failed: ' . $e->getMessage() );
+			throw new StorageException( esc_html( 'Buzzsprout upload failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -234,20 +234,14 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 
 		// Fallback to system temp directory
 		$temp_dir = sys_get_temp_dir();
-		if ( ! $temp_dir || ! is_writable( $temp_dir ) ) {
+		if ( ! $temp_dir || ! wp_is_writable( $temp_dir ) ) {
 			// Try WordPress uploads temp if system temp not available
 			$upload_dir = function_exists( 'wp_upload_dir' ) ? wp_upload_dir() : null;
 			if ( $upload_dir && ! empty( $upload_dir['basedir'] ) ) {
 				$temp_dir = $upload_dir['basedir'] . '/tmp';
-				if ( ! file_exists( $temp_dir ) ) {
-					if ( function_exists( 'wp_mkdir_p' ) ) {
-						wp_mkdir_p( $temp_dir );
-					} else {
-						// Fallback to native PHP
-						if ( ! mkdir( $temp_dir, 0755, true ) ) {
-							throw new \Exception( 'Cannot create temporary directory: ' . $temp_dir );
-						}
-					}
+				// wp_mkdir_p always exists here: this code runs inside WordPress.
+				if ( ! file_exists( $temp_dir ) && ! wp_mkdir_p( $temp_dir ) ) {
+					throw new \Exception( esc_html( 'Cannot create temporary directory: ' . $temp_dir ) );
 				}
 			} else {
 				throw new \Exception( 'No writable temporary directory available for Buzzsprout upload' );
@@ -260,7 +254,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		
 		// Test if we can write to the temp file
 		if ( file_put_contents( $temp_file, '' ) === false ) {
-			throw new \Exception( 'Cannot create temporary file for Buzzsprout upload: ' . $temp_file );
+			throw new \Exception( esc_html( 'Cannot create temporary file for Buzzsprout upload: ' . $temp_file ) );
 		}
 
 		return $temp_file;
@@ -333,7 +327,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 				'error' => $e->getMessage(),
 				'file_url' => $file_url,
 			] );
-			throw new StorageException( 'Buzzsprout deletion failed: ' . $e->getMessage() );
+			throw new StorageException( esc_html( 'Buzzsprout deletion failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -423,7 +417,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			$response = $this->getPodcastInfo();
 			return isset( $response['id'] );
 		} catch ( \Exception $e ) {
-			throw new StorageException( 'Buzzsprout connection test failed: ' . $e->getMessage() );
+			throw new StorageException( esc_html( 'Buzzsprout connection test failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -477,20 +471,12 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'podcast_id' => $this->credentials['podcast_id']
 		] );
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, $this->api_base_url . '/' . $this->credentials['podcast_id'] . '/episodes.json' );
-		curl_setopt( $ch, CURLOPT_POST, true );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, [
-			'Authorization: Token token=' . $this->credentials['api_token']
-		] );
-		// Prepare POST fields
+		// Text POST fields
 		$post_fields = [
 			'title' => $upload_data['title'],
 			'description' => $upload_data['description'],
 			'published' => $upload_data['published'] ? 'true' : 'false',
 			'private' => $upload_data['private'] ? 'true' : 'false',
-			'audio_file' => new \CURLFile( $file_path, 'audio/mpeg', $filename )
 		];
 
 		// Include the optional episode fields that uploadFile() prepared. These
@@ -510,26 +496,55 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 		if ( ! empty( $upload_data['artwork_url'] ) ) {
 			$post_fields['artwork_url'] = $upload_data['artwork_url'];
 		}
-		
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields );
-		curl_setopt( $ch, CURLOPT_TIMEOUT, 120 ); // 2 minutes timeout for upload
-		curl_setopt( $ch, CURLOPT_VERBOSE, false );
 
-		$response = curl_exec( $ch );
-		$http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-		$curl_error = curl_error( $ch );
-		$upload_info = curl_getinfo( $ch );
-		curl_close( $ch );
+		$audio_contents = file_get_contents( $file_path );
+		if ( false === $audio_contents ) {
+			throw new StorageException( 'BuzzSprout: could not read temporary audio file' );
+		}
+
+		// wp_remote_post() has no native file-upload support, so build the
+		// multipart/form-data body by hand (replaces the previous raw cURL +
+		// CURLFile implementation flagged by Plugin Check).
+		$boundary = 'wpTts' . wp_generate_password( 24, false );
+		$safe_name = str_replace( array( '"', "\r", "\n" ), '', $filename );
+
+		$payload = '';
+		foreach ( $post_fields as $name => $value ) {
+			$payload .= "--{$boundary}\r\n";
+			$payload .= "Content-Disposition: form-data; name=\"{$name}\"\r\n\r\n";
+			$payload .= $value . "\r\n";
+		}
+		$payload .= "--{$boundary}\r\n";
+		$payload .= "Content-Disposition: form-data; name=\"audio_file\"; filename=\"{$safe_name}\"\r\n";
+		$payload .= "Content-Type: audio/mpeg\r\n\r\n";
+		$payload .= $audio_contents . "\r\n";
+		$payload .= "--{$boundary}--\r\n";
+
+		$start_time = microtime( true );
+		$http_response = wp_remote_post(
+			$this->api_base_url . '/' . $this->credentials['podcast_id'] . '/episodes.json',
+			[
+				'headers' => [
+					'Authorization' => 'Token token=' . $this->credentials['api_token'],
+					'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
+				],
+				'body'    => $payload,
+				'timeout' => 120, // 2 minutes timeout for upload
+			]
+		);
+
+		if ( is_wp_error( $http_response ) ) {
+			throw new StorageException( esc_html( 'BuzzSprout request error: ' . $http_response->get_error_message() ) );
+		}
+
+		$http_code = wp_remote_retrieve_response_code( $http_response );
+		$response = wp_remote_retrieve_body( $http_response );
 
 		$this->log( 'info', 'BuzzSprout: API response received', [
 			'http_code' => $http_code,
-			'upload_time' => round( $upload_info['total_time'], 2 ),
+			'upload_time' => round( microtime( true ) - $start_time, 2 ),
 			'response_length' => strlen( $response )
 		] );
-
-		if ( ! empty( $curl_error ) ) {
-			throw new StorageException( 'BuzzSprout cURL error: ' . $curl_error );
-		}
 
 		if ( $http_code === 201 ) {
 			$episode_data = json_decode( $response, true );
@@ -550,9 +565,9 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			if ( $error_data ) {
 				$error_msg .= ' - ' . json_encode( $error_data );
 			}
-			throw new StorageException( $error_msg );
+			throw new StorageException( esc_html( $error_msg ) );
 		} else {
-			throw new StorageException( "BuzzSprout: HTTP error $http_code - $response" );
+			throw new StorageException( esc_html( "BuzzSprout: HTTP error $http_code - $response" ) );
 		}
 	}
 
@@ -581,7 +596,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			'audio_url' => 'https://www.buzzsprout.com/episodes/' . $episode_id . '.mp3',
 			'duration' => 120,
 			'file_size' => 1024000,
-			'published_at' => date( 'Y-m-d\TH:i:s\Z' ),
+			'published_at' => gmdate( 'Y-m-d\TH:i:s\Z' ),
 		];
 	}
 
@@ -843,7 +858,7 @@ class BuzzsproutStorageProvider implements SimpleStorageProviderInterface {
 			$this->logger->{$level}( $message, $context );
 		} else {
 			$context_str = empty( $context ) ? '' : ' ' . json_encode( $context );
-			error_log( "[BuzzSprout {$level}] {$message}{$context_str}" );
+			\WP_TTS\Utils\Logger::debugLog( "[BuzzSprout {$level}] {$message}{$context_str}" );
 		}
 	}
 }

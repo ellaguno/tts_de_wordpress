@@ -273,7 +273,7 @@ class Plugin {
 			$audio_url   = $tts_data['audio']['url'];
 			$status      = $tts_data['audio']['status'];
 			
-			error_log("[Plugin] renderTTSMetaBox for post {$post->ID}: enabled=" . ($enabled ? 'true' : 'false'));
+			\WP_TTS\Utils\Logger::debugLog("[Plugin] renderTTSMetaBox for post {$post->ID}: enabled=" . ($enabled ? 'true' : 'false'));
 		} else {
 			// Fallback to old system
 			$enabled     = (bool) get_post_meta( $post->ID, '_tts_enabled', true );
@@ -291,7 +291,7 @@ class Plugin {
 		// If no provider is set, use default provider
 		if ( empty( $provider ) && ! empty( $defaults['default_provider'] ) ) {
 			$provider = $defaults['default_provider'];
-			error_log("[Plugin] Using default provider: {$provider}");
+			\WP_TTS\Utils\Logger::debugLog("[Plugin] Using default provider: {$provider}");
 		}
 		
 		// If no voice is set and we have a provider, use the provider's default voice
@@ -299,7 +299,7 @@ class Plugin {
 			$provider_config = $config->getProviderConfig( $provider );
 			if ( ! empty( $provider_config['default_voice'] ) ) {
 				$voice_id = $provider_config['default_voice'];
-				error_log("[Plugin] Using default voice for {$provider}: {$voice_id}");
+				\WP_TTS\Utils\Logger::debugLog("[Plugin] Using default voice for {$provider}: {$voice_id}");
 			}
 		}
 
@@ -335,17 +335,17 @@ class Plugin {
 		$enabled = isset( $_POST['tts_enabled'] ) ? true : false;
 		
 		// Debug: Log what we're receiving from the form
-		error_log("[Plugin] Saving TTS settings for post $post_id");
-		error_log("[Plugin] tts_enabled: " . ($enabled ? 'true' : 'false'));
-		error_log("[Plugin] tts_voice_provider: " . ($_POST['tts_voice_provider'] ?? 'NOT SET'));
-		error_log("[Plugin] tts_voice_id: " . ($_POST['tts_voice_id'] ?? 'NOT SET'));
-		error_log("[Plugin] POST data: " . print_r($_POST, true));
+		\WP_TTS\Utils\Logger::debugLog("[Plugin] Saving TTS settings for post $post_id");
+		\WP_TTS\Utils\Logger::debugLog("[Plugin] tts_enabled: " . ($enabled ? 'true' : 'false'));
+		\WP_TTS\Utils\Logger::debugLog("[Plugin] tts_voice_provider: " . ($_POST['tts_voice_provider'] ?? 'NOT SET'));
+		\WP_TTS\Utils\Logger::debugLog("[Plugin] tts_voice_id: " . ($_POST['tts_voice_id'] ?? 'NOT SET'));
+		\WP_TTS\Utils\Logger::debugLog("[Plugin] POST data: " . wp_json_encode( $_POST ));
 		
 		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
 			// Use unified system
-			error_log("[Plugin] Setting TTS enabled to: " . ($enabled ? 'true' : 'false'));
+			\WP_TTS\Utils\Logger::debugLog("[Plugin] Setting TTS enabled to: " . ($enabled ? 'true' : 'false'));
 			$enabled_result = \WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, $enabled );
-			error_log("[Plugin] setTTSEnabled result: " . ($enabled_result ? 'SUCCESS' : 'FAILED'));
+			\WP_TTS\Utils\Logger::debugLog("[Plugin] setTTSEnabled result: " . ($enabled_result ? 'SUCCESS' : 'FAILED'));
 
 			if ( isset( $_POST['tts_voice_provider'] ) ) {
 				$provider = $security->sanitizeInput( $_POST['tts_voice_provider'] );
@@ -353,15 +353,15 @@ class Plugin {
 				if ( isset( $_POST['tts_voice_id'] ) ) {
 					$voice_id = $security->sanitizeInput( $_POST['tts_voice_id'] );
 				}
-				error_log("[Plugin] Saving voice config - provider: '$provider', voice_id: '$voice_id'");
+				\WP_TTS\Utils\Logger::debugLog("[Plugin] Saving voice config - provider: '$provider', voice_id: '$voice_id'");
 				$voice_result = \WP_TTS\Utils\TTSMetaManager::setVoiceConfig( $post_id, $provider, $voice_id );
-				error_log("[Plugin] setVoiceConfig result: " . ($voice_result ? 'SUCCESS' : 'FAILED'));
+				\WP_TTS\Utils\Logger::debugLog("[Plugin] setVoiceConfig result: " . ($voice_result ? 'SUCCESS' : 'FAILED'));
 				
 				// Immediately verify what was saved
 				$verify_config = \WP_TTS\Utils\TTSMetaManager::getVoiceConfig( $post_id );
-				error_log("[Plugin] Verification - saved voice config: " . print_r($verify_config, true));
+				\WP_TTS\Utils\Logger::debugLog("[Plugin] Verification - saved voice config: " . wp_json_encode( $verify_config ));
 			} else {
-				error_log("[Plugin] tts_voice_provider not set in POST data");
+				\WP_TTS\Utils\Logger::debugLog("[Plugin] tts_voice_provider not set in POST data");
 			}
 
 			if ( isset( $_POST['tts_custom_text'] ) ) {
@@ -416,7 +416,7 @@ class Plugin {
 	 */
 	public function handleGenerateAudio(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_generate_audio' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_generate_audio' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
@@ -492,12 +492,12 @@ class Plugin {
 	public function handleValidateProvider(): void {
 		// Verify nonce and permissions. The JS (admin.js) sends wpTtsAdmin.nonce,
 		// which is created for the 'wp_tts_admin' action.
-		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'wp_tts_admin' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_admin' ) ||
 			! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
+			wp_die( esc_html__( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
 		}
 
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+		$provider = sanitize_text_field( wp_unslash( $_POST['provider'] ?? ''  ));
 
 		try {
 			$tts_service = $this->container->get( 'tts_service' );
@@ -526,7 +526,7 @@ class Plugin {
 	 */
 	public function handleGetVoicesForMetaBox(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_admin' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_admin' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
@@ -534,7 +534,7 @@ class Plugin {
 			return;
 		}
 
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+		$provider = sanitize_text_field( wp_unslash( $_POST['provider'] ?? ''  ));
 
 		try {
 			$tts_service = $this->container->get( 'tts_service' );
@@ -564,15 +564,15 @@ class Plugin {
 	 */
 	public function handleDeleteAudio(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_delete_audio' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_delete_audio' ) ||
 			! current_user_can( 'edit_posts' ) ) {
-			wp_die( __( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
+			wp_die( esc_html__( 'Falló la verificación de seguridad', 'tts-sesolibre' ) );
 		}
 
 		$post_id = intval( $_POST['post_id'] );
 
 		if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-			wp_die( __( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' ) );
+			wp_die( esc_html__( 'No tienes permiso para editar esta entrada', 'tts-sesolibre' ) );
 		}
 
 		try {
@@ -594,7 +594,7 @@ class Plugin {
 				$real_file = realpath( $file_path );
 				$real_base = realpath( $upload_dir['basedir'] );
 				if ( $real_file && $real_base && strpos( $real_file, $real_base . DIRECTORY_SEPARATOR ) === 0 ) {
-					unlink( $real_file );
+					wp_delete_file( $real_file );
 					$this->container->get( 'logger' )->info( 'Audio file deleted', [
 						'post_id' => $post_id,
 						'file_path' => $real_file
@@ -960,8 +960,8 @@ class Plugin {
 			$all_player_config = $this->config->get('player', []);
 			$wp_option_data = get_option('wp_tts_config', 'NOT_FOUND');
 			$debug_info = "<!-- TTS DEBUG: auto_insert=" . ($auto_insert ? 'true' : 'false') . 
-			             ", full_player_config=" . print_r($all_player_config, true) . 
-			             ", wp_option_data=" . print_r($wp_option_data, true) . " -->";
+			             ", full_player_config=" . wp_json_encode( $all_player_config ) . 
+			             ", wp_option_data=" . wp_json_encode( $wp_option_data ) . " -->";
 			$content = $debug_info . $content;
 		}
 		
@@ -1101,7 +1101,7 @@ class Plugin {
 	 */
 	public function handleAutoSaveEnabled(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
@@ -1170,7 +1170,7 @@ class Plugin {
 	 */
 	public function handleAutoSaveProvider(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
@@ -1179,7 +1179,7 @@ class Plugin {
 		}
 
 		$post_id = intval( $_POST['post_id'] );
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
+		$provider = sanitize_text_field( wp_unslash( $_POST['provider'] ?? ''  ));
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
@@ -1234,7 +1234,7 @@ class Plugin {
 	 */
 	public function handleAutoSaveVoice(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )
@@ -1243,8 +1243,8 @@ class Plugin {
 		}
 
 		$post_id = intval( $_POST['post_id'] );
-		$provider = sanitize_text_field( $_POST['provider'] ?? '' );
-		$voice_id = sanitize_text_field( $_POST['voice_id'] ?? '' );
+		$provider = sanitize_text_field( wp_unslash( $_POST['provider'] ?? ''  ));
+		$voice_id = sanitize_text_field( wp_unslash( $_POST['voice_id'] ?? ''  ));
 
 		if ( ! $post_id ) {
 			wp_send_json_error( [
@@ -1298,7 +1298,7 @@ class Plugin {
 	 */
 	public function handleLoadDefaultAssets(): void {
 		// Verify nonce and permissions
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'wp_tts_auto_save' ) ||
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_tts_auto_save' ) ||
 			! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Falló la verificación de seguridad', 'tts-sesolibre' )

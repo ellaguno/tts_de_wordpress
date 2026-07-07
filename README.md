@@ -1,4 +1,4 @@
-# WordPress TTS Plugin
+# TTS SesoLibre
 
 Un plugin avanzado de Text-to-Speech (TTS) para WordPress que soporta múltiples proveedores de TTS y almacenamiento en la nube.
 

@@ -85,7 +85,7 @@ class TextChunker {
 		}
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( '[TextChunker] Split ' . strlen( $text ) . " bytes into " . count( $chunks ) . " chunks for {$provider} (limit {$limit})" );
+			\WP_TTS\Utils\Logger::debugLog( '[TextChunker] Split ' . strlen( $text ) . " bytes into " . count( $chunks ) . " chunks for {$provider} (limit {$limit})" );
 		}
 
 		return $chunks;

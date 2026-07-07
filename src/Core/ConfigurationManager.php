@@ -212,7 +212,7 @@ class ConfigurationManager {
 			'round_robin'   => array(
 				'current_provider' => $this->defaults['defaults']['default_provider'],
 				'usage_count'      => array(),
-				'last_reset'       => date( 'Y-m-01' ), // First day of current month
+				'last_reset'       => gmdate( 'Y-m-01' ), // First day of current month
 				'failed_providers' => array(),
 			),
 			'cache'         => $this->defaults['cache'],
@@ -341,7 +341,7 @@ class ConfigurationManager {
 		
 		// Ensure storage is an array
 		if ( ! is_array( $storage ) ) {
-			error_log( "[ConfigurationManager] getEnabledStorageProviders() storage is not array: " . gettype( $storage ) );
+			\WP_TTS\Utils\Logger::debugLog( "[ConfigurationManager] getEnabledStorageProviders() storage is not array: " . gettype( $storage ) );
 			return array();
 		}
 		
@@ -366,7 +366,7 @@ class ConfigurationManager {
 		
 		// Ensure we always return an array
 		if ( ! is_array( $defaults ) ) {
-			error_log( "[ConfigurationManager] getDefaults() returned non-array: " . gettype( $defaults ) );
+			\WP_TTS\Utils\Logger::debugLog( "[ConfigurationManager] getDefaults() returned non-array: " . gettype( $defaults ) );
 			return $this->defaults['defaults'];
 		}
 		

@@ -98,40 +98,40 @@ class TTSMetaManager {
      */
     public static function saveTTSData(int $post_id, array $data): bool {
         // Log the operation start
-        error_log("[TTSMetaManager] Starting saveTTSData for post $post_id");
-        error_log("[TTSMetaManager] Input data: " . print_r($data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Starting saveTTSData for post $post_id");
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Input data: " . wp_json_encode( $data ));
         
         try {
             // Ensure we have the current timestamp
             $data['updated_at'] = current_time('mysql');
-            error_log("[TTSMetaManager] Added timestamp: " . $data['updated_at']);
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Added timestamp: " . $data['updated_at']);
             
             // Validate and sanitize data
             $data = self::validateAndSanitizeData($data);
-            error_log("[TTSMetaManager] Data after validation: " . print_r($data, true));
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Data after validation: " . wp_json_encode( $data ));
             
             // Try to save
-            error_log("[TTSMetaManager] Attempting update_post_meta with meta_key: " . self::META_KEY);
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Attempting update_post_meta with meta_key: " . self::META_KEY);
             $result = update_post_meta($post_id, self::META_KEY, $data);
-            error_log("[TTSMetaManager] update_post_meta result: " . ($result ? 'SUCCESS' : 'FAILED'));
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] update_post_meta result: " . ($result ? 'SUCCESS' : 'FAILED'));
             
             // Verify it was saved
             $saved_data = get_post_meta($post_id, self::META_KEY, true);
             if ($saved_data) {
-                error_log("[TTSMetaManager] Verification: Data was saved successfully");
+                \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Verification: Data was saved successfully");
             } else {
-                error_log("[TTSMetaManager] Verification: Data was NOT saved!");
+                \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Verification: Data was NOT saved!");
             }
             
             return $result;
             
         } catch (\Exception $e) {
-            error_log("[TTSMetaManager] Exception in saveTTSData: " . $e->getMessage());
-            error_log("[TTSMetaManager] Exception trace: " . $e->getTraceAsString());
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Exception in saveTTSData: " . $e->getMessage());
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Exception trace: " . $e->getTraceAsString());
             return false;
         } catch (\Error $e) {
-            error_log("[TTSMetaManager] Fatal error in saveTTSData: " . $e->getMessage());
-            error_log("[TTSMetaManager] Error trace: " . $e->getTraceAsString());
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Fatal error in saveTTSData: " . $e->getMessage());
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Error trace: " . $e->getTraceAsString());
             return false;
         }
     }
@@ -145,30 +145,30 @@ class TTSMetaManager {
      * @return bool Success
      */
     public static function updateTTSSection(int $post_id, string $section, array $section_data): bool {
-        error_log("[TTSMetaManager] Starting updateTTSSection for post $post_id, section: $section");
-        error_log("[TTSMetaManager] Section data: " . print_r($section_data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Starting updateTTSSection for post $post_id, section: $section");
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Section data: " . wp_json_encode( $section_data ));
         
         $current_data = self::getTTSData($post_id);
-        error_log("[TTSMetaManager] Current data: " . print_r($current_data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Current data: " . wp_json_encode( $current_data ));
         
         if (!isset($current_data[$section])) {
-            error_log("[TTSMetaManager] Section '$section' not found in current data structure");
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Section '$section' not found in current data structure");
             // Initialize with defaults if section doesn't exist
             $defaults = self::getDefaultData();
             if (isset($defaults[$section])) {
                 $current_data[$section] = $defaults[$section];
-                error_log("[TTSMetaManager] Initialized section '$section' with defaults");
+                \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Initialized section '$section' with defaults");
             } else {
-                error_log("[TTSMetaManager] Section '$section' not found in defaults either - cannot proceed");
+                \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Section '$section' not found in defaults either - cannot proceed");
                 return false;
             }
         }
         
         $current_data[$section] = array_merge($current_data[$section], $section_data);
-        error_log("[TTSMetaManager] Data after merge: " . print_r($current_data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Data after merge: " . wp_json_encode( $current_data ));
         
         $result = self::saveTTSData($post_id, $current_data);
-        error_log("[TTSMetaManager] updateTTSSection save result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] updateTTSSection save result: " . ($result ? 'SUCCESS' : 'FAILED'));
         
         return $result;
     }
@@ -192,15 +192,15 @@ class TTSMetaManager {
      * @return bool Success
      */
     public static function setTTSEnabled(int $post_id, bool $enabled): bool {
-        error_log("[TTSMetaManager] setTTSEnabled called for post $post_id, enabled: " . ($enabled ? 'true' : 'false'));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] setTTSEnabled called for post $post_id, enabled: " . ($enabled ? 'true' : 'false'));
         
         $data = self::getTTSData($post_id);
-        error_log("[TTSMetaManager] Current data before setting enabled: " . print_r($data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Current data before setting enabled: " . wp_json_encode( $data ));
         
         $data['enabled'] = $enabled;
         
         $result = self::saveTTSData($post_id, $data);
-        error_log("[TTSMetaManager] setTTSEnabled save result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] setTTSEnabled save result: " . ($result ? 'SUCCESS' : 'FAILED'));
         
         return $result;
     }
@@ -255,8 +255,8 @@ class TTSMetaManager {
      * @return bool Success
      */
     public static function setVoiceConfig(int $post_id, string $provider, string $voice_id = '', string $language = 'es-MX'): bool {
-        error_log("[TTSMetaManager] setVoiceConfig called for post $post_id");
-        error_log("[TTSMetaManager] provider: '$provider', voice_id: '$voice_id', language: '$language'");
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] setVoiceConfig called for post $post_id");
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] provider: '$provider', voice_id: '$voice_id', language: '$language'");
         
         $voice_data = [
             'provider' => $provider,
@@ -266,10 +266,10 @@ class TTSMetaManager {
         
         // Ensure we have valid data structure first
         $current_data = self::getTTSData($post_id);
-        error_log("[TTSMetaManager] Current data before voice config: " . print_r($current_data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Current data before voice config: " . wp_json_encode( $current_data ));
         
         $result = self::updateTTSSection($post_id, 'voice', $voice_data);
-        error_log("[TTSMetaManager] setVoiceConfig result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] setVoiceConfig result: " . ($result ? 'SUCCESS' : 'FAILED'));
         
         return $result;
     }
@@ -374,16 +374,16 @@ class TTSMetaManager {
      * @return array Sanitized data
      */
     private static function validateAndSanitizeData(array $data): array {
-        error_log("[TTSMetaManager] Starting validateAndSanitizeData");
-        error_log("[TTSMetaManager] Input data for validation: " . print_r($data, true));
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Starting validateAndSanitizeData");
+        \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Input data for validation: " . wp_json_encode( $data ));
         
         try {
             $defaults = self::getDefaultData();
-            error_log("[TTSMetaManager] Default data structure: " . print_r($defaults, true));
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Default data structure: " . wp_json_encode( $defaults ));
             
             // Ensure all required keys exist - use array_merge, not array_merge_recursive
             $data = array_replace_recursive($defaults, $data);
-            error_log("[TTSMetaManager] Data after merge with defaults: " . print_r($data, true));
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Data after merge with defaults: " . wp_json_encode( $data ));
             
             // Sanitize specific fields
             $data['enabled'] = (bool) ($data['enabled'] ?? false);
@@ -403,11 +403,11 @@ class TTSMetaManager {
             $data['stats']['generation_time_ms'] = max(0, intval($data['stats']['generation_time_ms'] ?? 0));
             $data['stats']['cost_estimate'] = max(0, floatval($data['stats']['cost_estimate'] ?? 0));
             
-            error_log("[TTSMetaManager] Final sanitized data: " . print_r($data, true));
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Final sanitized data: " . wp_json_encode( $data ));
             return $data;
             
         } catch (\Exception $e) {
-            error_log("[TTSMetaManager] Exception in validateAndSanitizeData: " . $e->getMessage());
+            \WP_TTS\Utils\Logger::debugLog("[TTSMetaManager] Exception in validateAndSanitizeData: " . $e->getMessage());
             throw $e;
         }
     }
@@ -464,14 +464,14 @@ class TTSMetaManager {
         
         if (!empty($old_data['generated_at'])) {
             $timestamp = is_numeric($old_data['generated_at']) ? 
-                date('Y-m-d H:i:s', $old_data['generated_at']) : 
+                gmdate('Y-m-d H:i:s', $old_data['generated_at']) : 
                 $old_data['generated_at'];
             $new_data['audio']['generated_at'] = $timestamp;
         }
         
         if (!empty($old_data['last_generated'])) {
             $timestamp = is_numeric($old_data['last_generated']) ? 
-                date('Y-m-d H:i:s', $old_data['last_generated']) : 
+                gmdate('Y-m-d H:i:s', $old_data['last_generated']) : 
                 $old_data['last_generated'];
             $new_data['generation']['last_attempt'] = $timestamp;
         }

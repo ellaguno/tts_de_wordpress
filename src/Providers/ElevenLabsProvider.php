@@ -149,7 +149,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 			$this->logger->error( 'ElevenLabs TTS generation failed', [
 				'error' => $e->getMessage(),
 			] );
-			throw new ProviderException( 'ElevenLabs TTS generation failed: ' . $e->getMessage() );
+			throw new ProviderException( esc_html( 'ElevenLabs TTS generation failed: ' . $e->getMessage() ) );
 		}
 	}
 
@@ -192,7 +192,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 
 		if ( is_wp_error( $response ) ) {
 			$this->logger->error( 'ElevenLabs API request failed (wp_error)', [ 'error_message' => $response->get_error_message() ] );
-			throw new ProviderException( 'ElevenLabs API request failed: ' . $response->get_error_message() );
+			throw new ProviderException( esc_html( 'ElevenLabs API request failed: ' . $response->get_error_message() ) );
 		}
 
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -209,7 +209,7 @@ class ElevenLabsProvider implements TTSProviderInterface {
 				'error_message' => $error_message,
 				'chunk' => "{$chunk_number}/{$total_chunks}",
 			] );
-			throw new ProviderException( "ElevenLabs API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" );
+			throw new ProviderException( esc_html( "ElevenLabs API error ({$response_code}) on chunk {$chunk_number}/{$total_chunks}: {$error_message}" ) );
 		}
 
 		return $response_body;

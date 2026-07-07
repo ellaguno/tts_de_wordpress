@@ -35,7 +35,7 @@ class Activator {
 		flush_rewrite_rules();
 
 		// Log activation
-		error_log( 'WP TTS Plugin activated successfully' );
+		\WP_TTS\Utils\Logger::debugLog( 'WP TTS Plugin activated successfully' );
 	}
 
 	/**
@@ -66,6 +66,7 @@ class Activator {
 			if ( ! extension_loaded( $extension ) ) {
 				throw new \Exception(
 					sprintf(
+						/* translators: %s: PHP extension name */
 						__( 'El Plugin TTS de WordPress requiere la extensión %s de PHP.', 'tts-sesolibre' ),
 						$extension
 					)
@@ -75,7 +76,7 @@ class Activator {
 
 		// Check file permissions
 		$upload_dir = wp_upload_dir();
-		if ( ! is_writable( $upload_dir['basedir'] ) ) {
+		if ( ! wp_is_writable( $upload_dir['basedir'] ) ) {
 			throw new \Exception(
 				__( 'El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas.', 'tts-sesolibre' )
 			);
@@ -354,6 +355,7 @@ class Activator {
 		if ( $admin_email ) {
 			$subject = __( 'Plugin TTS de WordPress Activado', 'tts-sesolibre' );
 			$message = sprintf(
+				/* translators: %s: site name */
 				__( 'El Plugin TTS de WordPress ha sido activado exitosamente en %s.', 'tts-sesolibre' ),
 				get_bloginfo( 'name' )
 			);
@@ -380,7 +382,7 @@ class Activator {
 
 		// Log to file if debug is enabled
 		if ( WP_DEBUG_LOG ) {
-			error_log( 'WP TTS Plugin Activation: ' . json_encode( $log_data ) );
+			\WP_TTS\Utils\Logger::debugLog( 'WP TTS Plugin Activation: ' . json_encode( $log_data ) );
 		}
 	}
 }

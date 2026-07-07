@@ -283,7 +283,8 @@ class TTSService {
 								return [
 									'success' => false,
 									'message' => sprintf( 
-										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%s) y el de respaldo (%s)', 'tts-sesolibre' ),
+										/* translators: 1: primary storage error, 2: fallback storage error */
+										__( 'La generación TTS fue exitosa pero falló el almacenamiento principal (%1$s) y el de respaldo (%2$s)', 'tts-sesolibre' ),
 										$storage_error->getMessage(),
 										$fallback_error->getMessage()
 									),
@@ -336,7 +337,8 @@ class TTSService {
 				return [
 					'success' => false,
 					'message' => sprintf( 
-						__( 'La generación TTS falló con %s: %s', 'tts-sesolibre' ),
+						/* translators: 1: provider name, 2: error message */
+						__( 'La generación TTS falló con %1$s: %2$s', 'tts-sesolibre' ),
 						$current_provider_name,
 						$e->getMessage()
 					),
@@ -351,6 +353,7 @@ class TTSService {
 			return [
 				'success' => false,
 				'message' => sprintf( 
+					/* translators: %s: provider name */
 					__( 'La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente.', 'tts-sesolibre' ),
 					$current_provider_name
 				),
@@ -534,7 +537,7 @@ class TTSService {
 		if ( ! add_option( $lock_key, time(), '', 'no' ) ) {
 			$lock_time = (int) get_option( $lock_key );
 			if ( $lock_time && ( time() - $lock_time ) < 10 * MINUTE_IN_SECONDS ) {
-				throw new \Exception( __( 'Ya hay una generación de audio en curso para esta entrada. Espera a que termine.', 'tts-sesolibre' ) );
+				throw new \Exception( esc_html( __( 'Ya hay una generación de audio en curso para esta entrada. Espera a que termine.', 'tts-sesolibre' ) ) );
 			}
 			// Stale lock (crashed request): take it over.
 			update_option( $lock_key, time(), 'no' );
@@ -932,7 +935,7 @@ class TTSService {
 		
 		if ( ! $result || ! $result['success'] ) {
 			$this->logger->error( '[generatePreview] Preview generation failed', [ 'result' => $result ] );
-			throw new \Exception( 'Failed to generate preview audio: ' . ( $result['message'] ?? 'Unknown error' ) );
+			throw new \Exception( esc_html( 'Failed to generate preview audio: ' . ( $result['message'] ?? 'Unknown error' ) ) );
 		}
 		
 		$this->logger->info( '[generatePreview] Preview generation completed successfully', [
@@ -1418,7 +1421,7 @@ class TTSService {
 			
 			// Clean up original main audio file to save space
 			if ( file_exists( $main_path ) ) {
-				unlink( $main_path );
+				wp_delete_file( $main_path );
 				$this->logger->info( 'Cleaned up original main audio file', [ 'path' => $main_path ] );
 			}
 			

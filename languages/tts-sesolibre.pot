@@ -1,0 +1,2016 @@
+# Copyright (C) 2026 Eduardo Llaguno
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: TTS SesoLibre 1.7.0\n"
+"Report-Msgid-Bugs-To: https://github.com/ellaguno/tts_sesolibre/issues\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-06T00:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: \n"
+"X-Domain: tts-sesolibre\n"
+
+#: src/Admin/AdminInterface.php:77
+#: src/Admin/AdminInterface.php:78
+msgid "Configuración TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:85
+#: src/Admin/AdminInterface.php:86
+#: src/Admin/AdminInterface.php:1080
+msgid "Herramientas TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:104
+#: src/Admin/AdminInterface.php:427
+msgid "Proveedores TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:112
+msgid "Clave API de OpenAI"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:120
+msgid "Clave API de ElevenLabs"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:128
+msgid "Credenciales de Google Cloud"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:137
+msgid "Voz Predeterminada de Google"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:146
+msgid "Voz Predeterminada de OpenAI"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:155
+msgid "Voz Predeterminada de ElevenLabs"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:164
+msgid "Clave de Acceso de Amazon Polly"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:172
+msgid "Clave Secreta de Amazon Polly"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:180
+msgid "Región de Amazon Polly"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:188
+msgid "Voz Predeterminada de Amazon Polly"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:196
+msgid "Proveedor Predeterminado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:205
+#: src/Admin/AdminInterface.php:509
+msgid "Configuración de Almacenamiento"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:213
+#: src/Admin/AdminInterface.php:513
+#: src/Admin/AdminInterface.php:517
+msgid "Proveedor de Almacenamiento"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:221
+msgid "Duración de Caché (horas)"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:229
+msgid "Tamaño Máximo de Caché (MB)"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:238
+msgid "Token API de Buzzsprout"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:246
+msgid "ID de Podcast de Buzzsprout"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:255
+msgid "Clave de Suscripción de Azure TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:263
+msgid "Región de Azure TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:271
+msgid "Voz Predeterminada de Azure TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:280
+#: src/Admin/AdminInterface.php:429
+msgid "Recursos de Audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:287
+#: src/Admin/AdminInterface.php:2519
+msgid "Audio de Introducción Predeterminado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:295
+#: src/Admin/AdminInterface.php:2535
+msgid "Audio de Cierre Predeterminado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:357
+#: src/Core/Plugin.php:849
+msgid "Seleccionar Archivo de Audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:358
+#: src/Core/Plugin.php:850
+msgid "Usar este audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:367
+#: src/Admin/AdminInterface.php:1058
+msgid "No tienes permisos suficientes para acceder a esta página."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:381
+msgid "Configuración de TTS SesoLibre"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:426
+msgid "Predeterminados"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:428
+msgid "Almacenamiento"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:430
+msgid "Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:448
+msgid "Configuración Predeterminada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:449
+msgid "Configura el proveedor TTS predeterminado y la configuración general."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:455
+msgid "Proveedor TTS Predeterminado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:458
+msgid "Selecciona el proveedor TTS predeterminado a utilizar cuando no se elige un proveedor específico para una entrada."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:464
+msgid "Duración de Caché"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:467
+msgid "Cuánto tiempo mantener los archivos de audio generados en caché (en horas)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:472
+msgid "Tamaño Máximo de Caché"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:475
+msgid "Tamaño máximo de caché en megabytes."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:488
+msgid "Configuración de Proveedores TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:489
+msgid "Configura tus proveedores TTS con claves API y voces predeterminadas."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:494
+msgid "Google Cloud TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:495
+msgid "OpenAI TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:496
+msgid "ElevenLabs"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:497
+msgid "Microsoft Azure TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:498
+msgid "Amazon Polly"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:510
+msgid "Configura dónde y cómo se almacenan los archivos de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:520
+msgid "Elige dónde almacenar los archivos de audio generados."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:529
+msgid "Configuración de Buzzsprout"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:533
+msgid "Habilitar Buzzsprout"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:536
+msgid "Habilita el almacenamiento en Buzzsprout."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:541
+msgid "Token API"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:544
+msgid "Tu token API de Buzzsprout para subir archivos de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:549
+msgid "ID de Podcast"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:552
+msgid "Tu ID de podcast de Buzzsprout."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:557
+msgid "Auto-publicar episodios"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:560
+msgid "Publica automáticamente los episodios en BuzzSprout."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:565
+msgid "Mantener episodios privados"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:568
+msgid "Los episodios se mantendrán privados en lugar de públicos."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:573
+msgid "Tags por defecto"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:576
+msgid "Tags que se agregarán a todos los episodios (separados por comas)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:581
+msgid "Incluir enlace al artículo"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:584
+msgid "Incluye un enlace al artículo original en la descripción del episodio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:593
+msgid "Configuración de Amazon S3"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:597
+msgid "Habilitar Amazon S3"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:600
+msgid "Habilita el almacenamiento en Amazon S3."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:605
+msgid "Access Key"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:608
+msgid "Tu AWS Access Key ID."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:613
+msgid "Secret Key"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:616
+msgid "Tu AWS Secret Access Key."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:621
+msgid "Bucket"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:624
+msgid "Nombre del bucket de S3."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:629
+#: src/Admin/AdminInterface.php:1007
+#: src/Admin/AdminInterface.php:1039
+msgid "Región"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:632
+msgid "Región de AWS (ej: us-east-1)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:641
+msgid "Configuración de Google Cloud Storage"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:645
+msgid "Habilitar Google Cloud Storage"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:647
+msgid "Google Cloud Storage no está implementado aún. Usa Local Storage o BuzzSprout."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:941
+msgid "Ruta de Credenciales"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:947
+#: src/Admin/AdminInterface.php:967
+#: src/Admin/AdminInterface.php:987
+#: src/Admin/AdminInterface.php:1013
+#: src/Admin/AdminInterface.php:1045
+msgid "Voz Predeterminada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:961
+#: src/Admin/AdminInterface.php:981
+msgid "Clave API"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1001
+msgid "Clave de Suscripción"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1027
+msgid "Clave de Acceso"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1033
+msgid "Clave Secreta"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1085
+msgid "Advertencia:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1086
+msgid "No hay proveedores TTS configurados y activos. Ve a Configuración TTS para configurar al menos un proveedor."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1092
+msgid "Vista Previa de Voz"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1093
+msgid "Prueba diferentes voces y proveedores antes de usarlos en tus entradas."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1096
+#: src/Admin/AdminInterface.php:1143
+msgid "Proveedor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1099
+msgid "Selecciona un proveedor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1107
+#: src/Admin/AdminInterface.php:1154
+#: templates/frontend/tts-player.php:183
+msgid "Voz"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1110
+#: src/Admin/AdminInterface.php:1327
+msgid "Selecciona primero un proveedor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1115
+msgid "Texto de Muestra"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1117
+msgid "Ingresa texto para previsualizar..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1124
+msgid "Generar Vista Previa"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1129
+#: src/Admin/AdminInterface.php:1187
+#: src/Admin/AdminInterface.php:1292
+#: src/Admin/AdminInterface.php:2575
+#: src/Admin/AdminInterface.php:2610
+#: src/Admin/AdminInterface.php:2653
+msgid "Tu navegador no soporta el elemento de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1139
+msgid "Generador de Texto Personalizado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1140
+msgid "Genera audio desde texto personalizado con opciones de configuración detalladas."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1146
+msgid "Usar proveedor predeterminado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1157
+#: src/Admin/AdminInterface.php:1340
+#: src/Admin/AdminInterface.php:1403
+#: src/Admin/AdminInterface.php:1415
+#: src/Admin/AdminInterface.php:1685
+msgid "Usar voz predeterminada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1162
+msgid "Texto Personalizado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1164
+msgid "Ingresa tu texto personalizado aquí..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1166
+#: src/Admin/AdminInterface.php:1235
+msgid "caracteres"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1168
+#: src/Admin/AdminInterface.php:1239
+msgid "costo estimado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1176
+#: src/Admin/AdminInterface.php:1275
+msgid "Generar Audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1182
+msgid "Preparando..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1190
+#: src/Admin/AdminInterface.php:1295
+msgid "Descargar Audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1200
+msgid "Editor de Texto TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1201
+msgid "Extrae y edita el contenido de un post antes de generar el audio TTS. Esto te permite limpiar el texto, eliminar elementos no deseados y hacer ajustes para mejorar la calidad del audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1207
+msgid "Seleccionar Post"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1209
+msgid "ID del Post"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1211
+msgid "Extraer Contenido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1213
+msgid "Ingresa el ID del post del cual quieres extraer y editar el contenido para TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1219
+msgid "Texto para Editar"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1224
+msgid "Limpiar Texto"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1227
+msgid "Restaurar Original"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1233
+msgid "El contenido extraído del post aparecerá aquí para editar..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1237
+msgid "palabras"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1248
+msgid "Acciones"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1252
+msgid "Guardar Texto Editado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1257
+msgid "Generar Audio con Texto Editado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1262
+msgid "Seleccionar Proveedor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1270
+#: src/Admin/AdminInterface.php:1573
+msgid "Seleccionar Voz"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1287
+msgid "Audio Generado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1306
+msgid "Estadísticas del Servicio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1331
+#: src/Admin/AdminInterface.php:1406
+#: src/Admin/AdminInterface.php:1576
+msgid "Cargando voces..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1346
+#: src/Admin/AdminInterface.php:1421
+#: src/Admin/AdminInterface.php:1691
+msgid "No hay voces disponibles"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1355
+#: src/Admin/AdminInterface.php:1429
+#: src/Admin/AdminInterface.php:1695
+msgid "Error al cargar voces"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1362
+#: src/Admin/AdminInterface.php:1435
+#: src/Admin/AdminInterface.php:1699
+msgid "Error de conexión"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1374
+msgid "Por favor ingresa algún texto para previsualizar"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1379
+#: src/Admin/AdminInterface.php:1633
+msgid "Generando..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1390
+#: src/Admin/AdminInterface.php:1393
+msgid "Falla en la vista previa"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1455
+msgid "Por favor ingresa algún texto para generar"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1487
+#: src/Admin/AdminInterface.php:1496
+msgid "Falla en la generación"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1512
+msgid "Por favor ingresa un ID de post válido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1518
+msgid "Extrayendo..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1532
+msgid "Error al extraer contenido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1536
+msgid "Error de conexión al extraer contenido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1562
+msgid "¿Estás seguro de que quieres restaurar el texto original? Se perderán todas las ediciones."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1583
+#: src/Admin/AdminInterface.php:1617
+msgid "Por favor extrae primero el contenido de un post"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1588
+#: src/Admin/AdminInterface.php:1624
+msgid "El texto no puede estar vacío"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1593
+msgid "Guardando..."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1602
+msgid "Error al guardar texto"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1606
+msgid "Error de conexión al guardar texto"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1628
+msgid "Por favor selecciona un proveedor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1646
+msgid "Error al generar audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1650
+msgid "Error de conexión al generar audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1731
+msgid "Configura tus proveedores TTS abajo."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1738
+msgid "Configura la configuración de almacenamiento de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1752
+msgid "Habilitar OpenAI TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1756
+msgid "Ingresa tu clave API de OpenAI para servicios TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1772
+msgid "Habilitar ElevenLabs TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1776
+msgid "Ingresa tu clave API de ElevenLabs para servicios TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1792
+msgid "Habilitar Google Cloud TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1796
+msgid "Ruta al archivo JSON de cuenta de servicio de Google Cloud."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1811
+msgid "Habilitar Amazon Polly TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1814
+msgid "ID de Clave de Acceso AWS:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1816
+msgid "Ingresa tu ID de Clave de Acceso AWS para Amazon Polly."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1830
+msgid "Clave de Acceso Secreta AWS:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1832
+msgid "Ingresa tu Clave de Acceso Secreta AWS para Amazon Polly."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1852
+msgid "Región AWS:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1858
+msgid "Selecciona la región AWS para Amazon Polly."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1888
+msgid "Selecciona la voz predeterminada para Amazon Polly."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1910
+msgid "Selecciona el proveedor TTS predeterminado a usar."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1930
+msgid "Selecciona dónde almacenar los archivos de audio generados."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1940
+msgid "Habilitar almacenamiento en Buzzsprout"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1950
+msgid "Ingresa tu token API de Buzzsprout para almacenamiento de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1959
+msgid "Ingresa tu ID de Podcast de Buzzsprout donde se almacenarán los archivos de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1969
+msgid "Publicar episodios automáticamente"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1980
+msgid "Mantener episodios como privados"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:1999
+msgid "Incluir enlace al artículo en la descripción"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2010
+msgid "Habilitar almacenamiento en Amazon S3"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2071
+msgid "Habilitar Azure TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2074
+msgid "Clave de Suscripción:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2076
+msgid "Ingresa tu clave de suscripción de Azure Cognitive Services para TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2120
+msgid "Región de Azure:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2126
+msgid "Selecciona la región de Azure para servicios TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2161
+msgid "Selecciona la voz predeterminada para Azure TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2188
+msgid "Selecciona la voz predeterminada para Google Cloud TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2211
+msgid "Selecciona la voz predeterminada para OpenAI TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2236
+msgid "Selecciona la voz predeterminada para ElevenLabs TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2246
+msgid "Cuánto tiempo mantener archivos de audio en caché (1-8760 horas)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2256
+msgid "Tamaño máximo de caché en megabytes (10-10000 MB)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2267
+msgid "Verificación de seguridad fallida (nonce)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2279
+#: src/Admin/AdminInterface.php:2352
+#: src/Admin/AdminInterface.php:2412
+#: src/Admin/AdminInterface.php:2462
+#: src/Admin/AdminInterface.php:2691
+#: src/Admin/AdminInterface.php:2920
+msgid "Permisos insuficientes."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2288
+msgid "No se proporcionó texto para la generación TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2307
+msgid "Audio de prueba generado exitosamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2312
+msgid "Falló la generación del audio de prueba. TTSService no retornó éxito o URL de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2317
+msgid "No hay proveedores TTS configurados. Por favor ve a Configuración > Configuración TTS para configurar al menos un proveedor (OpenAI, Google Cloud, ElevenLabs, Amazon Polly, o Azure TTS)."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2332
+msgid "Ocurrió una excepción durante la generación del audio de prueba."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2344
+#: src/Admin/AdminInterface.php:2404
+#: src/Admin/AdminInterface.php:2454
+#: src/Admin/AdminInterface.php:2672
+#: src/Admin/AdminInterface.php:2901
+#: src/Admin/AdminInterface.php:3406
+msgid "Verificación de seguridad fallida."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2422
+msgid "Esta es una muestra de vista previa de voz."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2433
+msgid "Vista previa generada exitosamente"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2437
+msgid "Falló la generación de vista previa - No se retornó URL de audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2442
+msgid "Falló la generación de vista previa"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2473
+msgid "El texto es requerido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2491
+#: src/Core/Plugin.php:461
+msgid "Audio generado exitosamente"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2495
+#: src/Admin/AdminInterface.php:2500
+msgid "Falló la generación"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2511
+msgid "Configuración de Recursos de Audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2512
+msgid "Configura archivos de audio de introducción y cierre predeterminados para grabaciones TTS. Estos se añadirán antes y después del contenido principal."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2515
+msgid "Recursos de Audio Predeterminados"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2522
+msgid "Selecciona el archivo de audio de introducción predeterminado que se añadirá al inicio de las grabaciones TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2527
+msgid "Música de Fondo Predeterminada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2530
+msgid "Selecciona la música de fondo predeterminada que sonará durante las grabaciones TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2538
+msgid "Selecciona el archivo de audio de cierre predeterminado que se añadirá al final de las grabaciones TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2551
+msgid "Configura archivos de audio de introducción y cierre para tus grabaciones TTS."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2582
+msgid "Seleccionar Audio de Introducción"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2583
+#: src/Admin/AdminInterface.php:2618
+#: src/Admin/AdminInterface.php:2661
+msgid "Remover"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2617
+msgid "Seleccionar Música de Fondo"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2623
+msgid "Volumen Predeterminado:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2660
+msgid "Seleccionar Audio de Cierre"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2683
+msgid "Parámetros inválidos."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2715
+msgid "Audio %s actualizado exitosamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2723
+#: src/Admin/AdminInterface.php:2951
+msgid "Administrador de Meta TTS no disponible."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2728
+msgid "Falló al guardar recurso de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2912
+msgid "ID de entrada inválido."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2946
+msgid "Volumen de fondo actualizado exitosamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2956
+msgid "Falló al guardar volumen de fondo."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2967
+msgid "Configuración del Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2968
+msgid "Elige entre diferentes estilos de reproductor y configura el comportamiento del reproductor."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2974
+msgid "Estilo del Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2977
+msgid "Elige el estilo del reproductor para mostrar audio TTS en tu sitio web."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2983
+msgid "Insertar Reproductor Automáticamente"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2986
+msgid "Insertar automáticamente el reproductor TTS en entradas y páginas."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2992
+msgid "Posición del Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2995
+msgid "Dónde mostrar el reproductor al insertar automáticamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2996
+msgid "La opción manual te permite usar el shortcode:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:2997
+msgid "Parámetros opcionales:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3003
+msgid "Controles de Volumen"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3006
+msgid "Configura qué controles de volumen mostrar en el reproductor SesoLibre."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3012
+msgid "Información del Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3015
+msgid "Configura qué información mostrar debajo de la barra de progreso en el reproductor SesoLibre."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3030
+msgid "Reproductor Clásico"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3031
+msgid "Reproductor SesoLibre (con Mezcla de Audio)"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3032
+msgid "Reproductor Minimalista"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3033
+msgid "Reproductor SesoLibre Mejorado (con Imagen Destacada)"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3045
+msgid "Insertar automáticamente reproductor TTS en entradas"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3056
+msgid "Antes del Contenido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3057
+msgid "Después del Contenido"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3058
+msgid "Manual (Shortcode)"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3072
+msgid "Mostrar Control de Volumen de Voz"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3079
+msgid "Mostrar Control de Volumen de Música de Fondo"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3100
+msgid "Mostrar Servicio TTS"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3107
+msgid "Mostrar Nombre de Voz"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3117
+msgid "Mostrar Enlace de Descarga"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3124
+msgid "Mostrar Título del Artículo"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3132
+msgid "Mostrar Imagen Destacada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3140
+msgid "Mostrar Control de Velocidad"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3149
+msgid "Personalización CSS del Reproductor Mejorado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3150
+msgid "Personaliza los colores y estilos del reproductor SesoLibre mejorado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3155
+msgid "Color del Icono de Play"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3158
+msgid "Color del icono de reproducir en el reproductor mejorado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3164
+msgid "Color del Icono de Pausa"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3167
+msgid "Color del icono de pausa en el reproductor mejorado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3173
+msgid "Color de la Barra de Progreso"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3176
+msgid "Color de la barra de progreso y elementos activos."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3182
+msgid "Color de Fondo del Reproductor"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3185
+msgid "Color de fondo principal del reproductor."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3191
+msgid "Color del Texto"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3194
+msgid "Color del texto principal en el reproductor."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3200
+msgid "CSS Personalizado"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3203
+msgid "CSS personalizado para el reproductor mejorado. Use selectores como .tts-enhanced-sesolibre-player para personalizar estilos específicos."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3212
+msgid "Documentación de Shortcode"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3213
+msgid "Al usar la posición Manual, puedes colocar el reproductor TTS en cualquier lugar de tu contenido usando el shortcode:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3216
+msgid "Shortcode"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3216
+msgid "Descripción"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3218
+msgid "Reproductor básico para la entrada actual"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3219
+msgid "Forzar estilo de reproductor clásico"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3220
+msgid "Forzar reproductor SesoLibre con mezcla de audio"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3221
+msgid "Forzar reproductor minimalista con visualización de ondas"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3222
+msgid "Forzar reproductor SesoLibre mejorado con imagen destacada"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3223
+msgid "Reproductor para ID de entrada específico"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3227
+msgid "Nota:"
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3228
+msgid "El shortcode solo se mostrará si TTS está habilitado para la entrada especificada y se ha generado audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3464
+msgid "Configuración del reproductor guardada exitosamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3470
+msgid "Falló al guardar la configuración del reproductor."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3484
+#: src/Admin/AdminInterface.php:3627
+#: src/Admin/AdminInterface.php:3736
+msgid "Nonce no proporcionado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3517
+#: src/Admin/AdminInterface.php:3660
+#: src/Admin/AdminInterface.php:3770
+msgid "ID de post requerido."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3524
+#: src/Admin/AdminInterface.php:3667
+#: src/Admin/AdminInterface.php:3777
+msgid "No tienes permiso para editar esta entrada."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3535
+msgid "Post no encontrado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3609
+msgid "Error al extraer el contenido del post."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3614
+msgid "Error fatal al extraer el contenido del post."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3709
+msgid "Texto guardado exitosamente."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3718
+msgid "Error al guardar el texto editado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3723
+msgid "Error fatal al guardar el texto editado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3796
+msgid "No se encontró texto editado. Por favor guarde el texto primero."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3817
+msgid "Audio generado exitosamente desde texto editado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3822
+msgid "Falló la generación de audio."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3828
+msgid "Error al generar audio desde texto editado."
+msgstr ""
+
+#: src/Admin/AdminInterface.php:3885
+msgid "Selectores CSS útiles:"
+msgstr ""
+
+#: src/Core/Activator.php:52
+msgid "El Plugin TTS de WordPress requiere WordPress 5.0 o superior."
+msgstr ""
+
+#: src/Core/Activator.php:59
+msgid "El Plugin TTS de WordPress requiere PHP 7.4 o superior."
+msgstr ""
+
+#: src/Core/Activator.php:70
+msgid "El Plugin TTS de WordPress requiere la extensión %s de PHP."
+msgstr ""
+
+#: src/Core/Activator.php:81
+msgid "El Plugin TTS de WordPress requiere permisos de escritura en el directorio de subidas."
+msgstr ""
+
+#: src/Core/Activator.php:356
+msgid "Plugin TTS de WordPress Activado"
+msgstr ""
+
+#: src/Core/Activator.php:359
+msgid "El Plugin TTS de WordPress ha sido activado exitosamente en %s."
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:485
+#: src/Core/ConfigurationManager.php:506
+msgid "La clave API es requerida"
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:488
+msgid "La región es requerida"
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:494
+msgid "Las credenciales de cuenta de servicio son requeridas"
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:500
+msgid "La clave de acceso y clave secreta de AWS son requeridas"
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:526
+msgid "La velocidad de voz debe estar entre 0.25 y 4.0"
+msgstr ""
+
+#: src/Core/ConfigurationManager.php:533
+msgid "El tono de voz debe estar entre -20 y 20"
+msgstr ""
+
+#: src/Core/Deactivator.php:238
+msgid "Plugin TTS de WordPress Desactivado"
+msgstr ""
+
+#: src/Core/Deactivator.php:241
+msgid "El Plugin TTS de WordPress ha sido desactivado en %1$s el %2$s."
+msgstr ""
+
+#: src/Core/Plugin.php:246
+msgid "Configuración de Texto a Voz"
+msgstr ""
+
+#: src/Core/Plugin.php:422
+#: src/Core/Plugin.php:497
+#: src/Core/Plugin.php:532
+#: src/Core/Plugin.php:569
+#: src/Core/Plugin.php:1107
+#: src/Core/Plugin.php:1176
+msgid "Falló la verificación de seguridad"
+msgstr ""
+
+#: src/Core/Plugin.php:431
+#: src/Core/Plugin.php:1117
+#: src/Core/Plugin.php:1186
+#: src/Core/Plugin.php:1251
+#: src/Core/Plugin.php:1313
+msgid "ID de entrada inválido"
+msgstr ""
+
+#: src/Core/Plugin.php:438
+#: src/Core/Plugin.php:575
+#: src/Core/Plugin.php:1124
+#: src/Core/Plugin.php:1193
+#: src/Core/Plugin.php:1258
+#: src/Core/Plugin.php:1320
+msgid "No tienes permiso para editar esta entrada"
+msgstr ""
+
+#: src/Core/Plugin.php:470
+msgid "Falló la generación de audio: Resultado inválido devuelto"
+msgstr ""
+
+#: src/Core/Plugin.php:481
+#: templates/admin/meta-box.php:1038
+#: templates/admin/meta-box.php:1043
+msgid "Falló la generación de audio"
+msgstr ""
+
+#: src/Core/Plugin.php:510
+msgid "La configuración del proveedor es válida"
+msgstr ""
+
+#: src/Core/Plugin.php:511
+msgid "La configuración del proveedor es inválida"
+msgstr ""
+
+#: src/Core/Plugin.php:517
+msgid "Falló la validación del proveedor"
+msgstr ""
+
+#: src/Core/Plugin.php:638
+msgid "Audio eliminado exitosamente"
+msgstr ""
+
+#: src/Core/Plugin.php:652
+#: templates/admin/meta-box.php:1089
+#: templates/admin/meta-box.php:1093
+msgid "Falló la eliminación del audio"
+msgstr ""
+
+#: src/Core/Plugin.php:893
+msgid "TTS: aún no hay audio generado para esta entrada. <a href=\"%s\">Generar audio</a> (este aviso solo lo ven los editores)."
+msgstr ""
+
+#: src/Core/Plugin.php:1146
+msgid "Estado de TTS habilitado guardado"
+msgstr ""
+
+#: src/Core/Plugin.php:1152
+msgid "Falló al guardar el estado de TTS habilitado"
+msgstr ""
+
+#: src/Core/Plugin.php:1157
+#: src/Core/Plugin.php:1221
+#: src/Core/Plugin.php:1285
+#: src/Core/Plugin.php:1356
+msgid "TTSMetaManager no disponible"
+msgstr ""
+
+#: src/Core/Plugin.php:1162
+msgid "Error al guardar el estado de TTS habilitado"
+msgstr ""
+
+#: src/Core/Plugin.php:1211
+msgid "Proveedor de TTS guardado"
+msgstr ""
+
+#: src/Core/Plugin.php:1216
+msgid "Falló al guardar el proveedor de TTS"
+msgstr ""
+
+#: src/Core/Plugin.php:1226
+msgid "Error al guardar el proveedor de TTS"
+msgstr ""
+
+#: src/Core/Plugin.php:1274
+msgid "Voz de TTS guardada"
+msgstr ""
+
+#: src/Core/Plugin.php:1280
+msgid "Falló al guardar la voz de TTS"
+msgstr ""
+
+#: src/Core/Plugin.php:1290
+msgid "Error al guardar la voz de TTS"
+msgstr ""
+
+#: src/Core/Plugin.php:1346
+msgid "Recursos de audio por defecto cargados"
+msgstr ""
+
+#: src/Core/Plugin.php:1351
+msgid "Falló al cargar recursos de audio por defecto"
+msgstr ""
+
+#: src/Core/Plugin.php:1361
+msgid "No hay recursos de audio por defecto configurados"
+msgstr ""
+
+#: src/Core/Plugin.php:1366
+msgid "Error al cargar recursos de audio por defecto"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:109
+msgid "Error al subir el archivo \"%1$s\" al almacenamiento %2$s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:145
+msgid "Error al eliminar el archivo \"%1$s\" del almacenamiento %2$s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:179
+msgid "Falló la autenticación para el almacenamiento %s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:212
+msgid "Cuota de almacenamiento superada para %s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:241
+msgid "Archivo \"%1$s\" no encontrado en el almacenamiento %2$s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:275
+msgid "El archivo \"%1$s\" es demasiado grande (%2$s). El tamaño máximo para %3$s es %4$s"
+msgstr ""
+
+#: src/Exceptions/StorageException.php:313
+msgid "Error de red durante la operación %1$s con el almacenamiento %2$s"
+msgstr ""
+
+#: src/Exceptions/TTSException.php:117
+msgid "El contenido del texto es inválido o está vacío."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:118
+msgid "Hubo un error con el servicio TTS. Por favor, inténtelo de nuevo."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:119
+msgid "Se ha superado la cuota del servicio TTS. Por favor, inténtelo más tarde."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:120
+msgid "La voz seleccionada no está disponible."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:121
+msgid "Error de conexión de red. Por favor, verifique su conexión a internet."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:122
+msgid "Falló la autenticación. Por favor, verifique sus credenciales de API."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:123
+msgid "Límite de tasa superado. Por favor, espere antes de intentar de nuevo."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:124
+msgid "El formato de audio solicitado no es compatible."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:125
+msgid "El texto es demasiado largo para procesarse."
+msgstr ""
+
+#: src/Exceptions/TTSException.php:126
+msgid "Error de configuración del plugin. Por favor, verifique su configuración."
+msgstr ""
+
+#: src/Services/TTSService.php:119
+msgid "No hay proveedores TTS configurados. Por favor configure al menos un proveedor en Configuración > Configuración TTS."
+msgstr ""
+
+#: src/Services/TTSService.php:287
+msgid "La generación TTS fue exitosa pero falló el almacenamiento principal (%1$s) y el de respaldo (%2$s)"
+msgstr ""
+
+#: src/Services/TTSService.php:341
+msgid "La generación TTS falló con %1$s: %2$s"
+msgstr ""
+
+#: src/Services/TTSService.php:357
+msgid "La generación TTS falló con el proveedor %s. Por favor verifique su configuración e intente nuevamente."
+msgstr ""
+
+#: src/Services/TTSService.php:540
+msgid "Ya hay una generación de audio en curso para esta entrada. Espera a que termine."
+msgstr ""
+
+#: templates/admin/meta-box.php:47
+msgid "Enable TTS"
+msgstr ""
+
+#: templates/admin/meta-box.php:58
+msgid "Enable text-to-speech conversion for this post"
+msgstr ""
+
+#: templates/admin/meta-box.php:65
+msgid "TTS Provider"
+msgstr ""
+
+#: templates/admin/meta-box.php:71
+msgid "No TTS providers are currently enabled. Please go to"
+msgstr ""
+
+#: templates/admin/meta-box.php:73
+msgid "TTS Settings"
+msgstr ""
+
+#: templates/admin/meta-box.php:75
+msgid "to enable at least one provider."
+msgstr ""
+
+#: templates/admin/meta-box.php:79
+msgid "No providers enabled"
+msgstr ""
+
+#: templates/admin/meta-box.php:83
+msgid "Use default provider"
+msgstr ""
+
+#: templates/admin/meta-box.php:90
+msgid "Default"
+msgstr ""
+
+#: templates/admin/meta-box.php:97
+msgid "Select the TTS provider for this post"
+msgstr ""
+
+#: templates/admin/meta-box.php:105
+msgid "Voice"
+msgstr ""
+
+#: templates/admin/meta-box.php:109
+#: templates/admin/meta-box.php:906
+#: templates/admin/meta-box.php:951
+#: templates/admin/meta-box.php:967
+msgid "Use default voice"
+msgstr ""
+
+#: templates/admin/meta-box.php:113
+msgid "Select the voice for text-to-speech conversion"
+msgstr ""
+
+#: templates/admin/meta-box.php:126
+msgid "Audio Assets"
+msgstr ""
+
+#: templates/admin/meta-box.php:127
+msgid "(clic para expandir)"
+msgstr ""
+
+#: templates/admin/meta-box.php:155
+msgid "Intro Audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:156
+msgid "Background Music"
+msgstr ""
+
+#: templates/admin/meta-box.php:157
+msgid "Outro Audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:158
+msgid "Custom Audio (replaces TTS)"
+msgstr ""
+
+#: templates/admin/meta-box.php:186
+msgid "DEFAULT"
+msgstr ""
+
+#: templates/admin/meta-box.php:198
+#: templates/admin/meta-box.php:317
+#: templates/admin/meta-box.php:1135
+msgid "Your browser does not support the audio element."
+msgstr ""
+
+#: templates/admin/meta-box.php:205
+msgid "Select Audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:206
+msgid "Remove"
+msgstr ""
+
+#: templates/admin/meta-box.php:208
+msgid "Use Default"
+msgstr ""
+
+#: templates/admin/meta-box.php:215
+msgid "Default Volume:"
+msgstr ""
+
+#: templates/admin/meta-box.php:227
+msgid "Configure audio assets for enhanced playback experience:"
+msgstr ""
+
+#: templates/admin/meta-box.php:228
+msgid "Intro Audio:"
+msgstr ""
+
+#: templates/admin/meta-box.php:228
+msgid "Plays before the main TTS audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:229
+msgid "Background Music:"
+msgstr ""
+
+#: templates/admin/meta-box.php:229
+msgid "Loops during main TTS audio playback"
+msgstr ""
+
+#: templates/admin/meta-box.php:230
+msgid "Outro Audio:"
+msgstr ""
+
+#: templates/admin/meta-box.php:230
+msgid "Plays after the main TTS audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:231
+msgid "Custom Audio:"
+msgstr ""
+
+#: templates/admin/meta-box.php:231
+msgid "Replaces auto-generated TTS entirely"
+msgstr ""
+
+#: templates/admin/meta-box.php:232
+msgid "Supported formats: MP3, WAV, OGG"
+msgstr ""
+
+#: templates/admin/meta-box.php:240
+msgid "Audio Status"
+msgstr ""
+
+#: templates/admin/meta-box.php:247
+msgid "Audio generated successfully"
+msgstr ""
+
+#: templates/admin/meta-box.php:249
+msgid "Listen"
+msgstr ""
+
+#: templates/admin/meta-box.php:255
+msgid "Audio Details"
+msgstr ""
+
+#: templates/admin/meta-box.php:258
+msgid "Provider:"
+msgstr ""
+
+#: templates/admin/meta-box.php:268
+msgid "Voice:"
+msgstr ""
+
+#: templates/admin/meta-box.php:286
+msgid "Generated:"
+msgstr ""
+
+#: templates/admin/meta-box.php:293
+msgid "ago"
+msgstr ""
+
+#: templates/admin/meta-box.php:309
+msgid "File Size:"
+msgstr ""
+
+#: templates/admin/meta-box.php:322
+msgid "Generating audio..."
+msgstr ""
+
+#: templates/admin/meta-box.php:327
+msgid "Audio generation failed"
+msgstr ""
+
+#: templates/admin/meta-box.php:332
+msgid "Audio not generated yet"
+msgstr ""
+
+#: templates/admin/meta-box.php:340
+#: templates/admin/meta-box.php:1310
+msgid "Edit Text Before Generate"
+msgstr ""
+
+#: templates/admin/meta-box.php:346
+msgid "Generate Audio Now"
+msgstr ""
+
+#: templates/admin/meta-box.php:352
+msgid "Regenerate"
+msgstr ""
+
+#: templates/admin/meta-box.php:356
+msgid "Delete Audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:365
+msgid "Generando audio… puede tardar hasta un minuto según la longitud del artículo."
+msgstr ""
+
+#: templates/admin/meta-box.php:876
+msgid "Se aplicaron los audios predeterminados (intro/outro/fondo). Recarga la página para verlos en este panel."
+msgstr ""
+
+#: templates/admin/meta-box.php:892
+#: templates/admin/meta-box.php:955
+msgid "Loading voices..."
+msgstr ""
+
+#: templates/admin/meta-box.php:913
+#: templates/admin/meta-box.php:917
+#: templates/admin/meta-box.php:972
+#: templates/admin/meta-box.php:976
+msgid "Error loading voices"
+msgstr ""
+
+#: templates/admin/meta-box.php:1012
+#: templates/admin/meta-box.php:1282
+msgid "Please save the post first"
+msgstr ""
+
+#: templates/admin/meta-box.php:1033
+msgid "Audio generado correctamente. Actualizando…"
+msgstr ""
+
+#: templates/admin/meta-box.php:1045
+msgid "La generación tardó demasiado. Puede seguir procesándose en el servidor: recarga la página en unos minutos."
+msgstr ""
+
+#: templates/admin/meta-box.php:1067
+msgid "Are you sure you want to delete the generated audio? This action cannot be undone."
+msgstr ""
+
+#: templates/admin/meta-box.php:1075
+msgid "Deleting..."
+msgstr ""
+
+#: templates/admin/meta-box.php:1114
+msgid "Select Audio File"
+msgstr ""
+
+#: templates/admin/meta-box.php:1116
+msgid "Use this audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:1287
+msgid "Loading..."
+msgstr ""
+
+#: templates/admin/meta-box.php:1303
+msgid "Error extracting content"
+msgstr ""
+
+#: templates/admin/meta-box.php:1307
+msgid "Error connecting to server"
+msgstr ""
+
+#: templates/admin/meta-box.php:1322
+msgid "Edit Text for TTS Generation"
+msgstr ""
+
+#: templates/admin/meta-box.php:1327
+msgid "Post:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1334
+msgid "Clean Text"
+msgstr ""
+
+#: templates/admin/meta-box.php:1337
+msgid "Reset to Original"
+msgstr ""
+
+#: templates/admin/meta-box.php:1342
+msgid "characters"
+msgstr ""
+
+#: templates/admin/meta-box.php:1344
+msgid "words"
+msgstr ""
+
+#: templates/admin/meta-box.php:1346
+msgid "costo aproximado"
+msgstr ""
+
+#: templates/admin/meta-box.php:1351
+msgid "Save & Generate Audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:1354
+msgid "Save Only"
+msgstr ""
+
+#: templates/admin/meta-box.php:1356
+msgid "Cancel"
+msgstr ""
+
+#: templates/admin/meta-box.php:1420
+msgid "Are you sure you want to reset to the original text? All changes will be lost."
+msgstr ""
+
+#: templates/admin/meta-box.php:1433
+#: templates/admin/meta-box.php:1484
+msgid "Text cannot be empty"
+msgstr ""
+
+#: templates/admin/meta-box.php:1439
+msgid "Saving..."
+msgstr ""
+
+#: templates/admin/meta-box.php:1455
+msgid "Text saved successfully!"
+msgstr ""
+
+#: templates/admin/meta-box.php:1456
+msgid "Characters:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1457
+msgid "Words:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1458
+msgid "You can now use the Generate Audio button to create TTS from your edited text."
+msgstr ""
+
+#: templates/admin/meta-box.php:1462
+#: templates/admin/meta-box.php:1545
+#: templates/admin/meta-box.php:1551
+msgid "Error saving text"
+msgstr ""
+
+#: templates/admin/meta-box.php:1463
+#: templates/admin/meta-box.php:1546
+msgid "Save failed:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1467
+msgid "Error connecting to server:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1490
+msgid "Saving & Generating..."
+msgstr ""
+
+#: templates/admin/meta-box.php:1520
+msgid "Audio generated successfully!"
+msgstr ""
+
+#: templates/admin/meta-box.php:1522
+msgid "Audio URL:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1533
+msgid "Error generating audio"
+msgstr ""
+
+#: templates/admin/meta-box.php:1534
+msgid "Generation failed:"
+msgstr ""
+
+#: templates/admin/meta-box.php:1538
+msgid "Error generating audio:"
+msgstr ""
+
+#: templates/frontend/audio-player.php:69
+msgid "Versión en audio de: %s"
+msgstr ""
+
+#: templates/frontend/audio-player.php:77
+#: templates/frontend/enhanced-sesolibre-player.php:171
+#: templates/frontend/tts-player.php:161
+msgid "Control de velocidad"
+msgstr ""
+
+#: templates/frontend/audio-player.php:95
+msgid "Escucha el artículo"
+msgstr ""
+
+#: templates/frontend/audio-player.php:101
+msgid "Voz: %s"
+msgstr ""
+
+#: templates/frontend/audio-player.php:107
+msgid "Proveedor: %s"
+msgstr ""
+
+#: templates/frontend/audio-player.php:115
+#: templates/frontend/enhanced-sesolibre-player.php:236
+#: templates/frontend/tts-player.php:233
+msgid "Descargar"
+msgstr ""
+
+#: templates/frontend/audio-player.php:151
+msgid "Error cargando el audio. Por favor intenta descargar el archivo."
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:136
+#: templates/frontend/tts-player.php:147
+msgid "Reproducir/Pausar"
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:153
+#: templates/frontend/minimal-player.php:87
+#: templates/frontend/tts-player.php:151
+msgid "Posición de reproducción"
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:198
+#: templates/frontend/tts-player.php:189
+msgid "Volumen de Voz"
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:212
+#: templates/frontend/tts-player.php:203
+msgid "Volumen de Música de Fondo"
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:246
+msgid "Cargando audio..."
+msgstr ""
+
+#: templates/frontend/enhanced-sesolibre-player.php:257
+#: templates/frontend/tts-player.php:246
+msgid "Reproduciendo archivo de audio personalizado"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:72
+msgid "Reproducir"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:166
+msgid "Ajustes de reproducción"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:177
+msgid "Velocidad de reproducción:"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:191
+msgid "Descargar audio"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:214
+msgid "Cargando audio…"
+msgstr ""
+
+#: templates/frontend/minimal-player.php:219
+msgid "Error al cargar el audio."
+msgstr ""
+
+#: templates/frontend/minimal-player.php:219
+msgid "Reintentar"
+msgstr ""
+
+#: templates/frontend/tts-player.php:136
+msgid "Reproductor SesoLibre"
+msgstr ""
+
+#: templates/frontend/tts-player.php:196
+msgid "Música"
+msgstr ""
+
+#: templates/frontend/tts-player.php:219
+msgid "Servicio:"
+msgstr ""
+
+#: templates/frontend/tts-player.php:225
+msgid "Voz:"
+msgstr ""
+
+#: wp-tts-plugin.php:98
+msgid "Configuración"
+msgstr ""
+
+#: wp-tts-plugin.php:109
+msgid "Documentación"
+msgstr ""
+
+#: wp-tts-plugin.php:110
+msgid "Soporte"
+msgstr ""

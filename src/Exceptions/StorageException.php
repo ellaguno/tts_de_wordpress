@@ -105,6 +105,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: 1: file name, 2: storage provider */
 			__( 'Error al subir el archivo "%1$s" al almacenamiento %2$s', 'tts-sesolibre' ),
 			$filename,
 			$provider
@@ -140,6 +141,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: 1: file name, 2: storage provider */
 			__( 'Error al eliminar el archivo "%1$s" del almacenamiento %2$s', 'tts-sesolibre' ),
 			$fileUrl,
 			$provider
@@ -173,6 +175,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: %s: storage provider */
 			__( 'Falló la autenticación para el almacenamiento %s', 'tts-sesolibre' ),
 			$provider
 		);
@@ -205,6 +208,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: %s: storage provider */
 			__( 'Cuota de almacenamiento superada para %s', 'tts-sesolibre' ),
 			$provider
 		);
@@ -233,6 +237,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: 1: file name, 2: storage provider */
 			__( 'Archivo "%1$s" no encontrado en el almacenamiento %2$s', 'tts-sesolibre' ),
 			$filename,
 			$provider
@@ -266,6 +271,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: 1: file name, 2: file size, 3: storage provider, 4: max size */
 			__( 'El archivo "%1$s" es demasiado grande (%2$s). El tamaño máximo para %3$s es %4$s', 'tts-sesolibre' ),
 			$filename,
 			size_format( $fileSize ),
@@ -303,6 +309,7 @@ class StorageException extends TTSException {
 		array $context = array()
 	): self {
 		$message = sprintf(
+			/* translators: 1: operation name, 2: storage provider */
 			__( 'Error de red durante la operación %1$s con el almacenamiento %2$s', 'tts-sesolibre' ),
 			$operation,
 			$provider

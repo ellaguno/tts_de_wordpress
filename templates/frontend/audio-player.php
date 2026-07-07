@@ -52,7 +52,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
     $voice_id = get_post_meta($post_id, '_tts_voice_id', true);
     $generated_at = get_post_meta($post_id, '_tts_generated_at', true);
     if ($generated_at && is_numeric($generated_at)) {
-        $generated_at = date('Y-m-d H:i:s', $generated_at);
+        $generated_at = gmdate('Y-m-d H:i:s', $generated_at);
     }
 }
 
@@ -66,10 +66,10 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
             controls 
             preload="none"
             crossorigin="anonymous"
-            aria-label="<?php echo esc_attr(sprintf(__('Versión en audio de: %s', 'tts-sesolibre'), $post_title)); ?>"
+            aria-label="<?php /* translators: %s: post title */ echo esc_attr(sprintf(__('Versión en audio de: %s', 'tts-sesolibre'), $post_title)); ?>"
             class="wp-tts-audio-element">
             <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
-            <p><?php _e('Tu navegador no soporta el elemento de audio.', 'tts-sesolibre'); ?></p>
+            <p><?php esc_html_e('Tu navegador no soporta el elemento de audio.', 'tts-sesolibre'); ?></p>
         </audio>
         
         <?php if ($player_config['show_speed_control'] ?? true): ?>
@@ -92,17 +92,19 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
     </div>
     
     <div class="wp-tts-player-meta">
-        <span class="wp-tts-label"><?php _e('Escucha el artículo', 'tts-sesolibre'); ?></span>
+        <span class="wp-tts-label"><?php esc_html_e('Escucha el artículo', 'tts-sesolibre'); ?></span>
         <?php if ($voice_id || $provider): ?>
             <span class="wp-tts-voice-info">
                 <?php 
                 if ($voice_id) {
-                    echo sprintf(__('Voz: %s', 'tts-sesolibre'), esc_html($voice_id));
+                    /* translators: %s: voice name */
+                    echo sprintf( esc_html__('Voz: %s', 'tts-sesolibre'), esc_html($voice_id));
                     if ($provider) {
                         echo ' (' . esc_html(ucfirst(str_replace('_', ' ', $provider))) . ')';
                     }
                 } else if ($provider) {
-                    echo sprintf(__('Proveedor: %s', 'tts-sesolibre'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
+                    /* translators: %s: TTS provider name */
+                    echo sprintf( esc_html__('Proveedor: %s', 'tts-sesolibre'), esc_html(ucfirst(str_replace('_', ' ', $provider))));
                 }
                 ?>
             </span>
@@ -110,7 +112,7 @@ if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
         <span class="wp-tts-download">
         <a href="<?php echo esc_url($audio_url); ?>" download class="wp-tts-download-link">
             <span class="wp-tts-headphones">🎧</span>
-            <?php _e('Descargar', 'tts-sesolibre'); ?>
+            <?php esc_html_e('Descargar', 'tts-sesolibre'); ?>
             </a>
         </span>
     </div>

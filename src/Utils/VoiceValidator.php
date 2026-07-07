@@ -124,7 +124,7 @@ class VoiceValidator {
 		// "valid" voice here silently changed the user's selection.
 		if ( $voice === '' ) {
 			$default = self::getDefaultVoice( $provider );
-			error_log( "[VoiceValidator] Empty voice for provider '{$provider}', using default '{$default}'" );
+			\WP_TTS\Utils\Logger::debugLog( "[VoiceValidator] Empty voice for provider '{$provider}', using default '{$default}'" );
 			return $default;
 		}
 

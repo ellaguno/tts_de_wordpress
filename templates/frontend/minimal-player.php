@@ -203,8 +203,8 @@ $text_color = $config->get('player.player_text_color', '#333333');
 
     <!-- Hidden Audio Element -->
     <audio class="wp-tts-audio" preload="none" crossorigin="anonymous">
-        <source src="<?php echo $audio_url; ?>" type="audio/mpeg">
-        <source src="<?php echo $audio_url; ?>" type="audio/ogg">
+        <source src="<?php echo esc_url($audio_url); ?>" type="audio/mpeg">
+        <source src="<?php echo esc_url($audio_url); ?>" type="audio/ogg">
         <?php esc_html_e('Tu navegador no soporta el elemento de audio.', 'tts-sesolibre'); ?>
     </audio>
 

@@ -10,7 +10,7 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: tts-sesolibre
  * Domain Path: /languages
- * Requires at least: 5.0
+ * Requires at least: 6.1
  * Tested up to: 6.4
  * Requires PHP: 7.4
  */
@@ -26,18 +26,6 @@ define('WP_TTS_PLUGIN_FILE', __FILE__);
 define('WP_TTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TTS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_TTS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-
-/**
- * Translate a string and escape it for safe output inside inline JavaScript.
- *
- * Convenience wrapper equivalent to esc_js( __( $text, $domain ) ). Several admin
- * views call esc_js__() directly; define it here so those calls resolve.
- */
-if (!function_exists('esc_js__')) {
-    function esc_js__($text, $domain = 'default') {
-        return esc_js(__($text, $domain));
-    }
-}
 
 // Include required classes directly for activation/deactivation
 require_once WP_TTS_PLUGIN_DIR . 'src/Core/Activator.php';
