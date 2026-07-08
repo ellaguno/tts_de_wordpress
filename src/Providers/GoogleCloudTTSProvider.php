@@ -232,10 +232,136 @@ class GoogleCloudTTSProvider implements TTSProviderInterface {
 	/**
 	 * Get available voices
 	 *
+	 * Tries the Google Cloud TTS API first (full, up-to-date catalog including
+	 * Wavenet/Neural2/Studio voices); falls back to a static list on failure.
+	 *
 	 * @param string $language Language code (optional).
 	 * @return array Available voices.
 	 */
 	public function getAvailableVoices( string $language = 'es-MX' ): array {
+		$api_voices = $this->fetchVoicesFromAPI( $language );
+		if ( ! empty( $api_voices ) ) {
+			return $api_voices;
+		}
+
+		return $this->getStaticVoiceList( $language );
+	}
+
+	/**
+	 * Fetch voices from Google Cloud TTS API
+	 *
+	 * @param string $language Language code to filter (optional).
+	 * @return array Array of voices or empty array on failure.
+	 */
+	private function fetchVoicesFromAPI( string $language = '' ): array {
+		if ( ! $this->isConfigured() ) {
+			return [];
+		}
+
+		try {
+			$credentials_path = GoogleCredentialsResolver::resolve( $this->config['credentials_path'] ?? '' );
+			if ( null === $credentials_path ) {
+				return [];
+			}
+
+			// Find the correct client class
+			$client_class = null;
+			$possible_classes = [
+				'\Google\Cloud\TextToSpeech\V1\TextToSpeechClient',
+				'\Google\Cloud\TextToSpeech\V1\Client\TextToSpeechClient',
+			];
+
+			foreach ( $possible_classes as $class_name ) {
+				if ( class_exists( $class_name ) ) {
+					$client_class = $class_name;
+					break;
+				}
+			}
+
+			if ( ! $client_class ) {
+				return [];
+			}
+
+			$client = new $client_class( [
+				'credentials' => $credentials_path,
+			] );
+
+			// Fetch voices from the API
+			$response = $client->listVoices();
+			$client->close();
+
+			$voices = [];
+			foreach ( $response->getVoices() as $voice ) {
+				$voice_name = $voice->getName();
+				$language_codes = $voice->getLanguageCodes();
+				$ssml_gender = $voice->getSsmlGender();
+
+				// Map gender enum to string
+				$gender = 'Unknown';
+				if ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::MALE ) {
+					$gender = 'Male';
+				} elseif ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::FEMALE ) {
+					$gender = 'Female';
+				} elseif ( $ssml_gender === \Google\Cloud\TextToSpeech\V1\SsmlVoiceGender::NEUTRAL ) {
+					$gender = 'Neutral';
+				}
+
+				// Determine voice type from name
+				$type = 'Standard';
+				if ( strpos( $voice_name, 'Neural2' ) !== false ) {
+					$type = 'Neural2';
+				} elseif ( strpos( $voice_name, 'Wavenet' ) !== false ) {
+					$type = 'Wavenet';
+				} elseif ( strpos( $voice_name, 'Studio' ) !== false ) {
+					$type = 'Studio';
+				} elseif ( strpos( $voice_name, 'Polyglot' ) !== false ) {
+					$type = 'Polyglot';
+				} elseif ( strpos( $voice_name, 'Journey' ) !== false ) {
+					$type = 'Journey';
+				}
+
+				// Get first language code
+				$lang_code = ! empty( $language_codes ) ? $language_codes[0] : 'unknown';
+
+				// Filter by language if specified
+				if ( ! empty( $language ) && $lang_code !== $language ) {
+					// Check if we want Spanish voices (es-*)
+					if ( strpos( $language, 'es-' ) === 0 && strpos( $lang_code, 'es-' ) !== 0 ) {
+						continue;
+					}
+				}
+
+				// Create display name
+				$display_name = $voice_name;
+				if ( preg_match( '/([A-Z][a-z0-9]+)[-]?([A-Z])?$/', $voice_name, $matches ) ) {
+					$display_name = $matches[1] . ( isset( $matches[2] ) ? ' ' . $matches[2] : '' ) . " ({$gender})";
+				}
+
+				$voices[] = [
+					'id' => $voice_name,
+					'name' => $display_name,
+					'gender' => $gender,
+					'type' => $type,
+					'language' => $lang_code,
+				];
+			}
+
+			$this->logger->info( 'Successfully fetched voices from Google Cloud TTS API', [ 'count' => count( $voices ) ] );
+			return $voices;
+
+		} catch ( \Exception $e ) {
+			$this->logger->warning( 'Failed to fetch voices from Google Cloud TTS API', [ 'error' => $e->getMessage() ] );
+			return [];
+		}
+	}
+
+	/**
+	 * Get static voice list as fallback
+	 *
+	 * @param string $language Language code (optional).
+	 * @return array Available voices.
+	 */
+	private function getStaticVoiceList( string $language = 'es-MX' ): array {
 		// Standard voices (free tier) for common languages
 		$voices = [
 			// Spanish (Spain) - Standard voices available

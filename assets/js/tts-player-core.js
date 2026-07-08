@@ -88,26 +88,48 @@ class TTSPlayerCore {
      * Audio element setup
      * ------------------------------------------------------------------ */
 
+    /**
+     * External hosts (e.g. Buzzsprout) don't send CORS headers, so setting
+     * crossOrigin='anonymous' on their URLs makes metadata loading fail.
+     */
+    isExternalUrl(url) {
+        if (!url) return false;
+        try {
+            const audioUrl = new URL(url, window.location.origin);
+            return audioUrl.hostname !== window.location.hostname ||
+                   url.includes('buzzsprout.com');
+        } catch (e) {
+            return false;
+        }
+    }
+
     createAudioElements(adoptAudioSelector) {
         if (adoptAudioSelector) {
             this.audio.main = this.container.querySelector(adoptAudioSelector);
         } else if (this.urls.main) {
             this.audio.main = new Audio();
-            this.audio.main.crossOrigin = 'anonymous';
+            // Don't set crossOrigin for external URLs to avoid CORS errors
+            if (!this.isExternalUrl(this.urls.main)) {
+                this.audio.main.crossOrigin = 'anonymous';
+            }
             this.audio.main.preload = 'metadata';
             this.audio.main.src = this.urls.main;
         }
 
         if (this.urls.intro) {
             this.audio.intro = new Audio();
-            this.audio.intro.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.urls.intro)) {
+                this.audio.intro.crossOrigin = 'anonymous';
+            }
             this.audio.intro.preload = 'metadata';
             this.audio.intro.src = this.urls.intro;
         }
 
         if (this.urls.background) {
             this.audio.background = new Audio();
-            this.audio.background.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.urls.background)) {
+                this.audio.background.crossOrigin = 'anonymous';
+            }
             this.audio.background.preload = 'metadata';
             this.audio.background.src = this.urls.background;
             this.audio.background.loop = true;
@@ -116,7 +138,9 @@ class TTSPlayerCore {
 
         if (this.urls.outro) {
             this.audio.outro = new Audio();
-            this.audio.outro.crossOrigin = 'anonymous';
+            if (!this.isExternalUrl(this.urls.outro)) {
+                this.audio.outro.crossOrigin = 'anonymous';
+            }
             this.audio.outro.preload = 'metadata';
             this.audio.outro.src = this.urls.outro;
         }

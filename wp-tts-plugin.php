@@ -3,7 +3,7 @@
  * Plugin Name: TTS SesoLibre
  * Plugin URI: https://github.com/ellaguno/tts_sesolibre.git
  * Description: Convert WordPress articles to audio using multiple TTS providers with cost optimization and Spanish language focus.
- * Version: 1.7.0
+ * Version: 2.0.0
  * Author: Eduardo Llaguno
  * Author URI: https://sesolibre.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WP_TTS_PLUGIN_VERSION', '1.7.0');
+define('WP_TTS_PLUGIN_VERSION', '2.0.0');
 define('WP_TTS_PLUGIN_FILE', __FILE__);
 define('WP_TTS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TTS_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -95,7 +95,7 @@ add_action('plugins_loaded', 'wp_tts_plugin_init');
  * Add action links to plugin page
  */
 function wp_tts_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=wp-tts-settings') . '">' . __('Configuración', 'tts-sesolibre') . '</a>';
+    $settings_link = '<a href="' . esc_url( admin_url('options-general.php?page=wp-tts-settings') ) . '">' . esc_html__('Configuración', 'tts-sesolibre') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
@@ -106,8 +106,8 @@ add_filter('plugin_action_links_' . WP_TTS_PLUGIN_BASENAME, 'wp_tts_plugin_actio
  */
 function wp_tts_plugin_meta_links($links, $file) {
     if ($file === WP_TTS_PLUGIN_BASENAME) {
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/wiki" target="_blank">' . __('Documentación', 'tts-sesolibre') . '</a>';
-        $links[] = '<a href="https://github.com/your-username/TTS de Wordpress/issues" target="_blank">' . __('Soporte', 'tts-sesolibre') . '</a>';
+        $links[] = '<a href="https://github.com/ellaguno/tts_de_wordpress/wiki" target="_blank">' . esc_html__('Documentación', 'tts-sesolibre') . '</a>';
+        $links[] = '<a href="https://github.com/ellaguno/tts_de_wordpress/issues" target="_blank">' . esc_html__('Soporte', 'tts-sesolibre') . '</a>';
     }
     return $links;
 }

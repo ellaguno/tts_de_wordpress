@@ -212,6 +212,10 @@ class Plugin {
 		// Background (cron) audio (re)generation scheduled by scheduleAudioGeneration()
 		add_action( 'wp_tts_generate_audio_background', array( $this, 'handleBackgroundAudioGeneration' ) );
 
+		// Auto-generation for posts published in configured categories
+		add_action( 'transition_post_status', array( $this, 'handlePostStatusTransition' ), 10, 3 );
+		add_action( 'wp_tts_auto_generate_audio', array( $this, 'handleAutoGenerateAudio' ) );
+
 		// Custom hooks for extensibility
 		do_action( 'wp_tts_plugin_loaded', $this );
 	}
@@ -1076,6 +1080,221 @@ class Plugin {
 				'error'   => $e->getMessage(),
 			] );
 		}
+	}
+
+	/**
+	 * Handle post status transition for auto-generation
+	 *
+	 * When a post in one of the configured categories transitions to
+	 * 'publish', schedules background audio generation for it.
+	 *
+	 * @param string   $new_status New post status
+	 * @param string   $old_status Old post status
+	 * @param \WP_Post $post       Post object
+	 */
+	public function handlePostStatusTransition( $new_status, $old_status, $post ): void {
+		$logger = $this->container->get( 'logger' );
+
+		// Only proceed if transitioning to 'publish'
+		if ( $new_status !== 'publish' ) {
+			return;
+		}
+
+		// Check if auto-generation is configured for this post (enabled + category match)
+		if ( ! $this->config->shouldAutoGenerateForPost( $post->ID ) ) {
+			return;
+		}
+
+		$auto_settings = $this->config->getAutoGenerateSettings();
+
+		// If on_publish_only is true, only generate when post is first published
+		if ( ! empty( $auto_settings['on_publish_only'] ) && $old_status === 'publish' ) {
+			$logger->info( 'Auto-generate skipped - post already published', [
+				'post_id' => $post->ID
+			] );
+			return;
+		}
+
+		// If already has audio and on_publish_only is true, skip
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) && ! empty( $auto_settings['on_publish_only'] ) ) {
+			$tts_data = \WP_TTS\Utils\TTSMetaManager::getTTSData( $post->ID );
+			if ( ! empty( $tts_data['audio']['url'] ) ) {
+				$logger->info( 'Auto-generate skipped - post already has audio', [
+					'post_id' => $post->ID
+				] );
+				return;
+			}
+		}
+
+		$logger->info( 'Triggering auto-generation for post', [
+			'post_id'    => $post->ID,
+			'post_title' => $post->post_title,
+			'old_status' => $old_status,
+			'new_status' => $new_status
+		] );
+
+		// Transient lock to prevent duplicate scheduling for the same post
+		$transient_key = 'wp_tts_auto_gen_' . $post->ID;
+		if ( get_transient( $transient_key ) ) {
+			$logger->info( 'Auto-generation already scheduled', [ 'post_id' => $post->ID ] );
+			return;
+		}
+		set_transient( $transient_key, true, 300 ); // 5 minutes lock
+
+		// Method 1: Try Action Scheduler first (more reliable for background tasks)
+		if ( function_exists( 'as_schedule_single_action' ) ) {
+			as_schedule_single_action( time(), 'wp_tts_auto_generate_audio', [ $post->ID ], 'tts-sesolibre' );
+			return;
+		}
+
+		// Method 2: Use shutdown hook for immediate execution after the response
+		$post_id = $post->ID;
+		add_action( 'shutdown', function() use ( $post_id ) {
+			if ( connection_aborted() ) {
+				return;
+			}
+
+			// Set extended execution time for audio generation
+			if ( function_exists( 'set_time_limit' ) ) {
+				// phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Needed for long audio generation process
+				@set_time_limit( 300 ); // 5 minutes
+			}
+
+			$this->handleAutoGenerateAudio( $post_id );
+
+			// Cancel the wp_cron backup since shutdown executed successfully
+			$timestamp = wp_next_scheduled( 'wp_tts_auto_generate_audio', [ $post_id ] );
+			if ( $timestamp ) {
+				wp_unschedule_event( $timestamp, 'wp_tts_auto_generate_audio', [ $post_id ] );
+			}
+		}, 100 ); // Priority 100 to run late
+
+		// Method 3: Schedule wp_cron as backup (only runs if shutdown fails;
+		// it checks whether audio already exists before generating)
+		if ( ! wp_next_scheduled( 'wp_tts_auto_generate_audio', [ $post->ID ] ) ) {
+			wp_schedule_single_event( time() + 120, 'wp_tts_auto_generate_audio', [ $post->ID ] );
+		}
+	}
+
+	/**
+	 * Handle auto-generate audio for posts in configured categories
+	 *
+	 * @param int $post_id Post ID
+	 */
+	public function handleAutoGenerateAudio( $post_id ): void {
+		$post_id = intval( $post_id );
+		$logger  = $this->container->get( 'logger' );
+
+		if ( ! $post_id || ! get_post( $post_id ) ) {
+			return;
+		}
+
+		$logger->info( 'Starting auto-generate audio', [ 'post_id' => $post_id ] );
+
+		// Check if audio already exists for this post (prevents duplicate
+		// generation and duplicate uploads to Buzzsprout)
+		$existing_audio_url = '';
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			$existing_audio_url = \WP_TTS\Utils\TTSMetaManager::getAudioUrl( $post_id );
+		} else {
+			$existing_audio_url = get_post_meta( $post_id, '_tts_audio_url', true );
+		}
+
+		if ( ! empty( $existing_audio_url ) ) {
+			$logger->info( 'Auto-generate skipped - audio already exists', [
+				'post_id'            => $post_id,
+				'existing_audio_url' => $existing_audio_url
+			] );
+			delete_transient( 'wp_tts_auto_gen_' . $post_id );
+			return;
+		}
+
+		// Processing lock to prevent concurrent generation attempts
+		$processing_key = 'wp_tts_processing_' . $post_id;
+		if ( get_transient( $processing_key ) ) {
+			$logger->info( 'Auto-generate skipped - already being processed', [
+				'post_id' => $post_id
+			] );
+			return;
+		}
+		set_transient( $processing_key, true, 600 ); // 10 minutes
+
+		try {
+			// First, enable TTS for this post and set default configuration
+			$this->setupPostForAutoGeneration( $post_id );
+
+			// Then generate the audio (true = auto-generation, bypasses rate limiting)
+			$tts_service = $this->container->get( 'tts_service' );
+			$result = $tts_service->generateAudioForPost( $post_id, true );
+
+			if ( $result && isset( $result->url ) ) {
+				$logger->info( 'Auto-generate audio completed', [
+					'post_id'   => $post_id,
+					'audio_url' => $result->url,
+					'provider'  => $result->provider ?? 'unknown'
+				] );
+			} else {
+				$logger->error( 'Auto-generate audio failed - no result', [
+					'post_id' => $post_id
+				] );
+			}
+		} catch ( \Throwable $e ) {
+			$logger->error( 'Auto-generate audio failed with exception', [
+				'post_id' => $post_id,
+				'error'   => $e->getMessage()
+			] );
+		} finally {
+			delete_transient( $processing_key );
+			delete_transient( 'wp_tts_auto_gen_' . $post_id );
+		}
+	}
+
+	/**
+	 * Setup a post for auto-generation with default configuration
+	 *
+	 * Enables TTS on the post and copies the default provider, its default
+	 * voice and the default audio assets into the post meta, so generation
+	 * behaves exactly as if the user had configured the meta box manually.
+	 *
+	 * @param int $post_id Post ID
+	 */
+	private function setupPostForAutoGeneration( int $post_id ): void {
+		$default_provider = $this->config->get( 'defaults.default_provider', 'google' );
+
+		// Default voice comes from the provider's own configuration
+		$provider_config = $this->config->getProviderConfig( $default_provider );
+		$default_voice   = $provider_config['default_voice'] ?? '';
+
+		// Default audio assets (intro/outro/background)
+		$audio_assets       = $this->config->getAudioLibrary();
+		$default_intro      = $audio_assets['default_intro'] ?? '';
+		$default_outro      = $audio_assets['default_outro'] ?? '';
+		$default_background = $audio_assets['default_background'] ?? '';
+
+		if ( class_exists( '\\WP_TTS\\Utils\\TTSMetaManager' ) ) {
+			\WP_TTS\Utils\TTSMetaManager::setTTSEnabled( $post_id, true );
+			\WP_TTS\Utils\TTSMetaManager::setVoiceConfig( $post_id, $default_provider, $default_voice, 'es-MX' );
+
+			if ( $default_intro || $default_outro || $default_background ) {
+				\WP_TTS\Utils\TTSMetaManager::updateTTSSection( $post_id, 'audio_assets', [
+					'intro_audio'       => $default_intro,
+					'outro_audio'       => $default_outro,
+					'background_audio'  => $default_background,
+					'background_volume' => 0.3
+				] );
+			}
+		} else {
+			// Fallback to old meta system
+			update_post_meta( $post_id, '_tts_enabled', true );
+			update_post_meta( $post_id, '_tts_voice_provider', $default_provider );
+			update_post_meta( $post_id, '_tts_voice_id', $default_voice );
+		}
+
+		$this->container->get( 'logger' )->info( 'Post setup for auto-generation', [
+			'post_id'  => $post_id,
+			'provider' => $default_provider,
+			'voice'    => $default_voice
+		] );
 	}
 
 	/**

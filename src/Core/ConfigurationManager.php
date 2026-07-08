@@ -34,6 +34,7 @@ class ConfigurationManager {
 		'audio_library' => 'wp_tts_audio_library',
 		'analytics'     => 'wp_tts_analytics_settings',
 		'player'        => 'wp_tts_player_settings',
+		'auto_generate' => 'wp_tts_auto_generate_settings',
 	);
 
 	/**
@@ -50,6 +51,7 @@ class ConfigurationManager {
 		'audio_library' => 'audio_assets',
 		'analytics'     => 'analytics',
 		'player'        => 'player',
+		'auto_generate' => 'auto_generate',
 	);
 
 	/**
@@ -175,6 +177,13 @@ class ConfigurationManager {
 			'show_download_link'        => true,
 			'show_article_title'        => true,
 		),
+		'auto_generate' => array(
+			'enabled'            => false,
+			'categories'         => array(), // IDs de categorías que activan la generación
+			'post_types'         => array( 'post' ),
+			'on_publish_only'    => true, // Solo al publicar por primera vez
+			'use_default_config' => true,
+		),
 	);
 
 	/**
@@ -219,6 +228,7 @@ class ConfigurationManager {
 			'audio_library' => $this->defaults['audio_library'],
 			'analytics'     => $this->defaults['analytics'],
 			'player'        => $this->defaults['player'],
+			'auto_generate' => $this->defaults['auto_generate'],
 		);
 
 		$this->config = array();
@@ -382,6 +392,91 @@ class ConfigurationManager {
 		$current = $this->getDefaults();
 		$updated = array_merge( $current, $defaults );
 		$this->set( 'defaults', $updated );
+	}
+
+	/**
+	 * Get auto-generate settings
+	 *
+	 * @return array Auto-generate settings
+	 */
+	public function getAutoGenerateSettings(): array {
+		$settings = $this->get( 'auto_generate', $this->defaults['auto_generate'] );
+
+		// Ensure we always return an array
+		if ( ! is_array( $settings ) ) {
+			return $this->defaults['auto_generate'];
+		}
+
+		return array_merge( $this->defaults['auto_generate'], $settings );
+	}
+
+	/**
+	 * Update auto-generate settings
+	 *
+	 * @param array $settings New auto-generate settings
+	 */
+	public function updateAutoGenerateSettings( array $settings ): void {
+		$current = $this->getAutoGenerateSettings();
+		$updated = array_merge( $current, $settings );
+		$this->set( 'auto_generate', $updated );
+	}
+
+	/**
+	 * Check if a post should have auto-generated audio based on its categories
+	 *
+	 * @param int $post_id Post ID to check
+	 * @return bool Whether auto-generation should occur
+	 */
+	public function shouldAutoGenerateForPost( int $post_id ): bool {
+		$settings = $this->getAutoGenerateSettings();
+
+		$logger = $this->getLogger();
+		$logger->info( 'Checking auto-generate for post', [
+			'post_id' => $post_id,
+			'settings' => $settings
+		] );
+
+		// Check if auto-generate is enabled
+		if ( empty( $settings['enabled'] ) ) {
+			$logger->info( 'Auto-generate disabled' );
+			return false;
+		}
+
+		// Check if post type is supported
+		$post_type = get_post_type( $post_id );
+		$supported_types = $settings['post_types'] ?? [ 'post' ];
+		if ( ! in_array( $post_type, $supported_types, true ) ) {
+			$logger->info( 'Post type not supported', [
+				'post_type' => $post_type,
+				'supported' => $supported_types
+			] );
+			return false;
+		}
+
+		// If no categories are configured, don't auto-generate
+		$configured_categories = $settings['categories'] ?? [];
+		if ( empty( $configured_categories ) ) {
+			$logger->info( 'No categories configured for auto-generate' );
+			return false;
+		}
+
+		// Get post categories (as integers)
+		$post_categories = wp_get_post_categories( $post_id, array( 'fields' => 'ids' ) );
+
+		// Ensure both arrays contain integers for proper comparison
+		$post_categories = array_map( 'intval', $post_categories );
+		$configured_categories = array_map( 'intval', $configured_categories );
+
+		// Check if any post category matches configured categories
+		$matching_categories = array_intersect( $post_categories, $configured_categories );
+
+		$should_generate = ! empty( $matching_categories );
+		$logger->info( 'Auto-generate decision', [
+			'matching' => $matching_categories,
+			'should_generate' => $should_generate
+		] );
+
+		return $should_generate;
 	}
 
 	/**

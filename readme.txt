@@ -4,7 +4,7 @@ Tags: text-to-speech, tts, audio, accessibility, podcast
 Requires at least: 6.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,15 @@ Provider keys are encrypted at rest (AES-256-GCM, keyed from your WordPress salt
 
 == Changelog ==
 
+= 2.0.0 =
+* Auto-generation of audio for posts published in selected categories (new "Auto-Generación" settings tab).
+* Gutenberg block filtering before narration: images, embeds, custom HTML, forms, buttons and standalone URLs are no longer read aloud.
+* Google Cloud TTS voices are fetched dynamically from the API (full Wavenet/Neural2/Studio catalog), with static fallback.
+* Fixed CORS error when loading Buzzsprout-hosted audio in the player.
+* Rate limiting for manual audio generation (10 requests/min per user, filterable).
+* Formatted service statistics table in Tools (providers, cache size, posts with audio).
+* Fixed the Settings link on the Plugins page pointing to the wrong admin URL.
+
 = 1.7.0 =
 * Unified configuration into a single option with automatic migration.
 * Consolidated the player variants into one shared engine with accessibility improvements.
@@ -62,6 +71,9 @@ Provider keys are encrypted at rest (AES-256-GCM, keyed from your WordPress salt
 * Buzzsprout episode details and automatic publishing, configurable from settings.
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+Restores and improves features from the 1.9.x series (category auto-generation, Gutenberg filtering, Buzzsprout CORS fix) on top of the 1.7.0 refactor. Update from any prior version.
 
 = 1.7.0 =
 Major internal refactor (configuration, players, security). Settings are migrated automatically; review your provider configuration after updating.

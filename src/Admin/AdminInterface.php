@@ -375,7 +375,8 @@ class AdminInterface {
 			'defaults' => $this->config->get('defaults', []),
 			'storage' => $this->config->get('storage', []),
 			'audio_assets' => $this->config->get('audio_library', []),
-			'player' => $this->config->get('player', [])
+			'player' => $this->config->get('player', []),
+			'auto_generate' => $this->config->getAutoGenerateSettings()
 		];
 		
 		echo '<div class="wrap">';
@@ -407,6 +408,9 @@ class AdminInterface {
 			case 'player':
 				$this->renderPlayerTab( $config );
 				break;
+			case 'auto_generate':
+				$this->renderAutoGenerateTab( $config );
+				break;
 			default:
 				$this->renderDefaultsTab( $config );
 		}
@@ -428,7 +432,8 @@ class AdminInterface {
 			'providers' => __( 'Proveedores TTS', 'tts-sesolibre' ),
 			'storage' => __( 'Almacenamiento', 'tts-sesolibre' ),
 			'audio_assets' => __( 'Recursos de Audio', 'tts-sesolibre' ),
-			'player' => __( 'Reproductor', 'tts-sesolibre' )
+			'player' => __( 'Reproductor', 'tts-sesolibre' ),
+			'auto_generate' => __( 'Auto-Generación', 'tts-sesolibre' )
 		];
 
 		echo '<div class="nav-tab-wrapper">';
@@ -1305,7 +1310,83 @@ class AdminInterface {
 		// Service Statistics
 		echo '<div class="card">';
 		echo '<h2>' . esc_html__( 'Estadísticas del Servicio', 'tts-sesolibre' ) . '</h2>';
-		echo '<pre>' . esc_html( wp_json_encode( $stats, JSON_PRETTY_PRINT ) ) . '</pre>';
+
+		echo '<table class="wp-tts-stats-table" style="width: 100%; border-collapse: collapse;">';
+
+		// Default Provider
+		echo '<tr>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600; width: 40%;">' . esc_html__( 'Proveedor Predeterminado', 'tts-sesolibre' ) . '</td>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee;">' . esc_html( ucfirst( str_replace( '_', ' ', $stats['default_provider'] ?? 'N/A' ) ) ) . '</td>';
+		echo '</tr>';
+
+		// Configured Providers
+		echo '<tr>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">' . esc_html__( 'Proveedores Configurados', 'tts-sesolibre' ) . '</td>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee;">';
+		if ( ! empty( $stats['configured_providers'] ) ) {
+			$provider_names = array_map( function( $p ) {
+				return '<span class="wp-tts-provider-badge" style="display: inline-block; background: #0073aa; color: #fff; padding: 2px 8px; border-radius: 3px; margin: 2px; font-size: 12px;">' . esc_html( ucfirst( str_replace( '_', ' ', $p ) ) ) . '</span>';
+			}, $stats['configured_providers'] );
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content escaped in array_map above
+			echo implode( ' ', $provider_names );
+		} else {
+			echo '<em>' . esc_html__( 'Ninguno configurado', 'tts-sesolibre' ) . '</em>';
+		}
+		echo '</td>';
+		echo '</tr>';
+
+		// Cache Statistics
+		if ( ! empty( $stats['cache_stats'] ) ) {
+			$cache = $stats['cache_stats'];
+			echo '<tr>';
+			echo '<td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">' . esc_html__( 'Archivos en Caché', 'tts-sesolibre' ) . '</td>';
+			echo '<td style="padding: 8px; border-bottom: 1px solid #eee;">' . esc_html( $cache['total_files'] ?? 0 ) . '</td>';
+			echo '</tr>';
+
+			echo '<tr>';
+			echo '<td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">' . esc_html__( 'Tamaño del Caché', 'tts-sesolibre' ) . '</td>';
+			$cache_size = $cache['total_size'] ?? 0;
+			if ( $cache_size > 1048576 ) {
+				$size_display = number_format( $cache_size / 1048576, 2 ) . ' MB';
+			} elseif ( $cache_size > 1024 ) {
+				$size_display = number_format( $cache_size / 1024, 2 ) . ' KB';
+			} else {
+				$size_display = $cache_size . ' bytes';
+			}
+			echo '<td style="padding: 8px; border-bottom: 1px solid #eee;">' . esc_html( $size_display ) . '</td>';
+			echo '</tr>';
+		}
+
+		// Posts with TTS Audio
+		$posts_with_audio = get_posts( [
+			'post_type' => 'any',
+			'posts_per_page' => -1,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required to count posts with TTS audio
+			'meta_query' => [
+				[
+					'key' => '_tts_audio_url',
+					'compare' => 'EXISTS'
+				]
+			],
+			'fields' => 'ids'
+		] );
+
+		echo '<tr>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">' . esc_html__( 'Posts con Audio TTS', 'tts-sesolibre' ) . '</td>';
+		echo '<td style="padding: 8px; border-bottom: 1px solid #eee;">' . count( $posts_with_audio ) . '</td>';
+		echo '</tr>';
+
+		// Round Robin Status
+		echo '<tr>';
+		echo '<td style="padding: 8px; font-weight: 600;">' . esc_html__( 'Round Robin', 'tts-sesolibre' ) . '</td>';
+		$rr_status = ( $stats['round_robin_disabled'] ?? true )
+			? '<span style="color: #666;">' . esc_html__( 'Deshabilitado', 'tts-sesolibre' ) . '</span>'
+			: '<span style="color: #46b450;">' . esc_html__( 'Habilitado', 'tts-sesolibre' ) . '</span>';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content escaped above
+		echo '<td style="padding: 8px;">' . $rr_status . '</td>';
+		echo '</tr>';
+
+		echo '</table>';
 		echo '</div>';
 		
 		echo '</div>';
@@ -2733,6 +2814,135 @@ class AdminInterface {
 	}
 
 	/**
+	 * Render Auto-Generate tab
+	 */
+	private function renderAutoGenerateTab( array $config ): void {
+		echo '<div class="tts-tab-content">';
+		echo '<h2>' . esc_html__( 'Generación Automática de Audio', 'tts-sesolibre' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Configura la generación automática de audio cuando se publican nuevos posts en categorías específicas.', 'tts-sesolibre' ) . '</p>';
+
+		$auto_generate = $config['auto_generate'] ?? [];
+		$enabled = $auto_generate['enabled'] ?? false;
+		$categories = array_map( 'intval', (array) ( $auto_generate['categories'] ?? [] ) );
+		$post_types = $auto_generate['post_types'] ?? ['post'];
+		$on_publish_only = $auto_generate['on_publish_only'] ?? true;
+
+		// Marker so sanitizeSettings() processes this section even when every
+		// checkbox is unchecked (otherwise disabling the last option is impossible)
+		echo '<input type="hidden" name="wp_tts_config[auto_generate][_submitted]" value="1" />';
+
+		echo '<table class="form-table">';
+
+		// Enable Auto-Generation
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Habilitar Auto-Generación', 'tts-sesolibre' ) . '</th>';
+		echo '<td>';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[auto_generate][enabled]" value="1" ' . checked( $enabled, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Generar audio automáticamente al publicar posts en las categorías seleccionadas', 'tts-sesolibre' );
+		echo '</label>';
+		echo '<p class="description">' . esc_html__( 'Cuando está habilitado, el plugin generará automáticamente el audio usando la configuración por defecto.', 'tts-sesolibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+
+		// Categories Selection
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Categorías para Auto-Generación', 'tts-sesolibre' ) . '</th>';
+		echo '<td>';
+		$this->renderCategoriesCheckboxes( $categories );
+		echo '<p class="description">' . esc_html__( 'Selecciona las categorías que activarán la generación automática de audio. Los posts en estas categorías tendrán su audio generado al publicarse.', 'tts-sesolibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+
+		// Post Types Selection
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Tipos de Contenido', 'tts-sesolibre' ) . '</th>';
+		echo '<td>';
+		$this->renderPostTypesCheckboxes( $post_types );
+		echo '<p class="description">' . esc_html__( 'Selecciona los tipos de contenido que soportarán auto-generación.', 'tts-sesolibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+
+		// Only on Publish (not on update)
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Solo al Publicar', 'tts-sesolibre' ) . '</th>';
+		echo '<td>';
+		echo '<label>';
+		echo '<input type="checkbox" name="wp_tts_config[auto_generate][on_publish_only]" value="1" ' . checked( $on_publish_only, true, false ) . ' />';
+		echo ' ' . esc_html__( 'Solo generar audio cuando el post se publica por primera vez (no al actualizar)', 'tts-sesolibre' );
+		echo '</label>';
+		echo '<p class="description">' . esc_html__( 'Si está deshabilitado, el audio se regenerará cada vez que se actualice el post.', 'tts-sesolibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+
+		echo '</table>';
+
+		// Information box
+		echo '<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">';
+		echo '<strong>' . esc_html__( 'Nota Importante:', 'tts-sesolibre' ) . '</strong><br>';
+		echo esc_html__( 'La generación automática utilizará:', 'tts-sesolibre' ) . '<br>';
+		echo '• ' . esc_html__( 'El proveedor TTS predeterminado configurado en la pestaña Predeterminados', 'tts-sesolibre' ) . '<br>';
+		echo '• ' . esc_html__( 'La voz predeterminada del proveedor seleccionado', 'tts-sesolibre' ) . '<br>';
+		echo '• ' . esc_html__( 'Los recursos de audio (intro/outro/fondo) configurados por defecto', 'tts-sesolibre' ) . '<br>';
+		echo '</div>';
+
+		echo '</div>';
+	}
+
+	/**
+	 * Render categories checkboxes for auto-generation
+	 */
+	private function renderCategoriesCheckboxes( array $selected_categories ): void {
+		$categories = get_categories( [
+			'hide_empty' => false,
+			'orderby' => 'name',
+			'order' => 'ASC'
+		] );
+
+		if ( empty( $categories ) ) {
+			echo '<p>' . esc_html__( 'No hay categorías disponibles.', 'tts-sesolibre' ) . '</p>';
+			return;
+		}
+
+		echo '<div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #fff;">';
+
+		foreach ( $categories as $category ) {
+			$checked = in_array( (int) $category->term_id, $selected_categories, true ) ? 'checked' : '';
+			echo '<label style="display: block; margin-bottom: 5px;">';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $checked is hardcoded 'checked' or empty string
+			echo '<input type="checkbox" name="wp_tts_config[auto_generate][categories][]" value="' . esc_attr( $category->term_id ) . '" ' . $checked . ' />';
+			echo ' ' . esc_html( $category->name );
+			echo ' <span style="color: #666;">(' . esc_html( $category->count ) . ' ' . esc_html__( 'posts', 'tts-sesolibre' ) . ')</span>';
+			echo '</label>';
+		}
+
+		echo '</div>';
+	}
+
+	/**
+	 * Render post types checkboxes for auto-generation
+	 */
+	private function renderPostTypesCheckboxes( array $selected_types ): void {
+		$post_types = get_post_types( [ 'public' => true ], 'objects' );
+
+		// Exclude media/attachments
+		unset( $post_types['attachment'] );
+
+		echo '<div style="display: flex; flex-wrap: wrap; gap: 15px;">';
+
+		foreach ( $post_types as $post_type ) {
+			$checked = in_array( $post_type->name, $selected_types, true ) ? 'checked' : '';
+			echo '<label style="display: inline-flex; align-items: center;">';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $checked is hardcoded 'checked' or empty string
+			echo '<input type="checkbox" name="wp_tts_config[auto_generate][post_types][]" value="' . esc_attr( $post_type->name ) . '" ' . $checked . ' />';
+			echo ' ' . esc_html( $post_type->labels->singular_name );
+			echo '</label>';
+		}
+
+		echo '</div>';
+	}
+
+	/**
 	 * Render hidden fields for other tabs to preserve their data
 	 *
 	 * @param array  $config Current configuration
@@ -2742,23 +2952,8 @@ class AdminInterface {
 		// Preserve data from all tabs except the active one
 		$tabs_to_preserve = [];
 		
-		switch ( $active_tab ) {
-			case 'defaults':
-				$tabs_to_preserve = ['providers', 'storage', 'audio_assets', 'player'];
-				break;
-			case 'providers':
-				$tabs_to_preserve = ['defaults', 'storage', 'audio_assets', 'player'];
-				break;
-			case 'storage':
-				$tabs_to_preserve = ['defaults', 'providers', 'audio_assets', 'player'];
-				break;
-			case 'audio_assets':
-				$tabs_to_preserve = ['defaults', 'providers', 'storage', 'player'];
-				break;
-			case 'player':
-				$tabs_to_preserve = ['defaults', 'providers', 'storage', 'audio_assets'];
-				break;
-		}
+		$all_tabs = ['defaults', 'providers', 'storage', 'audio_assets', 'player', 'auto_generate'];
+		$tabs_to_preserve = array_diff( $all_tabs, [ $active_tab ] );
 		
 		foreach ( $tabs_to_preserve as $tab ) {
 			$this->renderHiddenFieldsForTab( $config, $tab );
@@ -2785,6 +2980,38 @@ class AdminInterface {
 			case 'audio_assets':
 				$this->renderHiddenAudioAssetsFields( $config );
 				break;
+			case 'auto_generate':
+				$this->renderHiddenAutoGenerateFields( $config );
+				break;
+		}
+	}
+
+	/**
+	 * Render hidden fields for auto-generate tab
+	 *
+	 * Reproduces the current auto-generate state so saving any other tab
+	 * does not wipe these settings. Unchecked booleans are simply omitted:
+	 * sanitizeSettings() only processes the section when the '_submitted'
+	 * marker is present, so omitting everything leaves the saved values.
+	 */
+	private function renderHiddenAutoGenerateFields( array $config ): void {
+		$auto_generate = $config['auto_generate'] ?? [];
+
+		echo '<input type="hidden" name="wp_tts_config[auto_generate][_submitted]" value="1" />';
+
+		if ( ! empty( $auto_generate['enabled'] ) ) {
+			echo '<input type="hidden" name="wp_tts_config[auto_generate][enabled]" value="1" />';
+		}
+		if ( ! empty( $auto_generate['on_publish_only'] ) ) {
+			echo '<input type="hidden" name="wp_tts_config[auto_generate][on_publish_only]" value="1" />';
+		}
+
+		foreach ( (array) ( $auto_generate['categories'] ?? [] ) as $category_id ) {
+			echo '<input type="hidden" name="wp_tts_config[auto_generate][categories][]" value="' . esc_attr( $category_id ) . '" />';
+		}
+
+		foreach ( (array) ( $auto_generate['post_types'] ?? [ 'post' ] ) as $post_type ) {
+			echo '<input type="hidden" name="wp_tts_config[auto_generate][post_types][]" value="' . esc_attr( $post_type ) . '" />';
 		}
 	}
 
@@ -3368,6 +3595,31 @@ class AdminInterface {
 				}
 			}
 			$config->updateDefaults( $defaults );
+		}
+
+		// Process auto-generate settings (only when the section was actually
+		// submitted — the '_submitted' marker distinguishes "all checkboxes
+		// unchecked" from "tab not present in this request")
+		if ( isset( $input['auto_generate'] ) && is_array( $input['auto_generate'] )
+			&& ! empty( $input['auto_generate']['_submitted'] ) ) {
+			$auto_generate_settings = [];
+			$auto_generate_settings['enabled'] = isset( $input['auto_generate']['enabled'] );
+			$auto_generate_settings['on_publish_only'] = isset( $input['auto_generate']['on_publish_only'] );
+			$auto_generate_settings['use_default_config'] = true;
+
+			// Categories (array of term IDs)
+			$auto_generate_settings['categories'] = [];
+			if ( isset( $input['auto_generate']['categories'] ) && is_array( $input['auto_generate']['categories'] ) ) {
+				$auto_generate_settings['categories'] = array_map( 'intval', $input['auto_generate']['categories'] );
+			}
+
+			// Post types (array of post type names)
+			$auto_generate_settings['post_types'] = [ 'post' ];
+			if ( isset( $input['auto_generate']['post_types'] ) && is_array( $input['auto_generate']['post_types'] ) ) {
+				$auto_generate_settings['post_types'] = array_map( 'sanitize_text_field', $input['auto_generate']['post_types'] );
+			}
+
+			$config->updateAutoGenerateSettings( $auto_generate_settings );
 		}
 
 		// Top-level default provider selector

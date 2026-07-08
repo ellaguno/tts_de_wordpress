@@ -9,6 +9,7 @@ namespace WP_TTS\Services;
 
 use WP_TTS\Utils\Logger;
 use WP_TTS\Utils\TTSMetaManager;
+use WP_TTS\Utils\TextProcessor;
 use WP_TTS\Interfaces\CacheServiceInterface;
 use WP_TTS\Core\StorageProviderFactory;
 use WP_TTS\Core\ConfigurationManager;
@@ -67,7 +68,74 @@ class TTSService {
 		$this->config_manager = new ConfigurationManager();
 		$this->storage_factory = new StorageProviderFactory( $this->config_manager );
 	}
-	
+
+	/**
+	 * Check rate limiting for audio generation
+	 *
+	 * @param int  $user_id User ID (0 for anonymous).
+	 * @param bool $is_auto_generate Whether this is an auto-generation request.
+	 * @return bool|array True if allowed, array with error info if rate limited.
+	 */
+	private function checkRateLimit( int $user_id = 0, bool $is_auto_generate = false ) {
+		// Bypass rate limiting for auto-generation (system-initiated)
+		// Auto-generation runs in cron/shutdown context where there's no user
+		// and we don't want to rate-limit automated processes
+		if ( $is_auto_generate ) {
+			return true;
+		}
+
+		$user_id = $user_id ?: get_current_user_id();
+
+		// If user_id is 0 (cron/background), bypass for known background contexts
+		if ( $user_id === 0 ) {
+			$is_cron = defined( 'DOING_CRON' ) && DOING_CRON;
+			$is_cli = defined( 'WP_CLI' ) && WP_CLI;
+
+			if ( $is_cron || $is_cli ) {
+				return true;
+			}
+		}
+
+		$rate_key = 'wp_tts_rate_' . $user_id;
+		$rate_data = get_transient( $rate_key );
+
+		// Rate limit configuration
+		$max_requests = apply_filters( 'wp_tts_rate_limit_max', 10 ); // 10 requests
+		$time_window = apply_filters( 'wp_tts_rate_limit_window', 60 ); // per 60 seconds
+
+		if ( false === $rate_data ) {
+			// First request
+			set_transient( $rate_key, [ 'count' => 1, 'start' => time() ], $time_window );
+			return true;
+		}
+
+		$count = $rate_data['count'] ?? 0;
+		$start = $rate_data['start'] ?? time();
+
+		// Check if we're still in the same time window
+		if ( ( time() - $start ) < $time_window ) {
+			if ( $count >= $max_requests ) {
+				$remaining = $time_window - ( time() - $start );
+				return [
+					'limited' => true,
+					'message' => sprintf(
+						/* translators: %d: number of seconds to wait */
+						__( 'Límite de solicitudes excedido. Por favor espera %d segundos.', 'tts-sesolibre' ),
+						$remaining
+					),
+					'retry_after' => $remaining
+				];
+			}
+			// Increment count
+			set_transient( $rate_key, [ 'count' => $count + 1, 'start' => $start ], $time_window - ( time() - $start ) );
+		} else {
+			// Time window expired, reset
+			set_transient( $rate_key, [ 'count' => 1, 'start' => time() ], $time_window );
+		}
+
+		return true;
+	}
+
 	/**
 	 * Generate audio from text
 	 *
@@ -77,6 +145,19 @@ class TTSService {
 	 */
 	public function generateAudio( string $text, array $options = [] ): ?array {
 		try {
+			// Check rate limiting first (bypassed for auto-generation and cron/CLI)
+			$is_auto_generate = ! empty( $options['is_auto_generate'] );
+			$rate_check = $this->checkRateLimit( 0, $is_auto_generate );
+			if ( is_array( $rate_check ) && ! empty( $rate_check['limited'] ) ) {
+				$this->logger->warning( 'Rate limit exceeded for user', [ 'user_id' => get_current_user_id() ] );
+				return [
+					'success' => false,
+					'message' => $rate_check['message'],
+					'error_code' => 'RATE_LIMITED',
+					'retry_after' => $rate_check['retry_after']
+				];
+			}
+
 			$this->logger->info( 'Starting TTS generation (Round Robin DISABLED)', [ 'text_length' => strlen( $text ) ] );
 			$this->logger->debug( '[generateAudio] Initial options received', $options );
 
@@ -525,11 +606,12 @@ class TTSService {
 	/**
 	 * Generate audio for a WordPress post
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int  $post_id Post ID.
+	 * @param bool $is_auto_generate Whether this is a system-initiated auto-generation (bypasses rate limiting).
 	 * @return object Audio result object.
 	 * @throws \Exception If generation fails.
 	 */
-	public function generateAudioForPost( int $post_id ) {
+	public function generateAudioForPost( int $post_id, bool $is_auto_generate = false ) {
 		// Per-post lock: a double click or a simultaneous cron+manual trigger
 		// would otherwise run two paid generations and publish two episodes.
 		// add_option() is atomic (INSERT), unlike get+set on a transient.
@@ -551,10 +633,11 @@ class TTSService {
 				throw new \Exception( 'Post not found' );
 			}
 			
-			// Get post content and strip HTML
-			$content = wp_strip_all_tags( $post->post_content );
+			// Get post content using TextProcessor (filters Gutenberg blocks
+			// not suited for audio — images, embeds, HTML — and strips HTML smartly)
+			$full_text = TextProcessor::extractPostContent( $post_id );
 			$title = $post->post_title;
-			$full_text = $title . '. ' . $content;
+			$content = substr( $full_text, strlen( $title ) + 2 ); // Remove title prefix for logging
 			
 			$this->logger->info( 'Post content extracted', [
 				'post_id' => $post_id,
@@ -725,6 +808,7 @@ class TTSService {
 				'provider' => $provider_from_meta, // Pass the potentially empty provider to generateAudio
 				'voice' => $voice,
 				'post_id' => $post_id,
+				'is_auto_generate' => $is_auto_generate,
 			];
 			
 			$result = $this->generateAudio( $full_text, $options );
