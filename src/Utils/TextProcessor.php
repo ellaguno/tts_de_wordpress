@@ -33,7 +33,11 @@ class TextProcessor {
 
 		// Remove shortcodes but keep their content where possible
 		$content = self::processShortcodes( $content );
-		
+
+		// Remove elements matching user-configured CSS selectors and any
+		// aria-hidden="true" elements (e.g. numbered reference links)
+		$content = self::removeExcludedElements( $content );
+
 		// Strip HTML tags but preserve basic structure
 		$content = self::stripHtmlSmart( $content );
 		
@@ -171,6 +175,148 @@ class TextProcessor {
 		// Clean up URLs that might appear alone (from removed links context)
 		// Keep URLs that are part of sentences, remove standalone URLs
 		$content = preg_replace( '/(?<!["\'])(https?:\/\/[^\s<>"\']+)(?!["\'])/i', '', $content );
+
+		return $content;
+	}
+
+	/**
+	 * Remove HTML elements that should never reach the TTS engine
+	 *
+	 * Two sources of exclusion:
+	 * 1. Elements with aria-hidden="true" — by definition not meant to be
+	 *    read aloud (e.g. numbered reference links rendered as "1 2 3 4 5"
+	 *    that otherwise get spoken as "twelve thousand three hundred...").
+	 * 2. User-configured CSS selectors from Settings → Defaults
+	 *    (defaults.excluded_css_selectors): comma-separated list of
+	 *    .class-name or #element-id tokens (a bare token is treated as a
+	 *    class name).
+	 *
+	 * @param string      $content   HTML content
+	 * @param string|null $selectors Comma-separated selectors; null = read from plugin config
+	 * @return string Content with excluded elements removed
+	 */
+	public static function removeExcludedElements( string $content, ?string $selectors = null ): string {
+		if ( strpos( $content, '<' ) === false ) {
+			return $content;
+		}
+
+		if ( $selectors === null ) {
+			$config    = get_option( 'wp_tts_config', array() );
+			$selectors = $config['defaults']['excluded_css_selectors'] ?? '.aicg-references';
+		}
+
+		$tokens = array_filter( array_map( 'trim', explode( ',', (string) $selectors ) ) );
+
+		if ( class_exists( '\DOMDocument' ) ) {
+			return self::removeExcludedElementsDom( $content, $tokens );
+		}
+
+		return self::removeExcludedElementsRegex( $content, $tokens );
+	}
+
+	/**
+	 * DOM-based removal (robust against nested markup)
+	 *
+	 * @param string $content HTML content
+	 * @param array  $tokens  Selector tokens (.class, #id or bare class name)
+	 * @return string Filtered content
+	 */
+	private static function removeExcludedElementsDom( string $content, array $tokens ): string {
+		$dom = new \DOMDocument();
+		$previous_errors = libxml_use_internal_errors( true );
+		$loaded = $dom->loadHTML(
+			'<?xml encoding="UTF-8"><html><body>' . $content . '</body></html>',
+			LIBXML_NOWARNING | LIBXML_NOERROR
+		);
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_errors );
+
+		if ( ! $loaded ) {
+			return self::removeExcludedElementsRegex( $content, $tokens );
+		}
+
+		$xpath   = new \DOMXPath( $dom );
+		$queries = array( '//*[@aria-hidden="true"]' );
+
+		foreach ( $tokens as $token ) {
+			if ( strpos( $token, '#' ) === 0 ) {
+				$queries[] = sprintf( '//*[@id="%s"]', substr( $token, 1 ) );
+			} else {
+				$class_name = ltrim( $token, '.' );
+				if ( $class_name !== '' ) {
+					$queries[] = sprintf(
+						'//*[contains(concat(" ", normalize-space(@class), " "), " %s ")]',
+						$class_name
+					);
+				}
+			}
+		}
+
+		foreach ( $queries as $query ) {
+			$nodes = $xpath->query( $query );
+			if ( ! $nodes ) {
+				continue;
+			}
+			// Iterate over a static copy: removing while iterating a live
+			// DOMNodeList skips nodes
+			foreach ( iterator_to_array( $nodes ) as $node ) {
+				if ( $node->parentNode ) {
+					$node->parentNode->removeChild( $node );
+				}
+			}
+		}
+
+		$body = $dom->getElementsByTagName( 'body' )->item( 0 );
+		if ( ! $body ) {
+			return $content;
+		}
+
+		$html = '';
+		foreach ( $body->childNodes as $child ) {
+			$html .= $dom->saveHTML( $child );
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Regex fallback when the DOM extension is unavailable
+	 *
+	 * Less robust with nested identical tags, but covers the common case of
+	 * flat reference/link containers.
+	 *
+	 * @param string $content HTML content
+	 * @param array  $tokens  Selector tokens
+	 * @return string Filtered content
+	 */
+	private static function removeExcludedElementsRegex( string $content, array $tokens ): string {
+		// aria-hidden="true" elements
+		$content = preg_replace(
+			'/<(\w+)[^>]*\baria-hidden=["\']true["\'][^>]*>.*?<\/\1>/is',
+			'',
+			$content
+		);
+
+		foreach ( $tokens as $token ) {
+			if ( strpos( $token, '#' ) === 0 ) {
+				$id = preg_quote( substr( $token, 1 ), '/' );
+				$content = preg_replace(
+					'/<(\w+)[^>]*\bid=["\']' . $id . '["\'][^>]*>.*?<\/\1>/is',
+					'',
+					$content
+				);
+			} else {
+				$class_name = preg_quote( ltrim( $token, '.' ), '/' );
+				if ( $class_name === '' ) {
+					continue;
+				}
+				$content = preg_replace(
+					'/<(\w+)[^>]*\bclass=["\'][^"\']*\b' . $class_name . '\b[^"\']*["\'][^>]*>.*?<\/\1>/is',
+					'',
+					$content
+				);
+			}
+		}
 
 		return $content;
 	}

@@ -481,7 +481,17 @@ class AdminInterface {
 		echo '<p class="description">' . esc_html__( 'Tamaño máximo de caché en megabytes.', 'tts-sesolibre' ) . '</p>';
 		echo '</td>';
 		echo '</tr>';
-		
+
+		// Excluded CSS selectors
+		$excluded_selectors = $config['defaults']['excluded_css_selectors'] ?? '.aicg-references';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__( 'Elementos excluidos de la lectura', 'tts-sesolibre' ) . '</th>';
+		echo '<td>';
+		echo '<input type="text" class="regular-text" name="wp_tts_config[defaults][excluded_css_selectors]" value="' . esc_attr( $excluded_selectors ) . '" placeholder=".aicg-references, #referencias" />';
+		echo '<p class="description">' . esc_html__( 'Selectores CSS separados por comas (.clase o #id). Los elementos que coincidan se eliminan del texto antes de generar el audio (ej. bloques de referencias numeradas). Los elementos con aria-hidden="true" siempre se excluyen.', 'tts-sesolibre' ) . '</p>';
+		echo '</td>';
+		echo '</tr>';
+
 		echo '</table>';
 		echo '</div>';
 	}
@@ -3024,7 +3034,7 @@ class AdminInterface {
 		$fields = [
 			'default_provider', 'default_storage', 'auto_generate', 'voice_speed',
 			'voice_pitch', 'audio_format', 'audio_quality', 'enable_ssml',
-			'add_pauses', 'background_processing'
+			'add_pauses', 'background_processing', 'excluded_css_selectors'
 		];
 		
 		foreach ( $fields as $field ) {

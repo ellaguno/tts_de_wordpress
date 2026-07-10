@@ -145,6 +145,9 @@ class ConfigurationManager {
 			'enable_ssml'           => true,
 			'add_pauses'            => true,
 			'background_processing' => true,
+			// Comma-separated CSS selectors (.class or #id) whose elements are
+			// stripped from post content before TTS generation
+			'excluded_css_selectors' => '.aicg-references',
 		),
 		'cache'         => array(
 			'cache_duration'    => 86400, // 24 hours
